@@ -61,7 +61,7 @@ This project is licensed under the GPL v2 or later. See the [LICENSE](LICENSE) f
 
 ## Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/yourusername/wp-dev-toolkit/issues) on our GitHub repository.
+If you encounter any issues or have questions, please [open an issue](https://github.com/mralaminahamed/wp-dev-toolkit/issues) on our GitHub repository.
 
 ## Acknowledgements
 
