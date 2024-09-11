@@ -1,0 +1,50 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Build files
+/build
+
+# WordPress
+/wp-admin/
+/wp-content/
+/wp-includes/
+/wp-*.php
+/.htaccess
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# PHP files
+*.php~
+
+# Composer
+composer.phar
+
+# Unit test / coverage reports
+phpunit.xml
+.phpunit.result.cache
+/coverage/
+
+# Compiled JavaScript
+*.min.js
