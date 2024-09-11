@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress Development Toolkit">
+    <description>WordPress Development Toolkit coding standards</description>
+
+    <!-- What to scan -->
+    <file>.</file>
+    <exclude-pattern>/vendor/</exclude-pattern>
+    <exclude-pattern>/node_modules/</exclude-pattern>
+
+    <!-- How to scan -->
+    <arg value="sp"/> <!-- Show sniff and progress -->
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+
+    <!-- Rules: WordPress Coding Standards -->
+    <config name="installed_paths" value="vendor/wp-coding-standards/wpcs"/>
+    <rule ref="WordPress">
+        <!-- Exclude rules -->
+        <exclude name="WordPress.Files.FileName"/>
+    </rule>
+
+    <!-- Rules: PHPCompatibility -->
+    <config name="testVersion" value="7.4-"/>
+    <rule ref="PHPCompatibility"/>
+
+    <!-- Rules: Custom -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+</ruleset>
