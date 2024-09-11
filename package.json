@@ -1,0 +1,29 @@
+{
+    "name": "wp-dev-toolkit",
+    "version": "1.0.0",
+    "description": "WordPress Development Toolkit with React-based control panel",
+    "scripts": {
+        "build": "wp-scripts build",
+        "start": "wp-scripts start",
+        "check-types": "tsc",
+        "lint": "wp-scripts lint-js"
+    },
+    "devDependencies": {
+        "@types/react": "^17.0.0",
+        "@types/react-dom": "^17.0.0",
+        "@types/react-router-dom": "^5.1.7",
+        "@typescript-eslint/eslint-plugin": "^4.22.0",
+        "@typescript-eslint/parser": "^4.22.0",
+        "@wordpress/scripts": "^18.0.0",
+        "node-sass": "^6.0.0",
+        "sass-loader": "^10.1.1",
+        "typescript": "^4.2.4"
+    },
+    "dependencies": {
+        "@wordpress/api-fetch": "^3.21.0",
+        "@wordpress/components": "^12.0.0",
+        "@wordpress/data": "^4.26.0",
+        "@wordpress/element": "^2.19.0",
+        "react-router-dom": "^5.2.0"
+    }
+}
