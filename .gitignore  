@@ -1,16 +1,9 @@
 # Dependencies
-/node_modules
-/vendor
+node_modules
+vendor
 
 # Build files
 /build
-
-# WordPress
-/wp-admin/
-/wp-content/
-/wp-includes/
-/wp-*.php
-/.htaccess
 
 # Environment files
 .env
