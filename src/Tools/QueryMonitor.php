@@ -38,16 +38,6 @@ class QueryMonitor implements ToolInterface {
         return rest_ensure_response(['queries' => $this->queries]);
     }
 
-    public function get_hooks() {
-        $cached_hooks = $this->get_cached_data('hooks');
-        if ($cached_hooks !== null) {
-            return rest_ensure_response(['hooks' => $cached_hooks]);
-        }
-
-        $this->set_cached_data('hooks', $this->hooks);
-        return rest_ensure_response(['hooks' => $this->hooks]);
-    }
-
     public function check_admin_permissions() {
         return current_user_can('manage_options');
     }
