@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 
 module.exports = {
@@ -13,29 +15,22 @@ module.exports = {
   },
   resolve: {
     ...defaultConfig.resolve,
-    extensions: ['.ts', '.tsx'],
+    extensions: ['.ts', '.tsx', '.js', '.json'],
   },
   module: {
     ...defaultConfig.module,
     rules: [
       ...defaultConfig.module.rules,
       {
-        test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true,
-              happyPackMode: true,
-            },
-          },
-        ],
+        test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
+          },
+        },
       },
     ],
   },
-  plugins: [
-    ...defaultConfig.plugins,
-    // Add any additional plugins here
-  ],
 };
