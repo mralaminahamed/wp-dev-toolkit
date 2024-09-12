@@ -1,6 +1,6 @@
 # Dependencies
-node_modules
-vendor
+node_modules/
+vendor/
 
 # Build files
 /build
@@ -19,6 +19,7 @@ yarn-error.log*
 # Editor directories and files
 .vscode/
 .idea/
+.yarn/
 *.swp
 *.swo
 *.swn
