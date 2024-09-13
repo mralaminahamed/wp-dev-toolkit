@@ -1,13 +1,12 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const defaultConfig = require('@wordpress/scripts/config/webpack.config');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
+
+const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 
 module.exports = {
   ...defaultConfig,
+  devtool: 'source-map',
   entry: {
     index: path.resolve(process.cwd(), 'src', 'index.tsx'),
-    // Add more entry points as needed
   },
   output: {
     ...defaultConfig.output,
@@ -16,6 +15,10 @@ module.exports = {
   resolve: {
     ...defaultConfig.resolve,
     extensions: ['.ts', '.tsx', '.js', '.json'],
+    alias: {
+      ...defaultConfig.resolve.alias,
+      '@': path.resolve(__dirname, 'src/'),
+    },
   },
   module: {
     ...defaultConfig.module,

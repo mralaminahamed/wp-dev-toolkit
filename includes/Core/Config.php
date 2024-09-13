@@ -1,52 +1,71 @@
 <?php
-// Create a new file: src/Core/Config.php
-
 namespace WPDevToolkit\Core;
 
-use function update_option;
-
 class Config {
-    private static $instance = null;
-    private $config = [];
+	private $config = [];
+	private $option_name = 'wp_dev_toolkit_config';
 
-    private function __construct() {
-        $this->load_config();
-    }
+	public function __construct() {
+		$this->load_config();
+	}
 
-    public static function get_instance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
+	private function load_config() {
+		$saved_config = get_option($this->option_name, []);
+		$this->config = array_merge($this->get_default_config(), $saved_config);
+	}
 
-    private function load_config() {
-        $default_config = [
-            'dev_mode' => false,
-            'error_logging' => true,
-            'query_monitoring' => true,
-            'hook_inspection' => true,
-        ];
+	public function get($key, $default = null) {
+		return isset($this->config[$key]) ? $this->config[$key] : $default;
+	}
 
-        $user_config = get_option('wp_dev_toolkit_config', []);
-        $this->config = array_merge($default_config, $user_config);
-    }
+	public function set($key, $value) {
+		$this->config[$key] = $value;
+		$this->save_config();
+	}
 
-    public function get($key, $default = null) {
-        return isset($this->config[$key]) ? $this->config[$key] : $default;
-    }
+	public function get_all() {
+		return $this->config;
+	}
 
-    public function set($key, $value) {
-        $this->config[$key] = $value;
-        update_option('wp_dev_toolkit_config', $this->config);
-    }
+	public function update($new_config) {
+		$this->config = array_merge($this->config, $new_config);
+		$this->save_config();
+	}
+
+	private function save_config() {
+		update_option($this->option_name, $this->config);
+	}
+
+	public function set_default_options() {
+		$this->config = $this->get_default_config();
+		$this->save_config();
+	}
+
+	public function reset_to_defaults() {
+		$this->set_default_options();
+	}
+
+	private function get_default_config() {
+		return [
+			'dev_mode' => false,
+			'error_logging' => true,
+			'query_monitoring' => true,
+			'hook_inspection' => true,
+			'debug_bar_integration' => true,
+			'log_retention_days' => 30,
+			'allowed_ip_addresses' => [],
+			'excluded_hooks' => [],
+			'excluded_queries' => [],
+		];
+	}
+
+	public function validate_config() {
+		$default_config = $this->get_default_config();
+		foreach ($default_config as $key => $default_value) {
+			if (!isset($this->config[$key])) {
+				$this->config[$key] = $default_value;
+			}
+		}
+		$this->save_config();
+	}
 }
-
-// Usage example:
-//use WPDevToolkit\Core\Config;
-//use function WPDevToolkit\Core\get_option;
-//use function WPDevToolkit\Core\update_option;
-//
-//$config = Config::get_instance();
-//$dev_mode = $config->get('dev_mode');
-//$config->set('dev_mode', true);
