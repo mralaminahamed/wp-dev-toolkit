@@ -1,0 +1,22 @@
+wp-dev-toolkit/
+├── wp-dev-toolkit.php (main plugin file)
+├── includes/
+│   ├── api/
+│   │   ├── class-rest-base.php
+│   │   ├── class-dev-mode.php
+│   │   ├── class-error-log.php
+│   │   ├── class-query-monitor.php
+│   │   └── class-hook-inspector.php
+│   └── (other PHP files)
+├── src/
+│   ├── components/
+│   │   ├── Dashboard.tsx
+│   │   ├── ErrorLog.tsx
+│   │   ├── QueryMonitor.tsx
+│   │   └── HookInspector.tsx
+│   ├── App.tsx
+│   └── index.tsx
+├── build/
+│   ├── index.js
+│   └── index.css
+└── (other directories and files)
