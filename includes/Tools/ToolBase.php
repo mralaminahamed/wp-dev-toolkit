@@ -18,7 +18,7 @@ abstract class ToolBase implements ToolInterface {
 		return $this->config->get(static::TOOL_KEY, false);
 	}
 
-	protected function check_admin_permissions() {
+	public function check_admin_permissions() {
 		return current_user_can('manage_options');
 	}
 }

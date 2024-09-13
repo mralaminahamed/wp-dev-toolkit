@@ -1,6 +1,8 @@
 import apiFetch from '@wordpress/api-fetch';
 import { ToggleControl, Button } from '@wordpress/components';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
 
 interface Config {
   dev_mode: boolean;
@@ -10,12 +12,7 @@ interface Config {
 }
 
 const Dashboard: React.FC = () => {
-  const [config, setConfig] = useState<Config>({
-    dev_mode: false,
-    error_logging: true,
-    query_monitoring: true,
-    hook_inspection: true,
-  });
+  const { config, setConfig, toggleTool } = useWPDevToolkit();
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -24,21 +21,23 @@ const Dashboard: React.FC = () => {
 
   const fetchConfig = async () => {
     try {
-      const response = await apiFetch({ path: 'wp-dev-toolkit/v1/config' });
+      const response = await apiFetch<Config>({ path: 'wp-dev-toolkit/v1/config' });
       setConfig(response);
     } catch (error) {
       console.error('Error fetching config:', error);
     }
   };
 
-  const updateConfig = async (newConfig: Partial<Config>) => {
+  const updateConfig = async (toolName: keyof Config) => {
     setIsSaving(true);
     try {
-      const updatedConfig = await apiFetch({
+      const newValue = !config[toolName];
+      const updatedConfig = await apiFetch<Config>({
         path: 'wp-dev-toolkit/v1/config',
         method: 'POST',
-        data: newConfig,
+        data: { [toolName]: newValue },
       });
+      toggleTool(toolName);
       setConfig(updatedConfig);
     } catch (error) {
       console.error('Error updating config:', error);
@@ -50,10 +49,10 @@ const Dashboard: React.FC = () => {
     <div className="wp-dev-toolkit-dashboard">
       <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
       <div className="space-y-4">
-        <ToggleControl label="Development Mode" checked={config.dev_mode} onChange={value => updateConfig({ dev_mode: value })} />
-        <ToggleControl label="Error Logging" checked={config.error_logging} onChange={value => updateConfig({ error_logging: value })} />
-        <ToggleControl label="Query Monitoring" checked={config.query_monitoring} onChange={value => updateConfig({ query_monitoring: value })} />
-        <ToggleControl label="Hook Inspection" checked={config.hook_inspection} onChange={value => updateConfig({ hook_inspection: value })} />
+        <ToggleControl label="Development Mode" checked={config.dev_mode} onChange={() => updateConfig('dev_mode')} />
+        <ToggleControl label="Error Logging" checked={config.error_logging} onChange={() => updateConfig('error_logging')} />
+        <ToggleControl label="Query Monitoring" checked={config.query_monitoring} onChange={() => updateConfig('query_monitoring')} />
+        <ToggleControl label="Hook Inspection" checked={config.hook_inspection} onChange={() => updateConfig('hook_inspection')} />
       </div>
       <div className="mt-6">
         <Button isPrimary onClick={fetchConfig} disabled={isSaving}>

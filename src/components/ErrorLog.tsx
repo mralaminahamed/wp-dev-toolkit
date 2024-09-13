@@ -42,7 +42,7 @@ const ErrorLog: React.FC = () => {
       <h2 className="text-xl font-semibold mb-4">Error Log</h2>
       <div className="mb-4">
         <TextareaControl
-          value={logContent}
+          value={logContent|| ""}
           readOnly
           rows={20}
           className="w-full font-mono text-sm"

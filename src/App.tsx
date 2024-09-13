@@ -6,6 +6,7 @@ import Dashboard from '@/components/Dashboard';
 import ErrorLog from '@/components/ErrorLog';
 import HookInspector from '@/components/HookInspector';
 import QueryMonitor from '@/components/QueryMonitor';
+import { JSX } from 'react/jsx-runtime';
 
 const App: React.FC = () => {
   const tabs = [
@@ -51,7 +52,7 @@ const App: React.FC = () => {
               }}
               tabs={tabs}
             >
-              {tab => <tab.component />}
+              {(tab: { component: JSX.IntrinsicAttributes }) => <tab.component />}
             </TabPanel>
           </CardBody>
         </Card>
