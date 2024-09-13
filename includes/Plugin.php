@@ -2,6 +2,8 @@
 namespace WPDevToolkit;
 
 use WPDevToolkit\Core\Config;
+use WPDevToolkit\Tools\ToolFactory;
+use WPDevToolkit\Tools\ToolInterface;
 
 class Plugin {
 	private $config;
@@ -98,7 +100,7 @@ class Plugin {
 		return rest_ensure_response($this->config->get_all());
 	}
 
-	public function check_admin_permissions() {
+	public function check_admin_permissions(): bool {
 		return current_user_can('manage_options');
 	}
 

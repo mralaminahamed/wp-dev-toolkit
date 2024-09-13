@@ -2,7 +2,6 @@
 namespace WPDevToolkit\Tools;
 
 use WPDevToolkit\Core\Config;
-use WPDevToolkit\ToolInterface;
 
 abstract class ToolBase implements ToolInterface {
 	protected $config;

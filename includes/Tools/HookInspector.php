@@ -4,7 +4,6 @@
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
-use WPDevToolkit\ToolInterface;
 use function add_action;
 use function current_user_can;
 use function get_option;

@@ -42,7 +42,7 @@ add_action( 'plugins_loaded', 'wp_dev_toolkit_init' );
  */
 function wp_dev_toolkit_init() {
 	$config = new WPDevToolkit\Core\Config();
-	$tool_factory = new WPDevToolkit\ToolFactory();
+	$tool_factory = new \WPDevToolkit\Tools\ToolFactory();
 	$plugin = new WPDevToolkit\Plugin( $config, $tool_factory );
 	$plugin->init();
 

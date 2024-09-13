@@ -1,39 +1,22 @@
-import { Card, CardBody, CardHeader, TabPanel } from '@wordpress/components';
+import { Card, CardBody, CardHeader } from '@wordpress/components';
 import React from 'react';
-import { HashRouter as Router } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 import Dashboard from '@/components/Dashboard';
 import ErrorLog from '@/components/ErrorLog';
 import HookInspector from '@/components/HookInspector';
 import QueryMonitor from '@/components/QueryMonitor';
-import { JSX } from 'react/jsx-runtime';
+import Settings from '@/components/Settings';
+import Terminal from '@/components/Terminal';
 
 const App: React.FC = () => {
   const tabs = [
-    {
-      name: 'dashboard',
-      title: 'Dashboard',
-      className: 'tab-dashboard',
-      component: Dashboard,
-    },
-    {
-      name: 'error-log',
-      title: 'Error Log',
-      className: 'tab-error-log',
-      component: ErrorLog,
-    },
-    {
-      name: 'query-monitor',
-      title: 'Query Monitor',
-      className: 'tab-query-monitor',
-      component: QueryMonitor,
-    },
-    {
-      name: 'hook-inspector',
-      title: 'Hook Inspector',
-      className: 'tab-hook-inspector',
-      component: HookInspector,
-    },
+    { name: 'dashboard', title: 'Dashboard', component: Dashboard },
+    { name: 'error-log', title: 'Error Log', component: ErrorLog },
+    { name: 'query-monitor', title: 'Query Monitor', component: QueryMonitor },
+    { name: 'hook-inspector', title: 'Hook Inspector', component: HookInspector },
+    { name: 'terminal', title: 'Terminal', component: Terminal },
+    { name: 'settings', title: 'Settings', component: Settings },
   ];
 
   return (
@@ -44,16 +27,23 @@ const App: React.FC = () => {
             <h1 className="text-2xl font-bold">WordPress Development Toolkit</h1>
           </CardHeader>
           <CardBody>
-            <TabPanel
-              className="wp-dev-toolkit-tab-panel"
-              activeClass="active-tab"
-              onSelect={(tabName: string) => {
-                window.location.hash = tabName;
-              }}
-              tabs={tabs}
-            >
-              {(tab: { component: JSX.IntrinsicAttributes }) => <tab.component />}
-            </TabPanel>
+            <nav className="mb-4">
+              <ul className="flex space-x-4">
+                {tabs.map(tab => (
+                  <li key={tab.name}>
+                    <Link to={`/${tab.name}`} className="text-blue-500 hover:text-blue-700">
+                      {tab.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              {tabs.map(tab => (
+                <Route key={tab.name} path={`/${tab.name}`} element={<tab.component />} />
+              ))}
+            </Routes>
           </CardBody>
         </Card>
       </div>
