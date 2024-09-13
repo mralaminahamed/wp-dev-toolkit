@@ -34,7 +34,7 @@ After activation, you'll find a new "Dev Toolkit" menu item in your WordPress ad
 You can configure the plugin by modifying the `wp-config.php` file or using the provided Config class:
 
 ```php
-use WPDevToolkit\Core\Config;
+use includes\Core\Config;
 
 $config = Config::get_instance();
 $config->set('dev_mode', true);

@@ -1,38 +1,53 @@
-// src/App.tsx
-import React from 'react';
-import { Route, Switch, Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '@wordpress/components';
-import Dashboard from './components/Dashboard';
-import ErrorLog from './components/ErrorLog';
-import QueryMonitor from './components/QueryMonitor';
-import HookInspector from './components/HookInspector';
+import React from 'react';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
+import Dashboard from '@/components/Dashboard';
+import ErrorLog from '@/components/ErrorLog';
+import HookInspector from '@/components/HookInspector';
+import QueryMonitor from '@/components/QueryMonitor';
+import Settings from '@/components/Settings';
+import Terminal from '@/components/Terminal';
 
 const App: React.FC = () => {
-  return (
-    <div className="wp-dev-toolkit-app">
-      <nav>
-        <ul>
-          <li><Link to="/">Dashboard</Link></li>
-          <li><Link to="/error-log">Error Log</Link></li>
-          <li><Link to="/query-monitor">Query Monitor</Link></li>
-          <li><Link to="/hook-inspector">Hook Inspector</Link></li>
-        </ul>
-      </nav>
+  const tabs = [
+    { name: 'dashboard', title: 'Dashboard', component: Dashboard },
+    { name: 'error-log', title: 'Error Log', component: ErrorLog },
+    { name: 'query-monitor', title: 'Query Monitor', component: QueryMonitor },
+    { name: 'hook-inspector', title: 'Hook Inspector', component: HookInspector },
+    { name: 'terminal', title: 'Terminal', component: Terminal },
+    { name: 'settings', title: 'Settings', component: Settings },
+  ];
 
-      <Card>
-        <CardHeader>
-          <h1>WordPress Development Toolkit</h1>
-        </CardHeader>
-        <CardBody>
-          <Switch>
-            <Route exact path="/" component={Dashboard} />
-            <Route path="/error-log" component={ErrorLog} />
-            <Route path="/query-monitor" component={QueryMonitor} />
-            <Route path="/hook-inspector" component={HookInspector} />
-          </Switch>
-        </CardBody>
-      </Card>
-    </div>
+  return (
+    <Router>
+      <div className="wp-dev-toolkit-app">
+        <Card>
+          <CardHeader>
+            <h1 className="text-2xl font-bold">WordPress Development Toolkit</h1>
+          </CardHeader>
+          <CardBody>
+            <nav className="mb-4">
+              <ul className="flex space-x-4">
+                {tabs.map(tab => (
+                  <li key={tab.name}>
+                    <Link to={`/${tab.name}`} className="text-blue-500 hover:text-blue-700">
+                      {tab.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              {tabs.map(tab => (
+                <Route key={tab.name} path={`/${tab.name}`} element={<tab.component />} />
+              ))}
+            </Routes>
+          </CardBody>
+        </Card>
+      </div>
+    </Router>
   );
 };
 

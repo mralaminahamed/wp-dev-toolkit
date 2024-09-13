@@ -1,33 +1,20 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom styles for WP Dev Toolkit */
 .wp-dev-toolkit-app {
-    max-width: 800px;
-    margin: 0 auto;
+  @apply p-4;
+}
 
-    nav {
-      ul {
-        display: flex;
-        list-style-type: none;
-        padding: 0;
-        margin-bottom: 20px;
+.wp-dev-toolkit-tab-panel {
+  @apply mt-4;
+}
 
-        li {
-          margin-right: 20px;
+.wp-dev-toolkit-tab-panel button {
+  @apply mr-2 mb-2;
+}
 
-          a {
-            text-decoration: none;
-            color: #0073aa;
-            font-weight: bold;
-
-            &:hover {
-              color: #00a0d2;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .wp-dev-toolkit-dashboard {
-    .components-toggle-control {
-      margin-bottom: 20px;
-    }
-  }
+.active-tab {
+  @apply bg-blue-500 text-white;
+}

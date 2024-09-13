@@ -3,8 +3,14 @@
 // src/Tools/HookInspector.php
 namespace WPDevToolkit\Tools;
 
-use WPDevToolkit\Core\ToolInterface;
 use WP_REST_Server;
+use function add_action;
+use function current_user_can;
+use function get_option;
+use function get_transient;
+use function register_rest_route;
+use function rest_ensure_response;
+use function set_transient;
 
 class HookInspector implements ToolInterface {
     private $hooks = [];
@@ -28,6 +34,12 @@ class HookInspector implements ToolInterface {
     }
 
     public function get_hooks() {
+        $cached_hooks = $this->get_cached_data('hooks');
+        if ($cached_hooks !== null) {
+            return rest_ensure_response(['hooks' => $cached_hooks]);
+        }
+
+        $this->set_cached_data('hooks', $this->hooks);
         return rest_ensure_response(['hooks' => $this->hooks]);
     }
 
@@ -45,25 +57,5 @@ class HookInspector implements ToolInterface {
 
     private function set_cached_data($key, $data, $expiration = 300) {
         set_transient('wp_dev_toolkit_' . $key, $data, $expiration);
-    }
-
-    public function get_queries() {
-        $cached_queries = $this->get_cached_data('queries');
-        if ($cached_queries !== null) {
-            return rest_ensure_response(['queries' => $cached_queries]);
-        }
-
-        $this->set_cached_data('queries', $this->queries);
-        return rest_ensure_response(['queries' => $this->queries]);
-    }
-
-    public function get_hooks() {
-        $cached_hooks = $this->get_cached_data('hooks');
-        if ($cached_hooks !== null) {
-            return rest_ensure_response(['hooks' => $cached_hooks]);
-        }
-
-        $this->set_cached_data('hooks', $this->hooks);
-        return rest_ensure_response(['hooks' => $this->hooks]);
     }
 }

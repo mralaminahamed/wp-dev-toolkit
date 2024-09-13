@@ -1,29 +1,55 @@
 {
-    "name": "wp-dev-toolkit",
-    "version": "1.0.0",
-    "description": "WordPress Development Toolkit with React-based control panel",
-    "scripts": {
-        "build": "wp-scripts build",
-        "start": "wp-scripts start",
-        "check-types": "tsc",
-        "lint": "wp-scripts lint-js"
-    },
-    "devDependencies": {
-        "@types/react": "^17.0.0",
-        "@types/react-dom": "^17.0.0",
-        "@types/react-router-dom": "^5.1.7",
-        "@typescript-eslint/eslint-plugin": "^4.22.0",
-        "@typescript-eslint/parser": "^4.22.0",
-        "@wordpress/scripts": "^18.0.0",
-        "node-sass": "^6.0.0",
-        "sass-loader": "^10.1.1",
-        "typescript": "^4.2.4"
-    },
-    "dependencies": {
-        "@wordpress/api-fetch": "^3.21.0",
-        "@wordpress/components": "^12.0.0",
-        "@wordpress/data": "^4.26.0",
-        "@wordpress/element": "^2.19.0",
-        "react-router-dom": "^5.2.0"
-    }
+  "name": "wp-dev-toolkit",
+  "version": "1.0.0",
+  "description": "WordPress Development Toolkit with React-based control panel",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+    "test": "wp-scripts test-unit-js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^22.5.4",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/wordpress__api-fetch": "^3.23.1",
+    "@types/wordpress__components": "^23.8.0",
+    "@types/wordpress__element": "^2.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
+    "@typescript-eslint/parser": "^8.5.0",
+    "@wordpress/scripts": "^29.0.0",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.0.1",
+    "css-loader": "^7.1.2",
+    "eslint": "8",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.36.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "postcss": "^8.4.45",
+    "postcss-loader": "^8.1.1",
+    "prettier": "^3.3.3",
+    "scss": "^0.2.4",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^3.4.11",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/typography": "^0.5.15",
+    "@wordpress/api-fetch": "^7.7.0",
+    "@wordpress/components": "^28.7.0",
+    "@wordpress/data": "^10.7.0",
+    "@wordpress/element": "^6.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  }
 }
