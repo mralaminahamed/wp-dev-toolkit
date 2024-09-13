@@ -14,10 +14,15 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-require_once __DIR__ . '/vendor/autoload.php';
+// Check if Composer's autoloader exists and load it
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require __DIR__ . '/vendor/autoload.php';
+} else {
+    wp_die('Composer autoloader not found. Please run "composer install" in the plugin directory.');
+}
 
-use WPDevToolkit\Core\Plugin;
-use WPDevToolkit\Core\ToolFactory;
+use WPDevToolkit\Plugin;
+use WPDevToolkit\ToolFactory;
 use WPDevToolkit\Tools\ErrorLogger;
 use WPDevToolkit\Tools\QueryMonitor;
 use WPDevToolkit\Tools\HookInspector;
@@ -56,4 +61,6 @@ class WPDevToolkit {
 }
 
 // Initialize the plugin
-WPDevToolkit::get_instance();
+add_action('plugins_loaded', function() {
+    WPDevToolkit::get_instance();
+});

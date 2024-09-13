@@ -1,7 +1,7 @@
 <?php
 
 // src/Core/ToolInterface.php
-namespace WPDevToolkit\Core;
+namespace WPDevToolkit;
 
 interface ToolInterface {
     public function init();

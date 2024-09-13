@@ -1,6 +1,6 @@
 <?php
 // src/Core/ToolFactory.php
-namespace WPDevToolkit\Core;
+namespace WPDevToolkit;
 
 class ToolFactory {
     private $tools = [];

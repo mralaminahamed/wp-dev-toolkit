@@ -2,8 +2,13 @@
 // src/Tools/ErrorLogger.php
 namespace WPDevToolkit\Tools;
 
-use WPDevToolkit\Core\ToolInterface;
 use WP_REST_Server;
+use WPDevToolkit\ToolInterface;
+use function current_user_can;
+use function get_option;
+use function register_rest_route;
+use function rest_ensure_response;
+use const WP_CONTENT_DIR;
 
 class ErrorLogger implements ToolInterface {
     public function init() {

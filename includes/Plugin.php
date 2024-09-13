@@ -1,6 +1,18 @@
 <?php
 // src/Core/Plugin.php
-namespace WPDevToolkit\Core;
+namespace WPDevToolkit;
+
+use function add_action;
+use function add_menu_page;
+use function current_user_can;
+use function do_action;
+use function load_plugin_textdomain;
+use function register_rest_route;
+use function rest_ensure_response;
+use function update_option;
+use function wp_enqueue_script;
+use function wp_enqueue_style;
+use function wp_localize_script;
 
 class Plugin {
     private $tool_factory;

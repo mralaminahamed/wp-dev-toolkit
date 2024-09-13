@@ -3,8 +3,15 @@
 // src/Tools/HookInspector.php
 namespace WPDevToolkit\Tools;
 
-use WPDevToolkit\Core\ToolInterface;
 use WP_REST_Server;
+use WPDevToolkit\ToolInterface;
+use function add_action;
+use function current_user_can;
+use function get_option;
+use function get_transient;
+use function register_rest_route;
+use function rest_ensure_response;
+use function set_transient;
 
 class HookInspector implements ToolInterface {
     private $hooks = [];

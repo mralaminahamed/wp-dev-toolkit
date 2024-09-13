@@ -17,8 +17,10 @@ class Logger {
     }
 }
 
-// Usage example:
-use WPDevToolkit\Core\Logger;
-
-Logger::log('Development mode enabled');
-Logger::log('An error occurred', 'error');
+//// Usage example:
+//use WPDevToolkit\Core\Logger;
+//use const WPDevToolkit\Core\WP_CONTENT_DIR;
+//use const WPDevToolkit\Core\WP_DEBUG;
+//
+//Logger::log('Development mode enabled');
+//Logger::log('An error occurred', 'error');

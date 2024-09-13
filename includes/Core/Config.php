@@ -3,6 +3,8 @@
 
 namespace WPDevToolkit\Core;
 
+use function update_option;
+
 class Config {
     private static $instance = null;
     private $config = [];
@@ -41,8 +43,10 @@ class Config {
 }
 
 // Usage example:
-use WPDevToolkit\Core\Config;
-
-$config = Config::get_instance();
-$dev_mode = $config->get('dev_mode');
-$config->set('dev_mode', true);
+//use WPDevToolkit\Core\Config;
+//use function WPDevToolkit\Core\get_option;
+//use function WPDevToolkit\Core\update_option;
+//
+//$config = Config::get_instance();
+//$dev_mode = $config->get('dev_mode');
+//$config->set('dev_mode', true);

@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "WPDevToolkit\\": "src/"
+            "WPDevToolkit\\": "includes/"
         }
     },
     "autoload-dev": {
