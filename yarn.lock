@@ -15366,7 +15366,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.88.2":
+"webpack@npm:^5.88.2, webpack@npm:^5.94.0":
   version: 5.94.0
   resolution: "webpack@npm:5.94.0"
   dependencies:
@@ -15602,6 +15602,7 @@ __metadata:
     style-loader: "npm:^4.0.0"
     tailwindcss: "npm:^3.4.11"
     typescript: "npm:^5.6.2"
+    webpack: "npm:^5.94.0"
   languageName: unknown
   linkType: soft
 
