@@ -1,6 +1,6 @@
 import { Card, CardBody, CardHeader } from '@wordpress/components';
 import React from 'react';
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router';
 
 import Dashboard from '@/components/Dashboard';
 import ErrorLog from '@/components/ErrorLog';
