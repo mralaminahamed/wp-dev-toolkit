@@ -1,8 +1,9 @@
 import apiFetch from '@wordpress/api-fetch';
-import { ToggleControl, Button } from '@wordpress/components';
+import { ToggleControl, Button, Card, CardBody, Spinner } from '@wordpress/components';
 import React, { useEffect, useState } from 'react';
 
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
+import { DevModeState } from '@/types';
 
 interface Config {
   dev_mode: boolean;
@@ -12,20 +13,34 @@ interface Config {
 }
 
 const Dashboard: React.FC = () => {
-  const { config, setConfig, toggleTool } = useWPDevToolkit();
+  const { config, setConfig, isLoading, devMode } = useWPDevToolkit();
+  const [devModeState, setDevModeState] = useState<DevModeState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    fetchConfig();
+    fetchDevMode();
   }, []);
 
-  const fetchConfig = async () => {
+  const fetchDevMode = async () => {
     try {
-      const response = await apiFetch<Config>({ path: 'wp-dev-toolkit/v1/config' });
-      setConfig(response);
+      const state = await devMode.get();
+      setDevModeState(state);
     } catch (error) {
-      console.error('Error fetching config:', error);
+      console.error('Error fetching dev mode state:', error);
     }
+  };
+
+  const updateDevMode = async (enabled: boolean) => {
+    setIsSaving(true);
+    try {
+      const state = await devMode.update(enabled);
+      setDevModeState(state);
+      // Also update the global config
+      setConfig({ ...config, dev_mode: enabled });
+    } catch (error) {
+      console.error('Error updating dev mode:', error);
+    }
+    setIsSaving(false);
   };
 
   const updateConfig = async (toolName: keyof Config) => {
