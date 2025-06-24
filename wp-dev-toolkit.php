@@ -42,8 +42,8 @@ add_action( 'plugins_loaded', 'wp_dev_toolkit_init' );
  */
 function wp_dev_toolkit_init() {
 	$config = new WPDevToolkit\Core\Config();
-	$tool_factory = new \WPDevToolkit\Tools\ToolFactory();
-	$plugin = new WPDevToolkit\Plugin( $config, $tool_factory );
+	$tool_factory = new WPDevToolkit\Tools\Factory();
+	$plugin = new WPDevToolkit\Core\Plugin( $config, $tool_factory );
 	$plugin->init();
 
 	// Load text domain for internationalization
@@ -153,13 +153,13 @@ add_action( 'wp_dev_toolkit_weekly_event', 'wp_dev_toolkit_do_weekly_event' );
  * @return array Modified array of Debug Bar panels.
  */
 function wp_dev_toolkit_debug_bar_panels( $panels ) {
-	if ( ! class_exists( 'WPDevToolkit\DebugBar\DevToolkitPanel' ) ) {
-		return $panels;
-	}
-	$panels[] = new WPDevToolkit\DebugBar\DevToolkitPanel();
-	return $panels;
+    if ( ! class_exists( 'WPDevToolkit\DebugBar\DevToolkitPanel' ) ) {
+        return $panels;
+    }
+    $panels[] = new WPDevToolkit\DebugBar\DevToolkitPanel();
+    return $panels;
 }
 add_filter( 'debug_bar_panels', 'wp_dev_toolkit_debug_bar_panels' );
 
 // Include any global helper functions
-require_once WP_DEV_TOOLKIT_PLUGIN_DIR . 'includes/helpers.php';
+require_once WP_DEV_TOOLKIT_PLUGIN_DIR . 'includes/Utilities/Helpers.php';

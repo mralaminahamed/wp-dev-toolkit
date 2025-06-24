@@ -2,11 +2,22 @@
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
+use WPDevToolkit\Base\ToolBase;
 
 class ErrorLogger extends ToolBase {
 	const TOOL_KEY = 'error_logging';
 
 	public static function clean_old_logs() {
+		// Implementation for cleaning old logs
+		$log_file = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
+		if (file_exists($log_file) && filesize($log_file) > 5 * 1024 * 1024) { // 5MB limit
+			$backup_file = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log.bak';
+			if (file_exists($backup_file)) {
+				unlink($backup_file);
+			}
+			rename($log_file, $backup_file);
+			file_put_contents($log_file, "Log file rotated at " . date('Y-m-d H:i:s') . "\n");
+		}
 	}
 
 	public function init() {

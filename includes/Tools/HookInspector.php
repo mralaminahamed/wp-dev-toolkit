@@ -4,6 +4,7 @@
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
+use WPDevToolkit\Base\ToolBase;
 use function add_action;
 use function current_user_can;
 use function get_option;
@@ -12,11 +13,13 @@ use function register_rest_route;
 use function rest_ensure_response;
 use function set_transient;
 
-class HookInspector implements ToolInterface {
+class HookInspector extends ToolBase {
+    const TOOL_KEY = 'hook_inspector';
+
     private $hooks = [];
 
     public function init() {
-        if (get_option('wp_dev_toolkit_dev_mode', false)) {
+        if ($this->is_enabled()) {
             add_action('all', [$this, 'log_hook'], 1);
         }
     }

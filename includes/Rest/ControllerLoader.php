@@ -1,0 +1,76 @@
+<?php
+/**
+ * REST Controllers Loader
+ *
+ * @package WPDevToolkit\Rest
+ */
+
+namespace WPDevToolkit\Rest;
+
+/**
+ * Controller Loader Class
+ *
+ * Manages registration of REST controllers
+ */
+class ControllerLoader {
+    /**
+     * Controller instances
+     *
+     * @var array
+     */
+    private $controllers = [];
+
+    /**
+     * Configuration instance
+     *
+     * @var \WPDevToolkit\Core\Config
+     */
+    private $config;
+
+    /**
+     * Constructor
+     *
+     * @param \WPDevToolkit\Core\Config $config Configuration instance
+     */
+    public function __construct(\WPDevToolkit\Core\Config $config) {
+        $this->config = $config;
+        $this->init_controllers();
+    }
+
+    /**
+     * Initialize controllers
+     *
+     * @return void
+     */
+    private function init_controllers() {
+        $this->controllers = [
+            'settings' => new Controllers\Settings($this->config),
+            'error_log' => new Controllers\ErrorLog(),
+            'query_monitor' => new Controllers\QueryMonitor(),
+            'hook_inspector' => new Controllers\HookInspector(),
+            'terminal' => new Controllers\Terminal(),
+        ];
+    }
+
+    /**
+     * Register all controllers
+     *
+     * @return void
+     */
+    public function register_routes() {
+        foreach ($this->controllers as $controller) {
+            $controller->register_routes();
+        }
+    }
+
+    /**
+     * Get controller by name
+     *
+     * @param string $name Controller name
+     *
+     * @return mixed|null Controller instance or null if not found
+     */
+    public function get_controller($name) {
+        return isset($this->controllers[$name]) ? $this->controllers[$name] : null;
+    }
+}

@@ -1,0 +1,25 @@
+includes/
+├── Admin/            # Admin-specific functionality
+│   └── Menu.php
+├── Base/             # Base classes and interfaces
+│   ├── ToolBase.php
+│   └── ToolInterface.php
+├── Core/             # Core functionality
+│   ├── Config.php    # (existing)
+│   ├── Logger.php    # (existing)
+│   └── Plugin.php    # (moved from root level)
+├── Rest/             # REST API endpoints
+│   ├── Base.php      # (renamed from RestBase.php)
+│   ├── DevMode.php   # (moved from API/)
+│   ├── ErrorLog.php  # (moved from API/)
+│   ├── HookInspector.php # (moved from API/)
+│   ├── QueryMonitor.php # (moved from API/)
+│   ├── Settings.php  # (moved from API/)
+│   └── Terminal.php  # (moved from API/)
+├── Tools/            # Tool implementations
+│   ├── ErrorLogger.php  # (existing)
+│   ├── Factory.php   # (renamed from ToolFactory.php)
+│   ├── HookInspector.php # (existing)
+│   └── QueryMonitor.php # (existing)
+└── Utilities/        # Helper functions and utilities
+    └── helpers.php   # (moved from root level)
