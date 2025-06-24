@@ -45,10 +45,12 @@ class ControllerLoader {
     private function init_controllers() {
         $this->controllers = [
             'settings' => new Controllers\Settings($this->config),
+            'dev_mode' => new Controllers\DevMode(),
             'error_log' => new Controllers\ErrorLog(),
             'query_monitor' => new Controllers\QueryMonitor(),
             'hook_inspector' => new Controllers\HookInspector(),
             'terminal' => new Controllers\Terminal(),
+            'system_info' => new Controllers\SystemInfo(),
         ];
     }
 

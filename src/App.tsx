@@ -7,6 +7,7 @@ import ErrorLog from '@/components/ErrorLog';
 import HookInspector from '@/components/HookInspector';
 import QueryMonitor from '@/components/QueryMonitor';
 import Settings from '@/components/Settings';
+import SystemInfo from '@/components/SystemInfo';
 import Terminal from '@/components/Terminal';
 
 const App: React.FC = () => {
@@ -16,6 +17,7 @@ const App: React.FC = () => {
     { name: 'query-monitor', title: 'Query Monitor', component: QueryMonitor },
     { name: 'hook-inspector', title: 'Hook Inspector', component: HookInspector },
     { name: 'terminal', title: 'Terminal', component: Terminal },
+    { name: 'system-info', title: 'System Info', component: SystemInfo },
     { name: 'settings', title: 'Settings', component: Settings },
   ];
 

@@ -90,9 +90,20 @@ class Menu {
             WP_DEV_TOOLKIT_VERSION
         );
 
+        // Enhanced global configuration object
+        $log_path = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
+        $log_path_relative = str_replace(ABSPATH, '', $log_path);
+
+        $debug_mode = defined('WP_DEBUG') && WP_DEBUG;
+
         wp_localize_script('wp-dev-toolkit-app', 'wpDevToolkit', [
             'nonce' => wp_create_nonce('wp_rest'),
             'apiUrl' => rest_url('wp-dev-toolkit/v1'),
+            'version' => WP_DEV_TOOLKIT_VERSION,
+            'logPath' => $log_path_relative,
+            'debugMode' => $debug_mode,
+            'wpVersion' => get_bloginfo('version'),
+            'phpVersion' => phpversion()
         ]);
     }
 }

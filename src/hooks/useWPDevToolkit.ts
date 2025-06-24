@@ -122,6 +122,35 @@ export const useWPDevToolkit = () => {
     }
   }, []);
 
+  // Error Log API
+  const getErrorLog = useCallback(async (): Promise<string> => {
+    setIsLoading(true);
+    try {
+      const response = await apiFetch({ path: 'wp-dev-toolkit/v1/error-log' });
+      setIsLoading(false);
+      return response.log_content || '';
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Error fetching error log:', error);
+      throw error;
+    }
+  }, []);
+
+  const clearErrorLog = useCallback(async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      await apiFetch({
+        path: 'wp-dev-toolkit/v1/error-log',
+        method: 'DELETE',
+      });
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Error clearing error log:', error);
+      throw error;
+    }
+  }, []);
+
   return {
     config,
     setConfig,
@@ -142,6 +171,10 @@ export const useWPDevToolkit = () => {
     toolSettings: {
       get: getToolSettings,
       update: updateToolSettings,
+    },
+    errorLog: {
+      get: getErrorLog,
+      clear: clearErrorLog,
     },
   };
 };

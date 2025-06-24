@@ -1,5 +1,19 @@
 declare module '@wordpress/components';
 
+interface WPDevToolkitGlobal {
+  apiUrl: string;
+  nonce: string;
+  version: string;
+  logPath?: string;
+  debugMode?: boolean;
+}
+
+declare global {
+  interface Window {
+    wpDevToolkit: WPDevToolkitGlobal;
+  }
+}
+
 declare module 'wp-dev-toolkit' {
   export interface Query {
     sql: string;
