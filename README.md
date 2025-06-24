@@ -8,17 +8,38 @@ WordPress Development Toolkit is a comprehensive plugin designed to assist WordP
 - Error Logging and Viewer
 - Database Query Monitor
 - WordPress Hook Inspector
-- React-based Admin Interface
+- Terminal Interface for Commands
+- React-based Admin Interface with Tailwind CSS
 - REST API Integration
 - Extensible Architecture
 
 ## Installation
 
-1. Download the plugin zip file or clone the repository into your WordPress plugins directory.
-2. Navigate to the plugin directory and run `composer install` to install PHP dependencies.
-3. Run `npm install` to install JavaScript dependencies.
-4. Run `npm run build` to compile the React application.
-5. Activate the plugin through the WordPress admin interface.
+1. Download the plugin zip file or clone the repository:
+   ```bash
+   git clone https://github.com/mralaminahamed/wp-dev-toolkit.git
+   ```
+
+2. Navigate to the plugin directory and install dependencies:
+   ```bash
+   cd wp-dev-toolkit
+   composer install
+   npm install
+   ```
+
+3. Build the assets:
+   ```bash
+   npm run build
+   ```
+
+4. Activate the plugin through the WordPress admin interface.
+
+## Requirements
+
+- WordPress 5.8 or higher
+- PHP 7.4 or higher
+- Node.js 14 or higher
+- Composer
 
 ## Usage
 
@@ -28,17 +49,22 @@ After activation, you'll find a new "Dev Toolkit" menu item in your WordPress ad
 2. **Error Log**: View and manage the WordPress error log.
 3. **Query Monitor**: Inspect database queries made during page loads.
 4. **Hook Inspector**: View all WordPress hooks fired during page execution.
+5. **Terminal**: Execute commands in a controlled environment.
+6. **Settings**: Configure the toolkit options.
 
 ## Configuration
 
-You can configure the plugin by modifying the `wp-config.php` file or using the provided Config class:
+You can configure the plugin through the Settings interface or programmatically:
 
 ```php
-use includes\Core\Config;
+use WPDevToolkit\Core\Config;
 
-$config = Config::get_instance();
-$config->set('dev_mode', true);
-$config->set('error_logging', true);
+$config = new Config();
+$config->update([
+    'error_logger' => true,
+    'query_monitor' => true,
+    'hook_inspector' => true,
+]);
 ```
 
 ## Extending the Toolkit
@@ -51,6 +77,34 @@ add_action('wp_dev_toolkit_init', function($plugin) {
 });
 ```
 
+Your custom tool class should implement the `WPDevToolkit\Tools\ToolInterface` interface.
+
+## Development
+
+### Frontend Development
+
+The admin interface is built with React and Tailwind CSS:
+
+```bash
+# Watch for changes during development
+npm run start
+
+# Build for production
+npm run build
+```
+
+### Backend Development
+
+The plugin follows WordPress coding standards. Run code quality checks with:
+
+```bash
+# PHP CodeSniffer
+composer run phpcs
+
+# PHPStan analysis
+composer run phpstan
+```
+
 ## Contributing
 
 We welcome contributions to the WordPress Development Toolkit! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information on how to get started.
@@ -61,7 +115,7 @@ This project is licensed under the GPL v2 or later. See the [LICENSE](LICENSE) f
 
 ## Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/yourusername/wp-dev-toolkit/issues) on our GitHub repository.
+If you encounter any issues or have questions, please [open an issue](https://github.com/mralaminahamed/wp-dev-toolkit/issues) on our GitHub repository.
 
 ## Acknowledgements
 
