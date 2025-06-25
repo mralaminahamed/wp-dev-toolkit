@@ -14,4 +14,5 @@ The Utilities components provide common functionality that doesn't fit into othe
 2. Formatting utilities
 3. Plugin data retrieval helpers
 
-The code in this directory is designed to be reused across different parts of the plugin, providing consistent functionality where needed.
+The code in this directory is designed to be reused across different parts of the plugin, providing consistent
+functionality where needed.

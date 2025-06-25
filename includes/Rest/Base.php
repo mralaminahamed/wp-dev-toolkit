@@ -23,7 +23,7 @@ abstract class Base extends WP_REST_Controller {
 	 * @return bool
 	 */
 	public function permission_callback(): bool {
-		return current_user_can('manage_options');
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -35,8 +35,8 @@ abstract class Base extends WP_REST_Controller {
 	 *
 	 * @return bool
 	 */
-	public function validate_boolean($param, $request, $key): bool {
-		return is_bool($param);
+	public function validate_boolean( $param, $request, $key ): bool {
+		return is_bool( $param );
 	}
 
 	/**
@@ -47,8 +47,8 @@ abstract class Base extends WP_REST_Controller {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	protected function send_json_success($data = null, $status_code = 200) {
-		return $this->send_json_response(true, $data, $status_code);
+	protected function send_json_success( $data = null, $status_code = 200 ) {
+		return $this->send_json_response( true, $data, $status_code );
 	}
 
 	/**
@@ -59,8 +59,8 @@ abstract class Base extends WP_REST_Controller {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	protected function send_json_error($message = '', $status_code = 400) {
-		return $this->send_json_response(false, ['message' => $message], $status_code);
+	protected function send_json_error( $message = '', $status_code = 400 ) {
+		return $this->send_json_response( false, array( 'message' => $message ), $status_code );
 	}
 
 	/**
@@ -72,11 +72,11 @@ abstract class Base extends WP_REST_Controller {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	private function send_json_response($success, $data, $status_code) {
-		$response = [
+	private function send_json_response( $success, $data, $status_code ) {
+		$response = array(
 			'success' => $success,
-			'data' => $data,
-		];
-		return rest_ensure_response($response);
+			'data'    => $data,
+		);
+		return rest_ensure_response( $response );
 	}
 }

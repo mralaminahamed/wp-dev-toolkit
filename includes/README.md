@@ -1,11 +1,12 @@
 # WordPress Development Toolkit - Core Components
 
-This directory contains the core components of the WordPress Development Toolkit plugin, organized into logical subdirectories.
+This directory contains the core components of the WordPress Development Toolkit plugin, organized into logical
+subdirectories.
 
 ## Directory Structure
 
 - `Admin/`: Admin interface components and menu handling
-- `Base/`: Base classes and interfaces for tool implementation 
+- `Base/`: Base classes and interfaces for tool implementation
 - `Core/`: Core functionality including plugin main class and configuration
 - `Rest/`: REST API controllers and endpoints
 - `Tools/`: Individual developer tools implementation

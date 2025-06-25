@@ -1,5 +1,5 @@
 import apiFetch from '@wordpress/api-fetch';
-import { ToggleControl, Button, Card, CardBody, Spinner } from '@wordpress/components';
+import { ToggleControl, Button } from '@wordpress/components';
 import React, { useEffect, useState } from 'react';
 
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
@@ -13,7 +13,7 @@ interface Config {
 }
 
 const Dashboard: React.FC = () => {
-  const { config, setConfig, isLoading, devMode } = useWPDevToolkit();
+  const { config, setConfig, devMode } = useWPDevToolkit();
   const [devModeState, setDevModeState] = useState<DevModeState | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -52,10 +52,23 @@ const Dashboard: React.FC = () => {
         method: 'POST',
         data: { [toolName]: newValue },
       });
-      toggleTool(toolName);
       setConfig(updatedConfig);
     } catch (error) {
       console.error('Error updating config:', error);
+    }
+    setIsSaving(false);
+  };
+
+  // Add missing fetchConfig function
+  const fetchConfig = async () => {
+    setIsSaving(true);
+    try {
+      const updatedConfig = await apiFetch<Config>({
+        path: 'wp-dev-toolkit/v1/config',
+      });
+      setConfig(updatedConfig);
+    } catch (error) {
+      console.error('Error fetching config:', error);
     }
     setIsSaving(false);
   };

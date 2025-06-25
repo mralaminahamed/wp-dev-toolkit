@@ -7,7 +7,7 @@ This directory contains individual REST API controllers for the WordPress Develo
 - `DevMode.php`: Manages development mode settings and state
 - `ErrorLog.php`: Provides access to error logs with filtering and clearing capabilities
 - `HookInspector.php`: Exposes WordPress hooks and their callbacks
-- `QueryMonitor.php`: Tracks and analyzes database queries 
+- `QueryMonitor.php`: Tracks and analyzes database queries
 - `Settings.php`: Manages global plugin settings
 - `Terminal.php`: Provides secure command execution capabilities
 

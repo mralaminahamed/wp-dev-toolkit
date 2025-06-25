@@ -20,4 +20,5 @@ The `Controllers/` subdirectory contains individual REST API controllers:
 
 ## Purpose
 
-The REST API components provide the backend endpoints that power the React-based admin interface. These controllers follow REST principles and handle data retrieval, updates, and actions required by the frontend.
+The REST API components provide the backend endpoints that power the React-based admin interface. These controllers
+follow REST principles and handle data retrieval, updates, and actions required by the frontend.

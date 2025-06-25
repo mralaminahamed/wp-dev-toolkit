@@ -16,46 +16,54 @@ class HookInspector extends Base {
 	 * @return void
 	 */
 	public function register_routes() {
-		register_rest_route($this->namespace, '/hook-inspector', [
-			[
-				'methods' => 'GET',
-				'callback' => [$this, 'get_hooks'],
-				'permission_callback' => [$this, 'permission_callback'],
-				'args' => [
-					'type' => [
-						'default' => 'all',
-						'enum' => ['all', 'action', 'filter'],
-					],
-					'search' => [
-						'type' => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-					],
-				],
-			],
-		]);
+		register_rest_route(
+			$this->namespace,
+			'/hook-inspector',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'get_hooks' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+					'args'                => array(
+						'type'   => array(
+							'default' => 'all',
+							'enum'    => array( 'all', 'action', 'filter' ),
+						),
+						'search' => array(
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+					),
+				),
+			)
+		);
 
-		register_rest_route($this->namespace, '/hook-inspector/settings', [
-			[
-				'methods' => 'GET',
-				'callback' => [$this, 'get_settings'],
-				'permission_callback' => [$this, 'permission_callback'],
-			],
-			[
-				'methods' => 'POST',
-				'callback' => [$this, 'update_settings'],
-				'permission_callback' => [$this, 'permission_callback'],
-				'args' => [
-					'enabled' => [
-						'type' => 'boolean',
-						'validate_callback' => [$this, 'validate_boolean'],
-					],
-					'track_hooks' => [
-						'type' => 'boolean',
-						'validate_callback' => [$this, 'validate_boolean'],
-					],
-				],
-			],
-		]);
+		register_rest_route(
+			$this->namespace,
+			'/hook-inspector/settings',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'get_settings' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+				),
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'update_settings' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+					'args'                => array(
+						'enabled'     => array(
+							'type'              => 'boolean',
+							'validate_callback' => array( $this, 'validate_boolean' ),
+						),
+						'track_hooks' => array(
+							'type'              => 'boolean',
+							'validate_callback' => array( $this, 'validate_boolean' ),
+						),
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -65,67 +73,72 @@ class HookInspector extends Base {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function get_hooks($request) {
+	public function get_hooks( $request ) {
 		global $wp_filter;
 
-		$type = $request->get_param('type');
-		$search = $request->get_param('search');
+		$type   = $request->get_param( 'type' );
+		$search = $request->get_param( 'search' );
 
-		$hooks = [];
+		$hooks = array();
 
-		foreach ($wp_filter as $hook_name => $hook_obj) {
+		foreach ( $wp_filter as $hook_name => $hook_obj ) {
 			// Skip if we're searching and the hook name doesn't match
-			if (!empty($search) && strpos($hook_name, $search) === false) {
+			if ( ! empty( $search ) && strpos( $hook_name, $search ) === false ) {
 				continue;
 			}
 
-			$is_action = strpos($hook_name, 'action_') === 0 || in_array($hook_name, $this->get_common_actions());
-			$is_filter = strpos($hook_name, 'filter_') === 0 || in_array($hook_name, $this->get_common_filters());
+			$is_action = strpos( $hook_name, 'action_' ) === 0 || in_array( $hook_name, $this->get_common_actions() );
+			$is_filter = strpos( $hook_name, 'filter_' ) === 0 || in_array( $hook_name, $this->get_common_filters() );
 
 			// Skip based on hook type filter
-			if ($type === 'action' && !$is_action) {
+			if ( $type === 'action' && ! $is_action ) {
 				continue;
-			} elseif ($type === 'filter' && !$is_filter) {
+			} elseif ( $type === 'filter' && ! $is_filter ) {
 				continue;
 			}
 
-			$callbacks = [];
+			$callbacks = array();
 
 			// Process callbacks for each priority
-			foreach ($hook_obj->callbacks as $priority => $callback_group) {
-				foreach ($callback_group as $callback_id => $callback_data) {
-					$callback_info = $this->get_callback_info($callback_data['function']);
+			foreach ( $hook_obj->callbacks as $priority => $callback_group ) {
+				foreach ( $callback_group as $callback_id => $callback_data ) {
+					$callback_info = $this->get_callback_info( $callback_data['function'] );
 
-					$callbacks[] = [
-						'priority' => $priority,
-						'function' => $callback_info['function'],
-						'file' => $callback_info['file'],
-						'line' => $callback_info['line'],
+					$callbacks[] = array(
+						'priority'      => $priority,
+						'function'      => $callback_info['function'],
+						'file'          => $callback_info['file'],
+						'line'          => $callback_info['line'],
 						'accepted_args' => $callback_data['accepted_args'],
-					];
+					);
 				}
 			}
 
 			// Add the hook to our results
-			$hooks[] = [
-				'name' => $hook_name,
-				'type' => $is_action ? 'action' : 'filter',
-				'callbacks' => $callbacks,
-				'callback_count' => count($callbacks),
-			];
+			$hooks[] = array(
+				'name'           => $hook_name,
+				'type'           => $is_action ? 'action' : 'filter',
+				'callbacks'      => $callbacks,
+				'callback_count' => count( $callbacks ),
+			);
 		}
 
 		// Sort hooks alphabetically
-		usort($hooks, function($a, $b) {
-			return strcmp($a['name'], $b['name']);
-		});
+		usort(
+			$hooks,
+			function ( $a, $b ) {
+				return strcmp( $a['name'], $b['name'] );
+			}
+		);
 
-		return $this->send_json_success([
-			'hooks' => $hooks,
-			'total' => count($hooks),
-			'type' => $type,
-			'search' => $search,
-		]);
+		return $this->send_json_success(
+			array(
+				'hooks'  => $hooks,
+				'total'  => count( $hooks ),
+				'type'   => $type,
+				'search' => $search,
+			)
+		);
 	}
 
 	/**
@@ -134,7 +147,7 @@ class HookInspector extends Base {
 	 * @return array
 	 */
 	private function get_common_actions() {
-		return [
+		return array(
 			'init',
 			'admin_init',
 			'wp_loaded',
@@ -147,7 +160,7 @@ class HookInspector extends Base {
 			'template_redirect',
 			'widgets_init',
 			'registered_post_type',
-		];
+		);
 	}
 
 	/**
@@ -156,14 +169,14 @@ class HookInspector extends Base {
 	 * @return array
 	 */
 	private function get_common_filters() {
-		return [
+		return array(
 			'the_content',
 			'the_title',
 			'the_excerpt',
 			'template_include',
 			'body_class',
 			'post_class',
-		];
+		);
 	}
 
 	/**
@@ -173,18 +186,18 @@ class HookInspector extends Base {
 	 *
 	 * @return array
 	 */
-	private function get_callback_info($function) {
-		$result = [
+	private function get_callback_info( $function ) {
+		$result = array(
 			'function' => 'Unknown',
-			'file' => 'Unknown',
-			'line' => 0,
-		];
+			'file'     => 'Unknown',
+			'line'     => 0,
+		);
 
 		// Function is a closure
-		if ($function instanceof \Closure) {
+		if ( $function instanceof \Closure ) {
 			$result['function'] = 'Anonymous function';
 
-			$reflection = new \ReflectionFunction($function);
+			$reflection     = new \ReflectionFunction( $function );
 			$result['file'] = $reflection->getFileName();
 			$result['line'] = $reflection->getStartLine();
 
@@ -192,16 +205,16 @@ class HookInspector extends Base {
 		}
 
 		// Function is an array (class method)
-		if (is_array($function)) {
-			if (is_object($function[0])) {
-				$class = get_class($function[0]);
+		if ( is_array( $function ) ) {
+			if ( is_object( $function[0] ) ) {
+				$class              = get_class( $function[0] );
 				$result['function'] = $class . '->' . $function[1];
 			} else {
 				$result['function'] = $function[0] . '::' . $function[1];
 			}
 
-			if (method_exists($function[0], $function[1])) {
-				$reflection = new \ReflectionMethod($function[0], $function[1]);
+			if ( method_exists( $function[0], $function[1] ) ) {
+				$reflection     = new \ReflectionMethod( $function[0], $function[1] );
 				$result['file'] = $reflection->getFileName();
 				$result['line'] = $reflection->getStartLine();
 			}
@@ -210,10 +223,10 @@ class HookInspector extends Base {
 		}
 
 		// Function is a string (function name)
-		if (is_string($function) && function_exists($function)) {
+		if ( is_string( $function ) && function_exists( $function ) ) {
 			$result['function'] = $function;
 
-			$reflection = new \ReflectionFunction($function);
+			$reflection     = new \ReflectionFunction( $function );
 			$result['file'] = $reflection->getFileName();
 			$result['line'] = $reflection->getStartLine();
 
@@ -231,10 +244,12 @@ class HookInspector extends Base {
 	 */
 	public function get_settings() {
 		// Implementation details would go here
-		return $this->send_json_success([
-			'enabled' => true,
-			'track_hooks' => true,
-		]);
+		return $this->send_json_success(
+			array(
+				'enabled'     => true,
+				'track_hooks' => true,
+			)
+		);
 	}
 
 	/**
@@ -244,20 +259,22 @@ class HookInspector extends Base {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function update_settings($request) {
-		$enabled = $request->get_param('enabled');
-		$track_hooks = $request->get_param('track_hooks');
+	public function update_settings( $request ) {
+		$enabled     = $request->get_param( 'enabled' );
+		$track_hooks = $request->get_param( 'track_hooks' );
 
 		// Implementation details would go here
 		$success = true; // Placeholder for actual implementation
 
-		if ($success) {
-			return $this->send_json_success([
-				'enabled' => $enabled,
-				'track_hooks' => $track_hooks,
-			]);
+		if ( $success ) {
+			return $this->send_json_success(
+				array(
+					'enabled'     => $enabled,
+					'track_hooks' => $track_hooks,
+				)
+			);
 		}
 
-		return $this->send_json_error(__('Failed to update settings', 'wp-dev-toolkit'));
+		return $this->send_json_error( __( 'Failed to update settings', 'wp-dev-toolkit' ) );
 	}
 }

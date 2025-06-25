@@ -10,17 +10,17 @@ namespace WPDevToolkit\Base;
  * @package WPDevToolkit\Base
  */
 interface ToolInterface {
-    /**
-     * Initialize the tool
-     *
-     * @return void
-     */
-    public function init();
+	/**
+	 * Initialize the tool
+	 *
+	 * @return void
+	 */
+	public function init();
 
-    /**
-     * Register REST routes for the tool
-     *
-     * @return void
-     */
-    public function register_rest_routes();
+	/**
+	 * Register REST routes for the tool
+	 *
+	 * @return void
+	 */
+	public function register_rest_routes();
 }

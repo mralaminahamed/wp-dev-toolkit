@@ -23,7 +23,7 @@ abstract class ToolBase implements ToolInterface {
 	 *
 	 * @param Config $config Configuration instance
 	 */
-	public function __construct(Config $config) {
+	public function __construct( Config $config ) {
 		$this->config = $config;
 	}
 
@@ -47,7 +47,7 @@ abstract class ToolBase implements ToolInterface {
 	 * @return bool
 	 */
 	protected function is_enabled() {
-		return $this->config->get(static::TOOL_KEY, false);
+		return $this->config->get( static::TOOL_KEY, false );
 	}
 
 	/**
@@ -56,6 +56,6 @@ abstract class ToolBase implements ToolInterface {
 	 * @return bool
 	 */
 	public function check_admin_permissions() {
-		return current_user_can('manage_options');
+		return current_user_can( 'manage_options' );
 	}
 }

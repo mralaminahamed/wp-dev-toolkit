@@ -10,7 +10,8 @@ This directory contains core functionality for the WordPress Development Toolkit
 
 ## Purpose
 
-The Core components are the foundation of the plugin, managing configuration, initialization, and coordinating between different plugin parts. These classes are responsible for:
+The Core components are the foundation of the plugin, managing configuration, initialization, and coordinating between
+different plugin parts. These classes are responsible for:
 
 1. Loading and saving plugin settings
 2. Initializing tools and controllers

@@ -18,7 +18,7 @@ interface QueryOptions {
 }
 
 const QueryMonitor: React.FC = () => {
-  const { toolSettings, isLoading } = useWPDevToolkit();
+  const { } = useWPDevToolkit();
   const [queries, setQueries] = useState<Query[]>([]);
   const [totalTime, setTotalTime] = useState<number>(0);
   const [totalQueries, setTotalQueries] = useState<number>(0);
@@ -28,12 +28,14 @@ const QueryMonitor: React.FC = () => {
     direction: 'desc',
     limit: 100,
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchQueries();
   }, [queryOptions]);
 
   const fetchQueries = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${window.wpDevToolkit.apiUrl}/query-monitor?limit=${queryOptions.limit}&order=${queryOptions.order}&direction=${queryOptions.direction}`, {
         headers: {
@@ -49,6 +51,8 @@ const QueryMonitor: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching queries:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

@@ -18882,6 +18882,7 @@ __metadata:
     "@wordpress/components": "npm:^29.11.0"
     "@wordpress/data": "npm:^10.25.0"
     "@wordpress/element": "npm:^6.25.0"
+    "@wordpress/eslint-plugin": "npm:^22.11.0"
     "@wordpress/scripts": "npm:^30.18.0"
     autoprefixer: "npm:^10.4.21"
     concurrently: "npm:^9.2.0"

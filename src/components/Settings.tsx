@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, ToggleControl, SelectControl, RangeControl, Button, Notice, Spinner } from '@wordpress/components';
+import { Card, CardBody, CardHeader, ToggleControl, SelectControl, RangeControl, Button, Notice } from '@wordpress/components';
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
-import { ToolSettings } from '@/types';
 
 interface Settings {
   dev_mode: boolean;
@@ -14,7 +13,7 @@ interface Settings {
 }
 
 const Settings: React.FC = () => {
-  const { toolSettings, isLoading } = useWPDevToolkit();
+  const { } = useWPDevToolkit();
   const [settings, setSettings] = useState<Settings>({
     dev_mode: false,
     error_logger: true,
@@ -27,12 +26,14 @@ const Settings: React.FC = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchSettings();
   }, []);
 
   const fetchSettings = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${window.wpDevToolkit.apiUrl}/settings`, {
         headers: {
@@ -48,6 +49,7 @@ const Settings: React.FC = () => {
       console.error('Error fetching settings:', err);
       setError('Failed to load settings');
     }
+    setIsLoading(false);
   };
 
   const updateSetting = <K extends keyof Settings>(key: K, value: Settings[K]) => {
@@ -123,11 +125,7 @@ const Settings: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Spinner />
-      </div>
-    );
+    return null;
   }
 
   return (

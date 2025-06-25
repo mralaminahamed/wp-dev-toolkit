@@ -9,4 +9,6 @@ This directory contains base classes and interfaces used throughout the WordPres
 
 ## Purpose
 
-The Base components provide common functionality and standardized interfaces to ensure consistency across the plugin. By using these base classes and interfaces, we create a more maintainable and extensible codebase where all tools follow the same patterns.
+The Base components provide common functionality and standardized interfaces to ensure consistency across the plugin. By
+using these base classes and interfaces, we create a more maintainable and extensible codebase where all tools follow
+the same patterns.
