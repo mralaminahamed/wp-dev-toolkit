@@ -22,15 +22,32 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
+    // WordPress ESLint configurations
+    'plugin:@wordpress/eslint-plugin/recommended',
+    'plugin:@wordpress/eslint-plugin/jsx',
+    'plugin:@wordpress/eslint-plugin/react',
+    // Keep prettier last to override other configs
     'plugin:prettier/recommended',
   ],
-  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'jsx-a11y', 'import', 'prettier'],
+  plugins: [
+    '@typescript-eslint',
+    'react',
+    'react-hooks',
+    'jsx-a11y',
+    'import',
+    '@wordpress', // Add WordPress plugin
+    'prettier',
+  ],
   rules: {
     'prettier/prettier': ['error', {}, { usePrettierrc: true }],
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
+    // Disable some WordPress rules that may conflict with TypeScript
+    '@wordpress/no-unused-vars-before-return': 'off',
+    '@wordpress/dependency-group': 'error',
+    '@wordpress/react-no-unsafe-timeout': 'error',
     'import/order': [
       'error',
       {
@@ -73,6 +90,7 @@ module.exports = {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
+      paths: ['src'],
     },
   },
 };

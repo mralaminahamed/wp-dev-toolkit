@@ -1,0 +1,45 @@
+{
+  "formatter": {
+    "indentSize": 2,
+    "useTabs": false,
+    "lineWidth": 100,
+    "singleQuote": true
+  },
+  "linter": {
+    "rules": {
+      "color-hex-case": "lower",
+      "color-hex-length": "short",
+      "block-no-empty": true,
+      "declaration-colon-space-after": "always",
+      "declaration-colon-space-before": "never",
+      "declaration-block-semicolon-newline-after": "always",
+      "declaration-block-trailing-semicolon": "always",
+      "indentation": 2,
+      "max-empty-lines": 1,
+      "selector-list-comma-newline-after": "always",
+      "selector-pseudo-element-colon-notation": "double"
+    }
+  },
+  "patterns": [
+    {
+      "name": "SCSS Mixin",
+      "description": "Create a SCSS mixin",
+      "pattern": "@mixin ${1:mixin-name}(${2:$param: default}) {\n  $0\n}"
+    },
+    {
+      "name": "SCSS Media Query",
+      "description": "Create a responsive media query",
+      "pattern": "@media screen and (${1|min-width,max-width|}: ${2:768px}) {\n  $0\n}"
+    },
+    {
+      "name": "WordPress Admin Styles",
+      "description": "Create styles for WordPress admin",
+      "pattern": ".wp-dev-toolkit {\n  &__${1:component} {\n    $0\n  }\n}"
+    },
+    {
+      "name": "Flexbox Container",
+      "description": "Create a flexbox container",
+      "pattern": "display: flex;\nflex-direction: ${1|row,column,row-reverse,column-reverse|};\njustify-content: ${2|flex-start,flex-end,center,space-between,space-around,space-evenly|};\nalign-items: ${3|flex-start,flex-end,center,stretch,baseline|};"
+    }
+  ]
+} 

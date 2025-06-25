@@ -1,7 +1,26 @@
 {
   "name": "wp-dev-toolkit",
   "version": "1.0.0",
-  "description": "WordPress Development Toolkit with React-based control panel",
+  "description": "A comprehensive toolkit for WordPress plugin development with React-based admin interface, debugging tools, and developer utilities",
+  "author": "Mr Alamin Ahamed <contact@mralaminahamed.com> (https://mralaminahamed.com)",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/mralaminahamed/wp-dev-toolkit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mralaminahamed/wp-dev-toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mralaminahamed/wp-dev-toolkit/issues"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "development",
+    "toolkit",
+    "react",
+    "debugging",
+    "developer-tools"
+  ],
   "scripts": {
     "start": "wp-scripts start",
     "build": "wp-scripts build",
@@ -9,47 +28,65 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
-    "test": "wp-scripts test-unit-js"
+    "test": "wp-scripts test-unit-js",
+    "prepare": "husky install",
+    "dev": "concurrently \"npm:start\" \"npm:check-types -- --watch\""
   },
   "devDependencies": {
-    "@playwright/test": "^1.47.0",
-    "@types/node": "^22.5.4",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
+    "@playwright/test": "^1.53.1",
+    "@types/node": "^24.0.4",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "@types/react-router-dom": "^5.3.3",
     "@types/wordpress__api-fetch": "^3.23.1",
     "@types/wordpress__components": "^23.8.0",
     "@types/wordpress__element": "^2.14.1",
-    "@typescript-eslint/eslint-plugin": "^8.5.0",
-    "@typescript-eslint/parser": "^8.5.0",
-    "@wordpress/scripts": "^29.0.0",
-    "autoprefixer": "^10.4.20",
-    "concurrently": "^9.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
+    "@wordpress/eslint-plugin": "^22.11.0",
+    "@wordpress/scripts": "^30.18.0",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.0",
     "css-loader": "^7.1.2",
     "eslint": "8",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.30.0",
-    "eslint-plugin-jsx-a11y": "^6.10.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.36.1",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "postcss": "^8.4.45",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.5.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^9.1.7",
+    "postcss": "^8.5.6",
     "postcss-loader": "^8.1.1",
-    "prettier": "^3.3.3",
+    "prettier": "^3.6.1",
+    "sass-loader": "^16.0.5",
     "scss": "^0.2.4",
     "style-loader": "^4.0.0",
-    "tailwindcss": "^3.4.11",
-    "typescript": "^5.6.2"
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "@tailwindcss/forms": "^0.5.9",
-    "@tailwindcss/typography": "^0.5.15",
-    "@wordpress/api-fetch": "^7.7.0",
-    "@wordpress/components": "^28.7.0",
-    "@wordpress/data": "^10.7.0",
-    "@wordpress/element": "^6.7.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2"
-  }
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@wordpress/api-fetch": "^7.25.0",
+    "@wordpress/components": "^29.11.0",
+    "@wordpress/data": "^10.25.0",
+    "@wordpress/element": "^6.25.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=7.0.0"
+  },
+  "packageManager": "yarn@4.9.2",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11"
+  ]
 }

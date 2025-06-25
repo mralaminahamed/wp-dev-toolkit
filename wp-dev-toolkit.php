@@ -24,6 +24,21 @@ define( 'WP_DEV_TOOLKIT_VERSION', '1.0.0' );
 define( 'WP_DEV_TOOLKIT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WP_DEV_TOOLKIT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WP_DEV_TOOLKIT_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'WP_DEV_TOOLKIT_ASSETS_URL', WP_DEV_TOOLKIT_PLUGIN_URL . 'assets/' );
+define( 'WP_DEV_TOOLKIT_ASSETS_DIR', WP_DEV_TOOLKIT_PLUGIN_DIR . 'assets/' );
+
+// Ensure the assets directories exist
+if ( ! file_exists( WP_DEV_TOOLKIT_ASSETS_DIR ) ) {
+	mkdir( WP_DEV_TOOLKIT_ASSETS_DIR, 0755, true );
+}
+
+if ( ! file_exists( WP_DEV_TOOLKIT_ASSETS_DIR . 'css/' ) ) {
+	mkdir( WP_DEV_TOOLKIT_ASSETS_DIR . 'css/', 0755, true );
+}
+
+if ( ! file_exists( WP_DEV_TOOLKIT_ASSETS_DIR . 'images/' ) ) {
+	mkdir( WP_DEV_TOOLKIT_ASSETS_DIR . 'images/', 0755, true );
+}
 
 // Composer autoloader
 if ( file_exists( WP_DEV_TOOLKIT_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
@@ -41,9 +56,12 @@ add_action( 'plugins_loaded', 'wp_dev_toolkit_init' );
  * @return void
  */
 function wp_dev_toolkit_init() {
+	// Initialize logger
+	WPDevToolkit\Core\Logger::init();
+	
 	$config = new WPDevToolkit\Core\Config();
-	$tool_factory = new \WPDevToolkit\Tools\ToolFactory();
-	$plugin = new WPDevToolkit\Plugin( $config, $tool_factory );
+	$tool_factory = new WPDevToolkit\Tools\Factory();
+	$plugin = new WPDevToolkit\Core\Plugin( $config, $tool_factory );
 	$plugin->init();
 
 	// Load text domain for internationalization
@@ -62,6 +80,21 @@ function wp_dev_toolkit_activate() {
 	// Perform any necessary setup on activation
 	$config = new WPDevToolkit\Core\Config();
 	$config->set_default_options();
+	
+	// Create any required directories
+	$upload_dir = wp_upload_dir();
+	$log_dir = $upload_dir['basedir'] . '/wp-dev-toolkit/logs';
+	
+	if ( ! file_exists( $log_dir ) ) {
+		wp_mkdir_p( $log_dir );
+		// Create an .htaccess file to protect logs
+		$htaccess_content = "# Prevent direct access to log files\n";
+		$htaccess_content .= "<Files \"*.log\">\n";
+		$htaccess_content .= "  Order Deny,Allow\n";
+		$htaccess_content .= "  Deny from all\n";
+		$htaccess_content .= "</Files>\n";
+		file_put_contents( $log_dir . '/.htaccess', $htaccess_content );
+	}
 
 	// Flush rewrite rules
 	flush_rewrite_rules();
@@ -79,6 +112,7 @@ function wp_dev_toolkit_deactivate() {
 	// Perform any necessary cleanup on deactivation
 	// For example, you might want to remove scheduled events
 	wp_clear_scheduled_hook( 'wp_dev_toolkit_daily_event' );
+	wp_clear_scheduled_hook( 'wp_dev_toolkit_weekly_event' );
 
 	// Flush rewrite rules
 	flush_rewrite_rules();
@@ -96,6 +130,23 @@ function wp_dev_toolkit_uninstall() {
 	// Perform any necessary cleanup on uninstall
 	// This function should be used to remove any options, database tables, etc.
 	delete_option( 'wp_dev_toolkit_config' );
+	
+	// Optional: Remove log files
+	$upload_dir = wp_upload_dir();
+	$log_dir = $upload_dir['basedir'] . '/wp-dev-toolkit/logs';
+	
+	if ( file_exists( $log_dir ) ) {
+		$files = glob( $log_dir . '/*.log' );
+		foreach ( $files as $file ) {
+			unlink( $file );
+		}
+		// Remove .htaccess file
+		if ( file_exists( $log_dir . '/.htaccess' ) ) {
+			unlink( $log_dir . '/.htaccess' );
+		}
+		// Remove directory
+		rmdir( $log_dir );
+	}
 }
 
 /**
@@ -128,13 +179,32 @@ function wp_dev_toolkit_cron_schedules( array $schedules ): array {
 }
 add_filter( 'cron_schedules', 'wp_dev_toolkit_cron_schedules' );
 
-// Schedule custom cron job
-if ( ! wp_next_scheduled( 'wp_dev_toolkit_weekly_event' ) ) {
-	wp_schedule_event( time(), 'weekly', 'wp_dev_toolkit_weekly_event' );
+// Schedule custom cron jobs
+function wp_dev_toolkit_setup_cron_jobs() {
+	if ( ! wp_next_scheduled( 'wp_dev_toolkit_daily_event' ) ) {
+		wp_schedule_event( time(), 'daily', 'wp_dev_toolkit_daily_event' );
+	}
+	
+	if ( ! wp_next_scheduled( 'wp_dev_toolkit_weekly_event' ) ) {
+		wp_schedule_event( time(), 'weekly', 'wp_dev_toolkit_weekly_event' );
+	}
 }
+add_action( 'wp', 'wp_dev_toolkit_setup_cron_jobs' );
 
 /**
- * Custom cron job callback
+ * Daily cron job callback
+ *
+ * @return void
+ */
+function wp_dev_toolkit_do_daily_event() {
+	// Perform daily tasks here
+	// For example, rotate logs
+	WPDevToolkit\Core\Logger::rotate_logs();
+}
+add_action( 'wp_dev_toolkit_daily_event', 'wp_dev_toolkit_do_daily_event' );
+
+/**
+ * Weekly cron job callback
  *
  * @return void
  */
@@ -153,13 +223,13 @@ add_action( 'wp_dev_toolkit_weekly_event', 'wp_dev_toolkit_do_weekly_event' );
  * @return array Modified array of Debug Bar panels.
  */
 function wp_dev_toolkit_debug_bar_panels( $panels ) {
-	if ( ! class_exists( 'WPDevToolkit\DebugBar\DevToolkitPanel' ) ) {
-		return $panels;
-	}
-	$panels[] = new WPDevToolkit\DebugBar\DevToolkitPanel();
-	return $panels;
+    if ( ! class_exists( 'WPDevToolkit\DebugBar\DevToolkitPanel' ) ) {
+        return $panels;
+    }
+    $panels[] = new WPDevToolkit\DebugBar\DevToolkitPanel();
+    return $panels;
 }
 add_filter( 'debug_bar_panels', 'wp_dev_toolkit_debug_bar_panels' );
 
 // Include any global helper functions
-require_once WP_DEV_TOOLKIT_PLUGIN_DIR . 'includes/helpers.php';
+require_once WP_DEV_TOOLKIT_PLUGIN_DIR . 'includes/Utilities/Helpers.php';

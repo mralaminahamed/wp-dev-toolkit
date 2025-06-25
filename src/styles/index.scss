@@ -1,20 +1,365 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Custom styles for WP Dev Toolkit */
-.wp-dev-toolkit-app {
-  @apply p-4;
+@config "../../tailwind.config.js";
+
+// Variables
+:root {
+  --wp-dev-toolkit-primary: #2271b1;
+  --wp-dev-toolkit-primary-dark: #135e96;
+  --wp-dev-toolkit-secondary: #f0f0f1;
+  --wp-dev-toolkit-text: #1d2327;
+  --wp-dev-toolkit-text-light: #50575e;
+  --wp-dev-toolkit-border: #c3c4c7;
+  --wp-dev-toolkit-hover: #e0e0e0;
+  --wp-dev-toolkit-background: #f0f6fc;
+  --wp-dev-toolkit-sidebar-width: 240px;
+  --wp-dev-toolkit-card-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.wp-dev-toolkit-tab-panel {
-  @apply mt-4;
+.wp-dev-toolkit {
+  &-app {
+    @apply wdt-flex wdt-h-screen wdt-w-full wdt-bg-gray-50;
+    background-color: var(--wp-dev-toolkit-background);
+  }
+
+  &-sidebar {
+    @apply wdt-flex wdt-flex-col wdt-w-60 wdt-min-w-60 wdt-h-full wdt-border-r wdt-border-gray-200 wdt-bg-white;
+    width: var(--wp-dev-toolkit-sidebar-width);
+    min-width: var(--wp-dev-toolkit-sidebar-width);
+  }
+  
+  &-logo {
+    @apply wdt-flex wdt-items-center wdt-gap-3 wdt-p-4 wdt-border-b wdt-border-gray-200;
+    
+    img {
+      @apply wdt-w-8 wdt-h-8;
+    }
+    
+    h1 {
+      @apply wdt-text-lg wdt-font-medium;
+      color: var(--wp-dev-toolkit-primary);
+    }
+  }
+
+  &-content {
+    @apply wdt-flex-1 wdt-overflow-auto wdt-p-6;
+  }
+  
+  &-container {
+    @apply wdt-max-w-7xl wdt-mx-auto;
+  }
+
+  &-version {
+    @apply wdt-mt-auto wdt-p-4 wdt-text-center wdt-text-xs wdt-text-gray-500 wdt-border-t wdt-border-gray-200;
+  }
+
+  &-nav {
+    @apply wdt-flex-1 wdt-py-2 wdt-overflow-auto;
+
+    ul {
+      @apply wdt-flex wdt-flex-col wdt-space-y-1;
+    }
+
+    li {
+      @apply wdt-relative;
+      
+      &.active {
+        @apply wdt-bg-blue-50;
+        
+        &::before {
+          content: '';
+          @apply wdt-absolute wdt-left-0 wdt-top-0 wdt-h-full wdt-w-1 wdt-bg-blue-600;
+        }
+        
+        a {
+          @apply wdt-text-blue-600;
+          
+          .dashicons, .dashicon {
+            @apply wdt-text-blue-600;
+          }
+        }
+      }
+    }
+
+    a {
+      @apply wdt-flex wdt-items-center wdt-gap-3 wdt-px-4 wdt-py-3 wdt-text-gray-700 hover:wdt-bg-gray-50 wdt-transition-colors wdt-no-underline;
+      
+      .dashicons, .dashicon {
+        @apply wdt-text-gray-500;
+      }
+      
+      span {
+        @apply wdt-font-medium;
+      }
+      
+      &.active {
+        @apply wdt-text-blue-600;
+        
+        .dashicons, .dashicon {
+          @apply wdt-text-blue-600;
+        }
+      }
+      
+      &:hover {
+        @apply wdt-text-blue-600;
+      }
+    }
+  }
+
+  &-card {
+    @apply wdt-bg-white wdt-rounded-lg wdt-overflow-hidden wdt-mb-6;
+    box-shadow: var(--wp-dev-toolkit-card-shadow);
+
+    &-header {
+      @apply wdt-flex wdt-justify-between wdt-items-center wdt-p-4 wdt-border-b wdt-border-gray-200;
+      
+      h2 {
+        @apply wdt-text-lg wdt-font-medium wdt-text-gray-800;
+      }
+    }
+
+    &-body {
+      @apply wdt-p-6;
+    }
+  }
+
+  &-dashboard {
+    &-stats {
+      @apply wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-3 wdt-gap-6 wdt-mb-8;
+    }
+
+    &-stat {
+      @apply wdt-bg-white wdt-p-6 wdt-rounded-lg wdt-flex wdt-items-center wdt-gap-4;
+      box-shadow: var(--wp-dev-toolkit-card-shadow);
+      
+      &-icon {
+        @apply wdt-p-3 wdt-rounded-full wdt-text-white;
+        
+        &.blue {
+          @apply wdt-bg-blue-500;
+        }
+        
+        &.green {
+          @apply wdt-bg-green-500;
+        }
+        
+        &.amber {
+          @apply wdt-bg-amber-500;
+        }
+      }
+      
+      &-content {
+        @apply wdt-flex wdt-flex-col;
+      }
+
+      &-title {
+        @apply wdt-text-sm wdt-text-gray-500;
+      }
+
+      &-value {
+        @apply wdt-text-2xl wdt-font-bold;
+      }
+    }
+    
+    &-widgets {
+      @apply wdt-grid wdt-grid-cols-1 lg:wdt-grid-cols-2 wdt-gap-6;
+    }
+  }
+
+  &-error-log {
+    pre {
+      @apply wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-font-mono wdt-text-sm wdt-overflow-auto wdt-max-h-[500px] wdt-border wdt-border-gray-200;
+    }
+  }
+
+  &-query-monitor {
+    &-query {
+      @apply wdt-border-b wdt-border-gray-200 wdt-py-3;
+    }
+
+    &-time {
+      @apply wdt-text-sm wdt-text-gray-500;
+    }
+
+    &-sql {
+      @apply wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-mt-2 wdt-border wdt-border-gray-200;
+    }
+  }
+
+  &-hook-inspector {
+    &-hook {
+      @apply wdt-border-b wdt-border-gray-200 wdt-py-3;
+    }
+
+    &-name {
+      @apply wdt-font-medium;
+    }
+
+    &-type {
+      @apply wdt-text-xs wdt-bg-gray-100 wdt-px-2 wdt-py-0.5 wdt-rounded-full wdt-ml-2;
+    }
+
+    &-callbacks {
+      @apply wdt-mt-2 wdt-text-sm;
+    }
+  }
+
+  &-terminal {
+    &-container {
+      @apply wdt-bg-gray-900 wdt-text-white wdt-p-4 wdt-rounded-lg wdt-font-mono wdt-text-sm;
+    }
+
+    &-output {
+      @apply wdt-mb-4 wdt-max-h-[500px] wdt-overflow-auto;
+    }
+
+    &-input {
+      @apply wdt-flex;
+
+      input {
+        @apply wdt-bg-gray-800 wdt-text-white wdt-px-3 wdt-py-2 wdt-rounded wdt-flex-grow;
+      }
+    }
+  }
+
+  &-system-info {
+    &-section {
+      @apply wdt-mb-8;
+      
+      h2 {
+        @apply wdt-text-lg wdt-font-medium wdt-mb-4 wdt-pb-2 wdt-border-b wdt-border-gray-200;
+      }
+    }
+
+    &-table {
+      @apply wdt-w-full;
+
+      th {
+        @apply wdt-text-left wdt-py-2 wdt-px-4 wdt-bg-gray-50 wdt-border-b wdt-border-gray-200 wdt-font-medium;
+      }
+
+      td {
+        @apply wdt-py-2 wdt-px-4 wdt-border-b wdt-border-gray-200;
+      }
+    }
+  }
+
+  &-settings {
+    &-section {
+      @apply wdt-mb-8;
+      
+      h2 {
+        @apply wdt-text-lg wdt-font-medium wdt-mb-4 wdt-pb-2 wdt-border-b wdt-border-gray-200;
+      }
+    }
+
+    &-option {
+      @apply wdt-mb-4;
+    }
+  }
 }
 
-.wp-dev-toolkit-tab-panel button {
-  @apply mr-2 mb-2;
+// Page title and header
+.wp-dev-toolkit-page-header {
+  @apply wdt-mb-8;
+  
+  h1 {
+    @apply wdt-text-2xl wdt-font-bold wdt-mb-1;
+  }
+  
+  p {
+    @apply wdt-text-gray-600;
+  }
 }
 
-.active-tab {
-  @apply bg-blue-500 text-white;
+// Buttons
+.wp-dev-toolkit-button {
+  @apply wdt-inline-flex wdt-items-center wdt-justify-center wdt-px-4 wdt-py-2 wdt-border wdt-border-transparent wdt-rounded-md wdt-font-medium wdt-transition-colors;
+  
+  &-primary {
+    @apply wdt-bg-blue-600 wdt-text-white hover:wdt-bg-blue-700;
+  }
+  
+  &-secondary {
+    @apply wdt-bg-white wdt-text-gray-700 wdt-border-gray-300 hover:wdt-bg-gray-50;
+  }
+}
+
+// Utility classes
+.code {
+  @apply wdt-font-mono wdt-bg-gray-50 wdt-p-1 wdt-rounded wdt-text-sm wdt-border wdt-border-gray-200;
+}
+
+// Animation
+.spinner {
+  @apply wdt-animate-spin wdt-h-5 wdt-w-5 wdt-text-blue-600;
+}
+
+// Form elements
+.wp-dev-toolkit-form {
+  &-group {
+    @apply wdt-mb-4;
+  }
+  
+  &-label {
+    @apply wdt-block wdt-mb-1 wdt-font-medium wdt-text-gray-700;
+  }
+  
+  &-input {
+    @apply wdt-w-full wdt-px-3 wdt-py-2 wdt-border wdt-border-gray-300 wdt-rounded-md focus:wdt-outline-none focus:wdt-ring-2 focus:wdt-ring-blue-500 focus:wdt-border-blue-500;
+  }
+}
+
+// WordPress components overrides
+.components-card {
+  @apply wdt-mb-4;
+}
+
+.components-toggle-control {
+  @apply wdt-mb-4;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .wp-dev-toolkit-app {
+    @apply wdt-flex-col;
+  }
+  
+  .wp-dev-toolkit-sidebar {
+    @apply wdt-w-full wdt-min-w-full wdt-h-auto wdt-border-b wdt-border-r-0;
+  }
+  
+  .wp-dev-toolkit-logo {
+    @apply wdt-justify-center;
+  }
+  
+  .wp-dev-toolkit-nav {
+    ul {
+      @apply wdt-flex-row wdt-flex-wrap wdt-justify-center;
+    }
+    
+    li {
+      &.active::before {
+        @apply wdt-left-0 wdt-top-auto wdt-bottom-0 wdt-h-1 wdt-w-full;
+      }
+    }
+    
+    a {
+      @apply wdt-flex-col wdt-gap-1 wdt-py-2 wdt-px-3;
+      
+      span {
+        @apply wdt-text-xs;
+      }
+    }
+  }
+  
+  .wp-dev-toolkit-content {
+    @apply wdt-p-4;
+  }
+  
+  .wp-dev-toolkit-dashboard-stats {
+    @apply wdt-grid-cols-1;
+  }
 }

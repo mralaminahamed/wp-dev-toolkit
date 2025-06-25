@@ -1,0 +1,78 @@
+{
+  "formatOnSave": true,
+  "organizeImportsOnSave": true,
+  "defaultFormatter": "cursor",
+  "lineNumbers": true,
+  "wordWrap": false,
+  "tabSize": 2,
+  "insertSpaces": true,
+  "bracketPairColorization": true,
+  "minimap": true,
+  "rulers": [100],
+  "formatters": {
+    ".php": "php",
+    ".js": "javascript",
+    ".jsx": "javascript",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".scss": "scss",
+    ".css": "scss",
+    ".json": "json",
+    ".md": "markdown"
+  },
+  "snippets": {
+    "wordpress": {
+      "prefix": "wphook",
+      "body": [
+        "add_${1|action,filter|}( '${2:hook_name}', function( ${3:$$param} ) {",
+        "\t$0",
+        "}, ${4:10}, ${5:1} );"
+      ],
+      "description": "Add WordPress hook"
+    },
+    "wpclass": {
+      "prefix": "wpclass",
+      "body": [
+        "<?php",
+        "",
+        "namespace ${1:WPDevToolkit}\\${2:Namespace};",
+        "",
+        "/**",
+        " * ${3:Class description}",
+        " *",
+        " * @package ${1:WPDevToolkit}\\${2:Namespace}",
+        " */",
+        "class ${4:ClassName} {",
+        "\t/**",
+        "\t * Constructor",
+        "\t */",
+        "\tpublic function __construct() {",
+        "\t\t$0",
+        "\t}",
+        "}"
+      ],
+      "description": "Create WordPress class"
+    },
+    "reactfc": {
+      "prefix": "reactfc",
+      "body": [
+        "import React from 'react';",
+        "",
+        "interface ${1:ComponentName}Props {",
+        "\t${2:prop}: ${3:type};",
+        "}",
+        "",
+        "const ${1:ComponentName}: React.FC<${1:ComponentName}Props> = ({ ${2:prop} }) => {",
+        "\treturn (",
+        "\t\t<div>",
+        "\t\t\t$0",
+        "\t\t</div>",
+        "\t);",
+        "};",
+        "",
+        "export default ${1:ComponentName};"
+      ],
+      "description": "React Functional Component"
+    }
+  }
+} 

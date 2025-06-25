@@ -6,7 +6,7 @@ module.exports = {
   ...defaultConfig,
   devtool: 'source-map',
   entry: {
-    index: path.resolve(process.cwd(), 'src', 'index.tsx'),
+    index: path.resolve(process.cwd(), 'src/index.tsx'),
   },
   output: {
     ...defaultConfig.output,
@@ -19,25 +19,5 @@ module.exports = {
       ...defaultConfig.resolve.alias,
       '@': path.resolve(__dirname, 'src/'),
     },
-  },
-  module: {
-    ...defaultConfig.module,
-    rules: [
-      ...defaultConfig.module.rules,
-      {
-        test: /\.scss$/,
-        use: [
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: [require('tailwindcss'), require('autoprefixer')],
-              },
-            },
-          },
-          'sass-loader',
-        ],
-      },
-    ],
-  },
+  }
 };
