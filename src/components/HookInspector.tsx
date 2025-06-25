@@ -9,13 +9,14 @@ import {
 } from '@wordpress/components';
 
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
-import { HookDetails, HookInspectorOptions, HookResponse } from '@/types/index';
+import { HookDetails, HookInspectorOptions, HookResponse, HookCallback } from '@/types/index';
 
 const HookInspector: React.FC = () => {
-  const { hooks, isLoading } = useWPDevToolkit();
+  const { hooks, isLoading, config, toggleTool } = useWPDevToolkit();
   const [hookData, setHookData] = useState<HookResponse | null>(null);
   const [selectedHook, setSelectedHook] = useState<HookDetails | null>(null);
   const [showStackTrace, setShowStackTrace] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [filterOptions, setFilterOptions] = useState<HookInspectorOptions>({
     type: 'all',
     search: '',
@@ -27,12 +28,25 @@ const HookInspector: React.FC = () => {
     key: 'name',
     direction: 'ascending',
   });
+  const [actionCount, setActionCount] = useState(0);
+  const [filterCount, setFilterCount] = useState(0);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     fetchHooks();
   }, [filterOptions]);
 
+  useEffect(() => {
+    if (hookData && hookData.grouped_hooks) {
+      const actionHooks = hookData.grouped_hooks.action || [];
+      const filterHooks = hookData.grouped_hooks.filter || [];
+      setActionCount(actionHooks.length);
+      setFilterCount(filterHooks.length);
+    }
+  }, [hookData]);
+
   const fetchHooks = async () => {
+    setIsFetching(true);
     try {
       const response = await hooks.get(filterOptions) as unknown as HookResponse;
       if (response) {
@@ -40,11 +54,22 @@ const HookInspector: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching hooks:', error);
+    } finally {
+      setIsFetching(false);
     }
   };
 
   const handleSearch = (search: string) => {
-    setFilterOptions(prev => ({ ...prev, search }));
+    // Debounce search to avoid too many API calls
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    const timeout = setTimeout(() => {
+      setFilterOptions(prev => ({ ...prev, search }));
+    }, 500);
+    
+    setSearchTimeout(timeout);
   };
 
   const handleTypeChange = (type: string) => {
@@ -53,6 +78,14 @@ const HookInspector: React.FC = () => {
 
   const viewHookDetails = (hook: HookDetails) => {
     setSelectedHook(hook);
+    
+    // Scroll to the details section
+    setTimeout(() => {
+      const detailsElement = document.getElementById('hook-details');
+      if (detailsElement) {
+        detailsElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const closeDetails = () => {
@@ -76,10 +109,17 @@ const HookInspector: React.FC = () => {
     const { key, direction } = sortConfig;
     
     return hooks.sort((a, b) => {
-      if (a[key as keyof typeof a] < b[key as keyof typeof b]) {
+      const aValue = a[key as keyof typeof a];
+      const bValue = b[key as keyof typeof b];
+      
+      if (!aValue && !bValue) return 0;
+      if (!aValue) return direction === 'ascending' ? -1 : 1;
+      if (!bValue) return direction === 'ascending' ? 1 : -1;
+      
+      if (aValue < bValue) {
         return direction === 'ascending' ? -1 : 1;
       }
-      if (a[key as keyof typeof a] > b[key as keyof typeof b]) {
+      if (aValue > bValue) {
         return direction === 'ascending' ? 1 : -1;
       }
       return 0;
@@ -93,8 +133,64 @@ const HookInspector: React.FC = () => {
 
   const getHookTypeClass = (type: string) => {
     return type === 'action' 
-      ? 'bg-green-100 text-green-800 border-green-200' 
-      : 'bg-blue-100 text-blue-800 border-blue-200';
+      ? 'wdt-bg-green-100 wdt-text-green-800 wdt-border-green-200' 
+      : 'wdt-bg-blue-100 wdt-text-blue-800 wdt-border-blue-200';
+  };
+
+  const getHookTypeBadge = (type: string, count: number) => {
+    return (
+      <span className={`wdt-inline-flex wdt-items-center wdt-gap-1 wdt-px-2.5 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium ${
+        type === 'action' 
+        ? 'wdt-bg-green-100 wdt-text-green-800' 
+        : 'wdt-bg-blue-100 wdt-text-blue-800'
+      }`}>
+        {type} <span className="wdt-bg-white wdt-px-1.5 wdt-py-0.5 wdt-rounded-full">{count}</span>
+      </span>
+    );
+  };
+
+  const formatFunctionName = (func: string) => {
+    // Handle closures and anonymous functions
+    if (func.includes('Closure')) {
+      return <span className="wdt-text-amber-600">Closure function</span>;
+    } else if (func.includes('class@anonymous')) {
+      return <span className="wdt-text-amber-600">Anonymous class</span>;
+    }
+    
+    // Format class methods
+    if (func.includes('::')) {
+      const [className, methodName] = func.split('::');
+      return (
+        <span>
+          <span className="wdt-text-blue-600">{className}</span>
+          <span className="wdt-text-gray-500">::</span>
+          <span className="wdt-text-purple-600">{methodName}</span>
+        </span>
+      );
+    }
+    
+    return <span className="wdt-text-gray-900">{func}</span>;
+  };
+
+  const formatFilePath = (file: string) => {
+    if (!file) return null;
+    
+    // Get the relative path from the WordPress root
+    const wpContentPos = file.indexOf('wp-content');
+    if (wpContentPos !== -1) {
+      return file.substring(wpContentPos);
+    }
+    
+    return file;
+  };
+
+  const toggleHookInspection = () => {
+    toggleTool('hook_inspection');
+  };
+
+  const formatTime = (time?: number) => {
+    if (time === undefined) return '0.00';
+    return time.toFixed(2);
   };
 
   return (
@@ -104,13 +200,46 @@ const HookInspector: React.FC = () => {
         <p>Inspect WordPress actions and filters</p>
       </div>
 
+      {/* Quick Actions */}
+      <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-mb-6">
+        <div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-4">
+          <Button 
+            className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
+            onClick={fetchHooks} 
+            disabled={isFetching}
+            icon="refresh"
+          >
+            {isFetching ? 'Refreshing...' : 'Refresh Hooks'}
+          </Button>
+          
+          <Button 
+            className={`wp-dev-toolkit-button ${config.hook_inspection ? 'wp-dev-toolkit-button-secondary' : 'wp-dev-toolkit-button-primary'}`}
+            onClick={toggleHookInspection}
+            icon={config.hook_inspection ? 'no-alt' : 'yes-alt'}
+          >
+            {config.hook_inspection ? 'Disable Hook Inspection' : 'Enable Hook Inspection'}
+          </Button>
+          
+          <div className="wdt-ml-auto wdt-flex wdt-items-center wdt-gap-2">
+            <ToggleControl
+              label="Show Stack Traces"
+              checked={showStackTrace}
+              onChange={() => setShowStackTrace(!showStackTrace)}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Filter Controls */}
-      <div className="wp-dev-toolkit-card mb-6">
+      <div className="wp-dev-toolkit-card wdt-mb-6">
         <div className="wp-dev-toolkit-card-header">
-          <h2>Filter Hooks</h2>
+          <div className="wdt-flex wdt-items-center wdt-gap-2">
+            <Dashicon icon="filter" />
+            <h2>Filter Hooks</h2>
+          </div>
         </div>
         <div className="wp-dev-toolkit-card-body">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <div className="wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-2 wdt-gap-6 wdt-mb-4">
             <div>
               <TextControl 
                 label="Search Hooks" 
@@ -132,27 +261,30 @@ const HookInspector: React.FC = () => {
               />
             </div>
           </div>
-          <div className="flex justify-between items-center">
-            <ToggleControl
-              label="Show Stack Traces"
-              checked={showStackTrace}
-              onChange={() => setShowStackTrace(!showStackTrace)}
-            />
-            <Button 
-              className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
-              onClick={fetchHooks} 
-              disabled={isLoading}
-              icon="refresh"
-            >
-              {isLoading ? 'Refreshing...' : 'Refresh Hooks'}
-            </Button>
-          </div>
+          
+          {filterOptions.search && (
+            <div className="wdt-bg-blue-50 wdt-p-3 wdt-rounded-md wdt-border wdt-border-blue-100 wdt-mb-4">
+              <div className="wdt-flex wdt-items-center wdt-gap-2">
+                <Dashicon icon="search" className="wdt-text-blue-500" />
+                <span className="wdt-text-blue-700">
+                  Searching for: <strong>{filterOptions.search}</strong>
+                </span>
+                <button 
+                  onClick={() => setFilterOptions(prev => ({ ...prev, search: '' }))}
+                  className="wdt-ml-auto wdt-text-blue-700 hover:wdt-text-blue-900"
+                  aria-label="Clear search"
+                >
+                  <Dashicon icon="no-alt" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Statistics Summary */}
       {hookData?.summary && (
-        <div className="wp-dev-toolkit-dashboard-stats mb-6">
+        <div className="wp-dev-toolkit-dashboard-stats wdt-mb-6">
           <div className="wp-dev-toolkit-dashboard-stat">
             <div className="wp-dev-toolkit-dashboard-stat-icon blue">
               <Dashicon icon="admin-plugins" />
@@ -161,6 +293,10 @@ const HookInspector: React.FC = () => {
               <div className="wp-dev-toolkit-dashboard-stat-title">Total Hooks</div>
               <div className="wp-dev-toolkit-dashboard-stat-value">
                 {hookData.summary.total_hooks}
+              </div>
+              <div className="wdt-mt-2 wdt-flex wdt-gap-2">
+                {getHookTypeBadge('action', actionCount)}
+                {getHookTypeBadge('filter', filterCount)}
               </div>
             </div>
           </div>
@@ -173,6 +309,9 @@ const HookInspector: React.FC = () => {
               <div className="wp-dev-toolkit-dashboard-stat-value">
                 {hookData.summary.total_executions}
               </div>
+              <div className="wdt-mt-2 wdt-text-sm wdt-text-gray-500">
+                Average: {(hookData.summary.total_executions / hookData.summary.total_hooks).toFixed(2)} per hook
+              </div>
             </div>
           </div>
           <div className="wp-dev-toolkit-dashboard-stat">
@@ -184,25 +323,28 @@ const HookInspector: React.FC = () => {
               <div className="wp-dev-toolkit-dashboard-stat-value">
                 {hookData.summary.total_time.toFixed(2)}
               </div>
+              <div className="wdt-mt-2 wdt-text-sm wdt-text-gray-500">
+                Average: {(hookData.summary.total_time / hookData.summary.total_hooks).toFixed(4)} ms per hook
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {isLoading ? (
-        <div className="flex justify-center items-center p-16 bg-white rounded-lg shadow-sm">
-          <Spinner /> <span className="ml-2">Loading hooks...</span>
+      {isFetching ? (
+        <div className="wdt-flex wdt-justify-center wdt-items-center wdt-p-16 wdt-bg-white wdt-rounded-lg wdt-shadow-sm">
+          <Spinner /> <span className="wdt-ml-2">Loading hooks...</span>
         </div>
       ) : (
         <>
           {/* Hook Details View */}
           {selectedHook && (
-            <div className="wp-dev-toolkit-card mb-6">
+            <div id="hook-details" className="wp-dev-toolkit-card wdt-mb-6">
               <div className="wp-dev-toolkit-card-header">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
+                <div className="wdt-flex wdt-justify-between wdt-items-center">
+                  <div className="wdt-flex wdt-items-center">
                     <h2>{selectedHook.name}</h2>
-                    <span className={`ml-2 px-3 py-1 text-xs rounded-full font-medium ${getHookTypeClass(selectedHook.type)}`}>
+                    <span className={`wdt-ml-2 wdt-px-3 wdt-py-1 wdt-text-xs wdt-rounded-full wdt-font-medium ${getHookTypeClass(selectedHook.type)}`}>
                       {selectedHook.type}
                     </span>
                   </div>
@@ -216,26 +358,50 @@ const HookInspector: React.FC = () => {
                 </div>
               </div>
               <div className="wp-dev-toolkit-card-body">
-                <h3 className="font-medium text-lg mb-3">Callbacks ({selectedHook.callbacks.length})</h3>
-                <div className="overflow-x-auto">
-                  <table className="wp-dev-toolkit-system-info-table">
-                    <thead>
+                <div className="wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-3 wdt-gap-4 wdt-mb-6">
+                  <div className="wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200">
+                    <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Callback Count</div>
+                    <div className="wdt-text-2xl wdt-font-bold">{selectedHook.callbacks.length}</div>
+                  </div>
+                  
+                  <div className="wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200">
+                    <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Type</div>
+                    <div className="wdt-text-2xl wdt-font-bold wdt-capitalize">{selectedHook.type}</div>
+                  </div>
+                  
+                  <div className="wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200">
+                    <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Hook Name</div>
+                    <div className="wdt-text-xl wdt-font-bold wdt-font-mono wdt-truncate">{selectedHook.name}</div>
+                  </div>
+                </div>
+                
+                <h3 className="wdt-font-medium wdt-text-lg wdt-mb-3">Callbacks ({selectedHook.callbacks.length})</h3>
+                <div className="wdt-overflow-x-auto">
+                  <table className="wdt-w-full wdt-border wdt-border-gray-200 wdt-rounded-lg wdt-overflow-hidden">
+                    <thead className="wdt-bg-gray-50 wdt-border-b wdt-border-gray-200">
                       <tr>
-                        <th>Priority</th>
-                        <th>Function</th>
-                        <th>Location</th>
-                        <th>Args</th>
+                        <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">Priority</th>
+                        <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">Function</th>
+                        <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">Location</th>
+                        <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">Args</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {selectedHook.callbacks.map((callback, index) => (
-                        <tr key={index}>
-                          <td>{callback.priority}</td>
-                          <td className="font-mono text-sm">{callback.function}</td>
-                          <td className="text-xs">
-                            {callback.file}:{callback.line}
+                    <tbody className="wdt-bg-white wdt-divide-y wdt-divide-gray-200">
+                      {selectedHook.callbacks.map((callback: HookCallback, index: number) => (
+                        <tr key={index} className="hover:wdt-bg-gray-50">
+                          <td className="wdt-py-3 wdt-px-4 wdt-font-medium">{callback.priority}</td>
+                          <td className="wdt-py-3 wdt-px-4 wdt-font-mono wdt-text-sm">
+                            {formatFunctionName(callback.function)}
                           </td>
-                          <td>{callback.accepted_args}</td>
+                          <td className="wdt-py-3 wdt-px-4 wdt-text-xs wdt-truncate wdt-max-w-[200px]">
+                            <div className="wdt-flex wdt-items-center wdt-gap-1">
+                              <Dashicon icon="admin-page" size={14} className="wdt-text-gray-400" />
+                              <span title={callback.file}>{formatFilePath(callback.file)}</span>
+                              <span className="wdt-text-gray-400">:</span>
+                              <span className="wdt-text-gray-700">{callback.line}</span>
+                            </div>
+                          </td>
+                          <td className="wdt-py-3 wdt-px-4">{callback.accepted_args}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -248,72 +414,75 @@ const HookInspector: React.FC = () => {
           {/* Hooks List */}
           <div className="wp-dev-toolkit-card">
             <div className="wp-dev-toolkit-card-header">
-              <div className="flex justify-between items-center">
-                <h2>Hooks</h2>
-                <div className="text-sm text-gray-500">
+              <div className="wdt-flex wdt-justify-between wdt-items-center">
+                <div className="wdt-flex wdt-items-center wdt-gap-2">
+                  <Dashicon icon="editor-code" />
+                  <h2>Hooks</h2>
+                </div>
+                <div className="wdt-text-sm wdt-text-gray-500">
                   {sortedHooks.length} hooks found
                 </div>
               </div>
             </div>
-            <div className="wp-dev-toolkit-card-body p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+            <div className="wp-dev-toolkit-card-body wdt-p-0">
+              <div className="wdt-overflow-x-auto">
+                <table className="wdt-w-full">
+                  <thead className="wdt-bg-gray-50 wdt-border-b wdt-border-gray-200">
                     <tr>
                       <th 
-                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-cursor-pointer hover:wdt-bg-gray-100 wdt-transition-colors"
                         onClick={() => handleSort('name')}
                       >
-                        <div className="flex items-center">
+                        <div className="wdt-flex wdt-items-center">
                           <span>Hook Name</span>
-                          <span className="ml-1">{sortIndicator('name')}</span>
+                          <span className="wdt-ml-1">{sortIndicator('name')}</span>
                         </div>
                       </th>
                       <th 
-                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-cursor-pointer hover:wdt-bg-gray-100 wdt-transition-colors"
                         onClick={() => handleSort('type')}
                       >
-                        <div className="flex items-center">
+                        <div className="wdt-flex wdt-items-center">
                           <span>Type</span>
-                          <span className="ml-1">{sortIndicator('type')}</span>
+                          <span className="wdt-ml-1">{sortIndicator('type')}</span>
                         </div>
                       </th>
                       <th 
-                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-cursor-pointer hover:wdt-bg-gray-100 wdt-transition-colors"
                         onClick={() => handleSort('count')}
                       >
-                        <div className="flex items-center">
+                        <div className="wdt-flex wdt-items-center">
                           <span>Count</span>
-                          <span className="ml-1">{sortIndicator('count')}</span>
+                          <span className="wdt-ml-1">{sortIndicator('count')}</span>
                         </div>
                       </th>
                       <th 
-                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-cursor-pointer hover:wdt-bg-gray-100 wdt-transition-colors"
                         onClick={() => handleSort('total_time')}
                       >
-                        <div className="flex items-center">
+                        <div className="wdt-flex wdt-items-center">
                           <span>Time (ms)</span>
-                          <span className="ml-1">{sortIndicator('total_time')}</span>
+                          <span className="wdt-ml-1">{sortIndicator('total_time')}</span>
                         </div>
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="wdt-bg-white wdt-divide-y wdt-divide-gray-200">
                     {sortedHooks.length > 0 ? (
                       sortedHooks.map((hook, index) => (
-                        <tr key={index} className="hover:bg-gray-50 transition-colors">
-                          <td className="py-3 px-4 font-medium">{hook.name}</td>
-                          <td className="py-3 px-4">
-                            <span className={`px-2 py-1 text-xs rounded-full ${getHookTypeClass(hook.type)}`}>
+                        <tr key={index} className="hover:wdt-bg-gray-50 wdt-transition-colors">
+                          <td className="wdt-py-3 wdt-px-4 wdt-font-medium wdt-font-mono wdt-text-sm">{hook.name}</td>
+                          <td className="wdt-py-3 wdt-px-4">
+                            <span className={`wdt-px-2 wdt-py-1 wdt-text-xs wdt-rounded-full ${getHookTypeClass(hook.type)}`}>
                               {hook.type}
                             </span>
                           </td>
-                          <td className="py-3 px-4">{hook.count}</td>
-                          <td className="py-3 px-4">{hook.total_time.toFixed(2)}</td>
-                          <td className="py-3 px-4">
+                          <td className="wdt-py-3 wdt-px-4">{hook.count}</td>
+                          <td className="wdt-py-3 wdt-px-4">{hook.total_time.toFixed(2)}</td>
+                          <td className="wdt-py-3 wdt-px-4">
                             <Button 
                               className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
                               onClick={() => viewHookDetails(hook)}
@@ -327,7 +496,7 @@ const HookInspector: React.FC = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="py-8 px-4 text-center text-gray-500">
+                        <td colSpan={5} className="wdt-py-8 wdt-px-4 wdt-text-center wdt-text-gray-500">
                           No hooks found matching your criteria.
                         </td>
                       </tr>

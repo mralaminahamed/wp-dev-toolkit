@@ -15,6 +15,8 @@ export interface QueryResponse {
     total_time: number;
     avg_time: number;
   };
+  total?: number;
+  total_time?: number;
 }
 
 export interface Hook {
@@ -27,17 +29,20 @@ export interface Hook {
 }
 
 export interface HookResponse {
-  hooks: Hook[];
-  grouped_hooks: {
-    action: Hook[];
-    filter: Hook[];
-    unknown: Hook[];
+  hooks: HookDetails[];
+  grouped_hooks?: {
+    action?: HookDetails[];
+    filter?: HookDetails[];
+    unknown?: HookDetails[];
   };
   summary: {
     total_hooks: number;
     total_executions: number;
     total_time: number;
   };
+  total?: number;
+  type?: string;
+  search?: string;
 }
 
 export interface ErrorLogEntry {
@@ -57,32 +62,43 @@ export interface ErrorLogResponse {
 export interface SystemInfoResponse {
   wordpress: {
     version: string;
-    site_url: string;
     home_url: string;
+    site_url: string;
     is_multisite: boolean;
     debug_mode: boolean;
     memory_limit: string;
-    table_prefix: string;
-    active_theme: string;
+    permalink_structure: string;
+    theme: string;
     theme_version: string;
+    active_plugins: number;
+    language: string;
   };
   server: {
     php_version: string;
     mysql_version: string;
-    server_software: string;
-    os: string;
-    max_execution_time: string;
-    memory_limit: string;
-    upload_max_filesize: string;
-    post_max_size: string;
+    web_server: string;
+    user_agent: string;
+    php_memory_limit: string;
+    php_max_execution_time: string;
+    php_post_max_size: string;
+    php_upload_max_filesize: string;
+    php_max_input_vars: string;
+    php_extensions: string;
   };
-  plugin: {
-    name: string;
-    version: string;
-    author: string;
-    plugin_uri: string;
-    text_domain: string;
-    domain_path: string;
+  constants: {
+    ABSPATH: boolean;
+    WP_CONTENT_DIR: string;
+    WP_CONTENT_URL: string;
+    WP_PLUGIN_DIR: string;
+    WP_PLUGIN_URL: string;
+    WPMU_PLUGIN_DIR: string;
+    WPMU_PLUGIN_URL: string;
+  };
+  permissions: {
+    root_writable: boolean;
+    wp_content_writable: boolean;
+    uploads_writable: boolean;
+    plugins_writable: boolean;
   };
 }
 
@@ -100,6 +116,7 @@ export interface DevModeState {
   wp_debug: boolean;
   wp_debug_log: boolean;
   wp_debug_display: boolean;
+  script_debug: boolean;
   config_updated?: boolean;
 }
 
@@ -121,6 +138,10 @@ export interface HookDetails {
   type: 'action' | 'filter';
   callbacks: HookCallback[];
   callback_count: number;
+  count?: number;
+  total_time?: number;
+  first_call?: number;
+  backtrace?: string[];
 }
 
 export interface TerminalCommand {

@@ -13,7 +13,9 @@ declare global {
       version: string;
       logPath?: string;
       debugMode?: boolean;
+      pluginUrl?: string;
     };
+    wpDevToolkitInitialRoute?: string;
   }
 }
 
@@ -26,12 +28,19 @@ if (!window.wpDevToolkit) {
     apiUrl: '/wp-json/wp-dev-toolkit/v1',
     nonce: '',
     version: '1.0.0',
-    debugMode: false
+    debugMode: false,
+    pluginUrl: '/'
   };
 }
 
+// For development testing - if no initial route, set to dashboard
+if (typeof window.wpDevToolkitInitialRoute === 'undefined') {
+  window.wpDevToolkitInitialRoute = 'dashboard';
+  console.info('No initial route found, defaulting to dashboard');
+}
+
 // Add version to console for debugging
-console.info(`WP Dev Toolkit v${window.wpDevToolkit.version} initialized`);
+console.info(`WP Dev Toolkit v${window.wpDevToolkit.version} initialized with route: ${window.wpDevToolkitInitialRoute}`);
 
 const container = document.getElementById('wp-dev-toolkit-app');
 if (!container) {
@@ -95,27 +104,27 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   override render(): React.ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="wp-dev-toolkit-error p-4 bg-red-50 border border-red-200 rounded text-red-700">
-          <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
-          <p className="mb-4">The WordPress Development Toolkit encountered an error and could not load properly.</p>
+        <div className="wp-dev-toolkit-error wdt-p-4 wdt-bg-red-50 wdt-border wdt-border-red-200 wdt-rounded wdt-text-red-700">
+          <h2 className="wdt-text-lg wdt-font-semibold wdt-mb-2">Something went wrong</h2>
+          <p className="wdt-mb-4">The WordPress Development Toolkit encountered an error and could not load properly.</p>
           {this.state.error && (
-            <div className="mb-4">
-              <h3 className="text-md font-semibold mb-1">Error:</h3>
-              <pre className="bg-white p-2 rounded text-sm overflow-auto">
+            <div className="wdt-mb-4">
+              <h3 className="wdt-text-md wdt-font-semibold wdt-mb-1">Error:</h3>
+              <pre className="wdt-bg-white wdt-p-2 wdt-rounded wdt-text-sm wdt-overflow-auto">
                 {this.state.error.toString()}
               </pre>
             </div>
           )}
           {this.state.errorInfo && (
-            <div className="mb-4">
-              <h3 className="text-md font-semibold mb-1">Component Stack:</h3>
-              <pre className="bg-white p-2 rounded text-sm overflow-auto max-h-48">
+            <div className="wdt-mb-4">
+              <h3 className="wdt-text-md wdt-font-semibold wdt-mb-1">Component Stack:</h3>
+              <pre className="wdt-bg-white wdt-p-2 wdt-rounded wdt-text-sm wdt-overflow-auto wdt-max-h-48">
                 {this.state.errorInfo.componentStack}
               </pre>
             </div>
           )}
           <button
-            className="mt-4 bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded"
+            className="wdt-mt-4 wdt-bg-red-600 hover:wdt-bg-red-700 wdt-text-white wdt-py-1 wdt-px-3 wdt-rounded"
             onClick={() => window.location.reload()}
           >
             Reload Page

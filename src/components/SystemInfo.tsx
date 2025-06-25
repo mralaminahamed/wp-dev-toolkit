@@ -36,6 +36,7 @@ const SystemInfo: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<string>('wordpress');
+    const [copySuccess, setCopySuccess] = useState<boolean>(false);
 
     useEffect(() => {
         fetchSystemInfo();
@@ -64,18 +65,54 @@ const SystemInfo: React.FC = () => {
         setIsLoading(false);
     };
 
+    const copyToClipboard = () => {
+        if (!systemInfo) return;
+        
+        // Create a formatted string of system info
+        let text = "=== WordPress Dev Toolkit - System Information ===\n\n";
+        
+        // WordPress Info
+        text += "--- WordPress Environment ---\n";
+        Object.entries(systemInfo.wordpress).forEach(([key, value]) => {
+            text += `${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: ${value}\n`;
+        });
+        
+        // Server Info
+        text += "\n--- Server Environment ---\n";
+        Object.entries(systemInfo.server).forEach(([key, value]) => {
+            text += `${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: ${value}\n`;
+        });
+        
+        // Constants
+        text += "\n--- WordPress Constants ---\n";
+        Object.entries(systemInfo.constants).forEach(([key, value]) => {
+            text += `${key}: ${value}\n`;
+        });
+        
+        // Permissions
+        text += "\n--- File Permissions ---\n";
+        Object.entries(systemInfo.permissions).forEach(([key, value]) => {
+            text += `${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: ${value ? 'Yes' : 'No'}\n`;
+        });
+        
+        navigator.clipboard.writeText(text).then(() => {
+            setCopySuccess(true);
+            setTimeout(() => setCopySuccess(false), 3000);
+        });
+    };
+
     const InfoRow = ({ label, value }: { label: string; value: any }) => (
-        <tr className="border-b border-gray-200">
-            <td className="py-3 px-4 font-medium text-gray-700">{label}</td>
-            <td className="py-3 px-4">
+        <tr className="wdt-border-b wdt-border-gray-200">
+            <td className="wdt-py-3 wdt-px-4 wdt-font-medium wdt-text-gray-700">{label}</td>
+            <td className="wdt-py-3 wdt-px-4">
                 {typeof value === 'boolean'
                     ? (value ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            <Dashicon icon="yes" size={14} className="mr-1" /> Yes
+                        <span className="wdt-inline-flex wdt-items-center wdt-px-2.5 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium wdt-bg-green-100 wdt-text-green-800">
+                            <Dashicon icon="yes" size={14} className="wdt-mr-1" /> Yes
                         </span>
                     ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            <Dashicon icon="no-alt" size={14} className="mr-1" /> No
+                        <span className="wdt-inline-flex wdt-items-center wdt-px-2.5 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium wdt-bg-red-100 wdt-text-red-800">
+                            <Dashicon icon="no-alt" size={14} className="wdt-mr-1" /> No
                         </span>
                     ))
                     : value}
@@ -91,8 +128,8 @@ const SystemInfo: React.FC = () => {
                     <p>View details about your WordPress environment</p>
                 </div>
                 
-                <div className="flex justify-center items-center p-16 bg-white rounded-lg shadow-sm">
-                    <Spinner /> <span className="ml-2">Loading system information...</span>
+                <div className="wdt-flex wdt-justify-center wdt-items-center wdt-p-16 wdt-bg-white wdt-rounded-lg wdt-shadow-sm">
+                    <Spinner /> <span className="wdt-ml-2">Loading system information...</span>
                 </div>
             </div>
         );
@@ -106,13 +143,13 @@ const SystemInfo: React.FC = () => {
                     <p>View details about your WordPress environment</p>
                 </div>
                 
-                <div className="wp-dev-toolkit-card bg-red-50 border border-red-200">
+                <div className="wp-dev-toolkit-card wdt-bg-red-50 wdt-border wdt-border-red-200">
                     <div className="wp-dev-toolkit-card-body">
-                        <div className="flex items-start">
-                            <Dashicon icon="warning" className="text-red-500 mr-3 mt-1" />
+                        <div className="wdt-flex wdt-items-start">
+                            <Dashicon icon="warning" className="wdt-text-red-500 wdt-mr-3 wdt-mt-1" />
                             <div>
-                                <h3 className="text-red-800 font-medium mb-2">Error Loading System Information</h3>
-                                <p className="text-red-700 mb-4">{error}</p>
+                                <h3 className="wdt-text-red-800 wdt-font-medium wdt-mb-2">Error Loading System Information</h3>
+                                <p className="wdt-text-red-700 wdt-mb-4">{error}</p>
                                 <Button 
                                     className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
                                     onClick={fetchSystemInfo}
@@ -159,61 +196,76 @@ const SystemInfo: React.FC = () => {
                 <p>View details about your WordPress environment</p>
             </div>
             
-            <div className="wp-dev-toolkit-card mb-6">
+            <div className="wp-dev-toolkit-card wdt-mb-6">
                 <div className="wp-dev-toolkit-card-header">
-                    <div className="flex justify-between items-center">
-                        <h2>System Overview</h2>
-                        <Button 
-                            className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
-                            onClick={fetchSystemInfo}
-                            icon="update"
-                        >
-                            Refresh Info
-                        </Button>
+                    <div className="wdt-flex wdt-justify-between wdt-items-center">
+                        <div className="wdt-flex wdt-items-center wdt-gap-2">
+                            <Dashicon icon="info-outline" />
+                            <h2>System Overview</h2>
+                        </div>
+                        <div className="wdt-flex wdt-gap-2">
+                            <Button 
+                                className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
+                                onClick={copyToClipboard}
+                                icon="clipboard"
+                            >
+                                {copySuccess ? 'Copied!' : 'Copy All Info'}
+                            </Button>
+                            <Button 
+                                className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
+                                onClick={fetchSystemInfo}
+                                icon="update"
+                            >
+                                Refresh Info
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 <div className="wp-dev-toolkit-card-body">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                            <div className="flex items-center mb-2">
-                                <Dashicon icon="wordpress" className="text-blue-600 mr-2" />
-                                <h3 className="text-lg font-medium">WordPress</h3>
+                    <div className="wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-2 lg:wdt-grid-cols-4 wdt-gap-6">
+                        <div className="wdt-bg-white wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-shadow-sm">
+                            <div className="wdt-flex wdt-items-center wdt-mb-2">
+                                <Dashicon icon="wordpress" className="wdt-text-blue-600 wdt-mr-2" />
+                                <h3 className="wdt-text-lg wdt-font-medium">WordPress</h3>
                             </div>
-                            <div className="text-xl font-bold">{systemInfo.wordpress.version}</div>
-                            <div className="text-sm text-gray-500 mt-1">
-                                {systemInfo.wordpress.debug_mode ? 'Debug Mode Enabled' : 'Debug Mode Disabled'}
+                            <div className="wdt-text-xl wdt-font-bold">{systemInfo.wordpress.version}</div>
+                            <div className="wdt-text-sm wdt-text-gray-500 wdt-mt-1">
+                                {systemInfo.wordpress.debug_mode ? 
+                                    <span className="wdt-text-amber-600">Debug Mode Enabled</span> : 
+                                    'Debug Mode Disabled'
+                                }
                             </div>
                         </div>
                         
-                        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                            <div className="flex items-center mb-2">
-                                <Dashicon icon="admin-site-alt3" className="text-purple-600 mr-2" />
-                                <h3 className="text-lg font-medium">PHP</h3>
+                        <div className="wdt-bg-white wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-shadow-sm">
+                            <div className="wdt-flex wdt-items-center wdt-mb-2">
+                                <Dashicon icon="admin-site-alt3" className="wdt-text-purple-600 wdt-mr-2" />
+                                <h3 className="wdt-text-lg wdt-font-medium">PHP</h3>
                             </div>
-                            <div className="text-xl font-bold">{systemInfo.server.php_version}</div>
-                            <div className="text-sm text-gray-500 mt-1">
+                            <div className="wdt-text-xl wdt-font-bold">{systemInfo.server.php_version}</div>
+                            <div className="wdt-text-sm wdt-text-gray-500 wdt-mt-1">
                                 Memory: {systemInfo.server.php_memory_limit}
                             </div>
                         </div>
                         
-                        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                            <div className="flex items-center mb-2">
-                                <Dashicon icon="database" className="text-green-600 mr-2" />
-                                <h3 className="text-lg font-medium">MySQL</h3>
+                        <div className="wdt-bg-white wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-shadow-sm">
+                            <div className="wdt-flex wdt-items-center wdt-mb-2">
+                                <Dashicon icon="database" className="wdt-text-green-600 wdt-mr-2" />
+                                <h3 className="wdt-text-lg wdt-font-medium">MySQL</h3>
                             </div>
-                            <div className="text-xl font-bold">{systemInfo.server.mysql_version}</div>
-                            <div className="text-sm text-gray-500 mt-1">
+                            <div className="wdt-text-xl wdt-font-bold">{systemInfo.server.mysql_version}</div>
+                            <div className="wdt-text-sm wdt-text-gray-500 wdt-mt-1">
                                 {systemInfo.server.web_server}
                             </div>
                         </div>
                         
-                        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                            <div className="flex items-center mb-2">
-                                <Dashicon icon="admin-appearance" className="text-amber-600 mr-2" />
-                                <h3 className="text-lg font-medium">Theme</h3>
+                        <div className="wdt-bg-white wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-shadow-sm">
+                            <div className="wdt-flex wdt-items-center wdt-mb-2">
+                                <Dashicon icon="admin-appearance" className="wdt-text-amber-600 wdt-mr-2" />
+                                <h3 className="wdt-text-lg wdt-font-medium">Theme</h3>
                             </div>
-                            <div className="text-xl font-bold">{systemInfo.wordpress.theme}</div>
-                            <div className="text-sm text-gray-500 mt-1">
+                            <div className="wdt-text-xl wdt-font-bold">{systemInfo.wordpress.theme}</div>
+                            <div className="wdt-text-sm wdt-text-gray-500 wdt-mt-1">
                                 Version: {systemInfo.wordpress.theme_version}
                             </div>
                         </div>
@@ -223,32 +275,35 @@ const SystemInfo: React.FC = () => {
 
             <div className="wp-dev-toolkit-card">
                 <div className="wp-dev-toolkit-card-header">
-                    <h2>Detailed Information</h2>
+                    <div className="wdt-flex wdt-items-center wdt-gap-2">
+                        <Dashicon icon="list-view" />
+                        <h2>Detailed Information</h2>
+                    </div>
                 </div>
-                <div className="wp-dev-toolkit-card-body p-0">
-                    <div className="border-b border-gray-200">
-                        <nav className="flex">
+                <div className="wp-dev-toolkit-card-body wdt-p-0">
+                    <div className="wdt-border-b wdt-border-gray-200">
+                        <nav className="wdt-flex">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.name}
-                                    className={`px-6 py-3 font-medium flex items-center ${
+                                    className={`wdt-px-6 wdt-py-3 wdt-font-medium wdt-flex wdt-items-center ${
                                         activeTab === tab.name
-                                            ? 'border-b-2 border-blue-500 text-blue-600'
-                                            : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                                            ? 'wdt-border-b-2 wdt-border-blue-500 wdt-text-blue-600'
+                                            : 'wdt-text-gray-600 hover:wdt-text-gray-800 hover:wdt-bg-gray-50'
                                     }`}
                                     onClick={() => setActiveTab(tab.name)}
                                 >
-                                    <Dashicon icon={tab.icon as any} className="mr-2" />
+                                    <Dashicon icon={tab.icon as any} className="wdt-mr-2" />
                                     {tab.title}
                                 </button>
                             ))}
                         </nav>
                     </div>
                     
-                    <div className="p-6">
+                    <div className="wdt-p-6">
                         {activeTab === 'wordpress' && (
                             <div>
-                                <h3 className="text-lg font-medium mb-4">WordPress Environment</h3>
+                                <h3 className="wdt-text-lg wdt-font-medium wdt-mb-4">WordPress Environment</h3>
                                 <table className="wp-dev-toolkit-system-info-table">
                                     <tbody>
                                         <InfoRow label="WordPress Version" value={systemInfo.wordpress.version} />
@@ -268,7 +323,7 @@ const SystemInfo: React.FC = () => {
                         
                         {activeTab === 'server' && (
                             <div>
-                                <h3 className="text-lg font-medium mb-4">Server Environment</h3>
+                                <h3 className="wdt-text-lg wdt-font-medium wdt-mb-4">Server Environment</h3>
                                 <table className="wp-dev-toolkit-system-info-table">
                                     <tbody>
                                         <InfoRow label="PHP Version" value={systemInfo.server.php_version} />
@@ -282,7 +337,7 @@ const SystemInfo: React.FC = () => {
                                         <InfoRow
                                             label="PHP Extensions"
                                             value={
-                                                <div className="max-h-32 overflow-y-auto text-xs">
+                                                <div className="wdt-max-h-32 wdt-overflow-y-auto wdt-text-xs">
                                                     {systemInfo.server.php_extensions}
                                                 </div>
                                             }
@@ -294,7 +349,7 @@ const SystemInfo: React.FC = () => {
                         
                         {activeTab === 'constants' && (
                             <div>
-                                <h3 className="text-lg font-medium mb-4">WordPress Constants</h3>
+                                <h3 className="wdt-text-lg wdt-font-medium wdt-mb-4">WordPress Constants</h3>
                                 <table className="wp-dev-toolkit-system-info-table">
                                     <tbody>
                                         {Object.entries(systemInfo.constants).map(([key, value]) => (
@@ -307,13 +362,13 @@ const SystemInfo: React.FC = () => {
                         
                         {activeTab === 'permissions' && (
                             <div>
-                                <h3 className="text-lg font-medium mb-4">File Permissions</h3>
+                                <h3 className="wdt-text-lg wdt-font-medium wdt-mb-4">File Permissions</h3>
                                 <table className="wp-dev-toolkit-system-info-table">
                                     <tbody>
                                         {Object.entries(systemInfo.permissions).map(([key, value]) => (
                                             <InfoRow
                                                 key={key}
-                                                label={key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                label={key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                                 value={value}
                                             />
                                         ))}

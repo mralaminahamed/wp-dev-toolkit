@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { createHashRouter, RouterProvider, Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Dashicon } from '@wordpress/components';
 
 import Dashboard from '@/components/Dashboard';
@@ -25,21 +25,6 @@ declare global {
     wpDevToolkitInitialRoute?: string;
   }
 }
-
-// Route initializer component
-const RouteInitializer: React.FC = () => {
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    // Check if we have an initial route from the server
-    if (window.wpDevToolkitInitialRoute) {
-      // Navigate to the initial route
-      navigate(`/${window.wpDevToolkitInitialRoute}`);
-    }
-  }, [navigate]);
-  
-  return null;
-};
 
 // Main navigation component
 const MainNavigation: React.FC = () => {
@@ -68,18 +53,23 @@ const MainNavigation: React.FC = () => {
       </div>
       <nav className="wp-dev-toolkit-nav">
         <ul>
-          {tabs.map(tab => (
-            <li key={tab.name} className={currentPath === `/${tab.name}` || (tab.name === 'dashboard' && currentPath === '/') ? 'active' : ''}>
-              <NavLink 
-                to={`/${tab.name}`} 
-                className={({ isActive }) => isActive ? 'active' : ''}
-                end={tab.name === 'dashboard'}
-              >
-                <Dashicon icon={tab.icon as any} />
-                <span>{tab.title}</span>
-              </NavLink>
-            </li>
-          ))}
+          {tabs.map(tab => {
+            const isActive = 
+              (tab.name === 'dashboard' && (currentPath === '/' || currentPath === '/dashboard')) || 
+              (tab.name !== 'dashboard' && currentPath === `/${tab.name}`);
+            
+            return (
+              <li key={tab.name} className={isActive ? 'active' : ''}>
+                <Link 
+                  to={tab.name === 'dashboard' ? '/' : `/${tab.name}`} 
+                  className={isActive ? 'active' : ''}
+                >
+                  <Dashicon icon={tab.icon as any} />
+                  <span>{tab.title}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
       <div className="wp-dev-toolkit-version">
@@ -89,31 +79,54 @@ const MainNavigation: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+// Root Layout Component
+const RootLayout: React.FC = () => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Check if we have an initial route from the server
+    if (window.wpDevToolkitInitialRoute) {
+      const route = window.wpDevToolkitInitialRoute === 'dashboard' ? '/' : `/${window.wpDevToolkitInitialRoute}`;
+      console.log('Initializing with route:', route);
+      // Navigate to the initial route
+      navigate(route);
+    }
+  }, [navigate]);
+  
   return (
-    <Router>
-      <RouteInitializer />
-      <div className="wp-dev-toolkit-app">
-        <MainNavigation />
-        <main className="wp-dev-toolkit-content">
-          <div className="wp-dev-toolkit-container">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/error-log" element={<ErrorLog />} />
-              <Route path="/query-monitor" element={<QueryMonitor />} />
-              <Route path="/hook-inspector" element={<HookInspector />} />
-              <Route path="/terminal" element={<Terminal />} />
-              <Route path="/system-info" element={<SystemInfo />} />
-              <Route path="/tailwind-test" element={<TailwindTest />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<Dashboard />} />
-            </Routes>
-          </div>
-        </main>
-      </div>
-    </Router>
+    <div className="wp-dev-toolkit-app">
+      <MainNavigation />
+      <main className="wp-dev-toolkit-content">
+        <div className="wp-dev-toolkit-container">
+          <Outlet />
+        </div>
+      </main>
+    </div>
   );
+};
+
+// Create router with routes configuration
+const router = createHashRouter([
+  {
+    path: '/',
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'error-log', element: <ErrorLog /> },
+      { path: 'query-monitor', element: <QueryMonitor /> },
+      { path: 'hook-inspector', element: <HookInspector /> },
+      { path: 'terminal', element: <Terminal /> },
+      { path: 'system-info', element: <SystemInfo /> },
+      { path: 'tailwind-test', element: <TailwindTest /> },
+      { path: 'settings', element: <Settings /> },
+      { path: '*', element: <Dashboard /> }
+    ]
+  }
+]);
+
+const App: React.FC = () => {
+  return <RouterProvider router={router} />;
 };
 
 export default App;

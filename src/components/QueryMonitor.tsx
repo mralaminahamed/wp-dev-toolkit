@@ -1,10 +1,11 @@
-import { Button, SelectControl, Spinner, Dashicon } from '@wordpress/components';
+import { Button, SelectControl, Spinner, Dashicon, TextControl, ToggleControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import React from 'react';
 
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
 
-interface Query {
+// Local interface to match the component's needs
+interface QueryItem {
   query: string;
   time: number;
   caller: string;
@@ -15,33 +16,72 @@ interface QueryOptions {
   order: 'time' | 'caller' | 'query';
   direction: 'asc' | 'desc';
   limit: number;
+  search?: string;
+}
+
+interface QueryStats {
+  slow: number;
+  medium: number;
+  fast: number;
 }
 
 const QueryMonitor: React.FC = () => {
-  const { } = useWPDevToolkit();
-  const [queries, setQueries] = useState<Query[]>([]);
+  const { config, toggleTool } = useWPDevToolkit();
+  const [queries, setQueries] = useState<QueryItem[]>([]);
   const [totalTime, setTotalTime] = useState<number>(0);
   const [totalQueries, setTotalQueries] = useState<number>(0);
-  const [selectedQuery, setSelectedQuery] = useState<Query | null>(null);
+  const [selectedQuery, setSelectedQuery] = useState<QueryItem | null>(null);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [stats, setStats] = useState<QueryStats>({ slow: 0, medium: 0, fast: 0 });
+  const [showOptimizationTips, setShowOptimizationTips] = useState<boolean>(false);
   const [queryOptions, setQueryOptions] = useState<QueryOptions>({
     order: 'time',
     direction: 'desc',
     limit: 100,
+    search: '',
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [filteredQueries, setFilteredQueries] = useState<QueryItem[]>([]);
 
   useEffect(() => {
     fetchQueries();
   }, [queryOptions]);
 
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = queries.filter(
+        (query) => 
+          query.query.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          (query.caller && query.caller.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredQueries(filtered);
+    } else {
+      setFilteredQueries(queries);
+    }
+  }, [searchTerm, queries]);
+
+  useEffect(() => {
+    if (queries.length) {
+      // Calculate query stats
+      const slow = queries.filter(q => q.time > 0.1).length;
+      const medium = queries.filter(q => q.time <= 0.1 && q.time > 0.05).length;
+      const fast = queries.filter(q => q.time <= 0.05).length;
+      setStats({ slow, medium, fast });
+    }
+  }, [queries]);
+
   const fetchQueries = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${window.wpDevToolkit.apiUrl}/query-monitor?limit=${queryOptions.limit}&order=${queryOptions.order}&direction=${queryOptions.direction}`, {
-        headers: {
-          'X-WP-Nonce': window.wpDevToolkit.nonce,
-        },
-      });
+      const response = await fetch(
+        `${window.wpDevToolkit.apiUrl}/query-monitor?limit=${queryOptions.limit}&order=${queryOptions.order}&direction=${queryOptions.direction}${queryOptions.search ? `&search=${encodeURIComponent(queryOptions.search)}` : ''}`, 
+        {
+          headers: {
+            'X-WP-Nonce': window.wpDevToolkit.nonce,
+          },
+        }
+      );
       const data = await response.json();
 
       if (data.success) {
@@ -64,8 +104,31 @@ const QueryMonitor: React.FC = () => {
     setQueryOptions(prev => ({ ...prev, direction: direction as 'asc' | 'desc' }));
   };
 
-  const viewQueryDetails = (query: Query) => {
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    
+    // Debounce API search
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    const timeout = setTimeout(() => {
+      setQueryOptions(prev => ({ ...prev, search: term }));
+    }, 500);
+    
+    setSearchTimeout(timeout);
+  };
+
+  const viewQueryDetails = (query: QueryItem) => {
     setSelectedQuery(query);
+    
+    // Scroll to details section
+    setTimeout(() => {
+      const detailsElement = document.getElementById('query-details');
+      if (detailsElement) {
+        detailsElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const closeDetails = () => {
@@ -76,6 +139,43 @@ const QueryMonitor: React.FC = () => {
     return `${(time * 1000).toFixed(2)} ms`;
   };
 
+  const getTimeClass = (time: number): string => {
+    if (time > 0.1) {
+      return 'wdt-bg-red-100 wdt-text-red-800 wdt-border-red-200';
+    } else if (time > 0.05) {
+      return 'wdt-bg-yellow-100 wdt-text-yellow-800 wdt-border-yellow-200';
+    }
+    return 'wdt-bg-green-100 wdt-text-green-800 wdt-border-green-200';
+  };
+
+  const toggleQueryMonitoring = () => {
+    toggleTool('query_monitoring');
+  };
+
+  const getOptimizationTips = () => {
+    if (stats.slow === 0) return null;
+    
+    return (
+      <div className="wdt-p-4 wdt-bg-amber-50 wdt-border wdt-border-amber-100 wdt-rounded-lg wdt-mb-6">
+        <div className="wdt-flex wdt-items-start wdt-gap-3">
+          <div className="wdt-text-amber-600">
+            <Dashicon icon="warning" size={24} />
+          </div>
+          <div>
+            <h3 className="wdt-font-medium wdt-text-amber-800 wdt-mb-2">Query Optimization Suggestions</h3>
+            <ul className="wdt-list-disc wdt-list-inside wdt-text-sm wdt-text-amber-700 wdt-space-y-1">
+              <li>You have {stats.slow} slow {stats.slow === 1 ? 'query' : 'queries'} ({">"} 100ms) that may need optimization.</li>
+              {stats.slow > 3 && <li>Consider adding proper indexes to tables frequently queried.</li>}
+              <li>Check for queries inside loops that could be consolidated.</li>
+              <li>Use <code className="wdt-px-1.5 wdt-py-0.5 wdt-bg-amber-100 wdt-rounded wdt-text-amber-800">get_posts()</code> instead of <code className="wdt-px-1.5 wdt-py-0.5 wdt-bg-amber-100 wdt-rounded wdt-text-amber-800">WP_Query</code> when you don{"'"}t need pagination.</li>
+              <li>Use <code className="wdt-px-1.5 wdt-py-0.5 wdt-bg-amber-100 wdt-rounded wdt-text-amber-800">$wpdb-{">"} prepare()</code> for all SQL queries with variables.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="wp-dev-toolkit-query-monitor">
       <div className="wp-dev-toolkit-page-header">
@@ -83,7 +183,37 @@ const QueryMonitor: React.FC = () => {
         <p>Track and analyze database queries</p>
       </div>
 
-      <div className="wp-dev-toolkit-dashboard-stats mb-6">
+      {/* Quick Actions */}
+      <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-mb-6">
+        <div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-4">
+          <Button 
+            className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
+            onClick={fetchQueries} 
+            disabled={isLoading}
+            icon="refresh"
+          >
+            {isLoading ? 'Refreshing...' : 'Refresh Queries'}
+          </Button>
+          
+          <Button 
+            className={`wp-dev-toolkit-button ${config.query_monitoring ? 'wp-dev-toolkit-button-secondary' : 'wp-dev-toolkit-button-primary'}`}
+            onClick={toggleQueryMonitoring}
+            icon={config.query_monitoring ? 'no-alt' : 'yes-alt'}
+          >
+            {config.query_monitoring ? 'Disable Query Monitor' : 'Enable Query Monitor'}
+          </Button>
+          
+          <div className="wdt-ml-auto wdt-flex wdt-items-center wdt-gap-2">
+            <ToggleControl
+              label="Show optimization tips"
+              checked={showOptimizationTips}
+              onChange={() => setShowOptimizationTips(!showOptimizationTips)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="wp-dev-toolkit-dashboard-stats wdt-mb-6">
         <div className="wp-dev-toolkit-dashboard-stat">
           <div className="wp-dev-toolkit-dashboard-stat-icon blue">
             <Dashicon icon="database" />
@@ -91,6 +221,9 @@ const QueryMonitor: React.FC = () => {
           <div className="wp-dev-toolkit-dashboard-stat-content">
             <div className="wp-dev-toolkit-dashboard-stat-title">Total Queries</div>
             <div className="wp-dev-toolkit-dashboard-stat-value">{totalQueries}</div>
+            <div className="wdt-mt-2 wdt-text-sm wdt-text-gray-500">
+              This page load
+            </div>
           </div>
         </div>
 
@@ -101,6 +234,17 @@ const QueryMonitor: React.FC = () => {
           <div className="wp-dev-toolkit-dashboard-stat-content">
             <div className="wp-dev-toolkit-dashboard-stat-title">Total Execution Time</div>
             <div className="wp-dev-toolkit-dashboard-stat-value">{formatTime(totalTime)}</div>
+            <div className="wdt-mt-2 wdt-flex wdt-gap-2">
+              <span className="wdt-inline-flex wdt-items-center wdt-gap-1 wdt-px-2 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium wdt-bg-green-100 wdt-text-green-800">
+                Fast <span className="wdt-bg-white wdt-px-1.5 wdt-py-0.5 wdt-rounded-full">{stats.fast}</span>
+              </span>
+              <span className="wdt-inline-flex wdt-items-center wdt-gap-1 wdt-px-2 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium wdt-bg-yellow-100 wdt-text-yellow-800">
+                Medium <span className="wdt-bg-white wdt-px-1.5 wdt-py-0.5 wdt-rounded-full">{stats.medium}</span>
+              </span>
+              <span className="wdt-inline-flex wdt-items-center wdt-gap-1 wdt-px-2 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium wdt-bg-red-100 wdt-text-red-800">
+                Slow <span className="wdt-bg-white wdt-px-1.5 wdt-py-0.5 wdt-rounded-full">{stats.slow}</span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -113,26 +257,34 @@ const QueryMonitor: React.FC = () => {
             <div className="wp-dev-toolkit-dashboard-stat-value">
               {totalQueries > 0 ? formatTime(totalTime / totalQueries) : '0 ms'}
             </div>
+            <div className="wdt-mt-2 wdt-text-sm wdt-text-gray-500">
+              {totalQueries > 30 ? 'High query count - consider caching' : 'Query count is acceptable'}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="wp-dev-toolkit-card mb-6">
+      {showOptimizationTips && getOptimizationTips()}
+
+      <div className="wp-dev-toolkit-card wdt-mb-6">
         <div className="wp-dev-toolkit-card-header">
-          <div className="flex justify-between items-center">
-            <h2>Query Settings</h2>
-            <Button
-              className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
-              onClick={fetchQueries}
-              disabled={isLoading}
-              icon="refresh"
-            >
-              {isLoading ? 'Refreshing...' : 'Refresh Queries'}
-            </Button>
+          <div className="wdt-flex wdt-justify-between wdt-items-center">
+            <div className="wdt-flex wdt-items-center wdt-gap-2">
+              <Dashicon icon="filter" />
+              <h2>Query Filters</h2>
+            </div>
           </div>
         </div>
         <div className="wp-dev-toolkit-card-body">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-3 wdt-gap-6">
+            <div>
+              <TextControl
+                label="Search Queries"
+                value={searchTerm}
+                onChange={handleSearch}
+                placeholder="Search in query or caller..."
+              />
+            </div>
             <div>
               <SelectControl
                 label="Sort By"
@@ -157,20 +309,41 @@ const QueryMonitor: React.FC = () => {
               />
             </div>
           </div>
+          
+          {searchTerm && (
+            <div className="wdt-bg-blue-50 wdt-p-3 wdt-rounded-md wdt-border wdt-border-blue-100 wdt-mt-4">
+              <div className="wdt-flex wdt-items-center wdt-gap-2">
+                <Dashicon icon="search" className="wdt-text-blue-500" />
+                <span className="wdt-text-blue-700">
+                  Found <strong>{filteredQueries.length}</strong> queries matching: <strong>{searchTerm}</strong>
+                </span>
+                <button 
+                  onClick={() => handleSearch('')}
+                  className="wdt-ml-auto wdt-text-blue-700 hover:wdt-text-blue-900"
+                  aria-label="Clear search"
+                >
+                  <Dashicon icon="no-alt" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center p-16 bg-white rounded-lg shadow-sm">
-          <Spinner /> <span className="ml-2">Loading queries...</span>
+        <div className="wdt-flex wdt-justify-center wdt-items-center wdt-p-16 wdt-bg-white wdt-rounded-lg wdt-shadow-sm">
+          <Spinner /> <span className="wdt-ml-2">Loading queries...</span>
         </div>
       ) : (
         <>
           {selectedQuery && (
-            <div className="wp-dev-toolkit-card mb-6">
+            <div id="query-details" className="wp-dev-toolkit-card wdt-mb-6">
               <div className="wp-dev-toolkit-card-header">
-                <div className="flex justify-between items-center">
-                  <h2>Query Details</h2>
+                <div className="wdt-flex wdt-justify-between wdt-items-center">
+                  <div className="wdt-flex wdt-items-center wdt-gap-2">
+                    <Dashicon icon="database" />
+                    <h2>Query Details</h2>
+                  </div>
                   <Button 
                     className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
                     onClick={closeDetails}
@@ -181,35 +354,35 @@ const QueryMonitor: React.FC = () => {
                 </div>
               </div>
               <div className="wp-dev-toolkit-card-body">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-2 wdt-gap-6 wdt-mb-6">
                   <div>
-                    <h3 className="font-medium mb-2">Execution Time</h3>
-                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 font-medium text-blue-800">
+                    <h3 className="wdt-font-medium wdt-mb-2">Execution Time</h3>
+                    <div className={`wdt-p-3 wdt-rounded-lg wdt-border wdt-font-medium ${getTimeClass(selectedQuery.time)}`}>
                       {formatTime(selectedQuery.time)}
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-medium mb-2">Caller</h3>
-                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 font-mono text-sm overflow-x-auto">
+                    <h3 className="wdt-font-medium wdt-mb-2">Caller</h3>
+                    <div className="wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-font-mono wdt-text-sm wdt-overflow-x-auto">
                       {selectedQuery.caller}
                     </div>
                   </div>
                 </div>
 
-                <div className="mb-6">
-                  <h3 className="font-medium mb-2">SQL Query</h3>
-                  <pre className="bg-gray-50 p-4 rounded-lg border border-gray-200 overflow-x-auto text-sm whitespace-pre-wrap font-mono">
+                <div className="wdt-mb-6">
+                  <h3 className="wdt-font-medium wdt-mb-2">SQL Query</h3>
+                  <pre className="wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-overflow-x-auto wdt-text-sm wdt-whitespace-pre-wrap wdt-font-mono">
                     {selectedQuery.query}
                   </pre>
                 </div>
 
                 {selectedQuery.backtrace && selectedQuery.backtrace.length > 0 && (
                   <div>
-                    <h3 className="font-medium mb-2">Stack Trace</h3>
-                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 overflow-x-auto">
-                      <ol className="list-decimal list-inside">
+                    <h3 className="wdt-font-medium wdt-mb-2">Stack Trace</h3>
+                    <div className="wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-overflow-x-auto">
+                      <ol className="wdt-list-decimal wdt-list-inside">
                         {selectedQuery.backtrace.map((trace, index) => (
-                          <li key={index} className="text-sm font-mono my-1 break-all">
+                          <li key={index} className="wdt-text-sm wdt-font-mono wdt-my-1 wdt-break-all">
                             {trace}
                           </li>
                         ))}
@@ -223,47 +396,51 @@ const QueryMonitor: React.FC = () => {
 
           <div className="wp-dev-toolkit-card">
             <div className="wp-dev-toolkit-card-header">
-              <h2>Database Queries</h2>
+              <div className="wdt-flex wdt-justify-between wdt-items-center">
+                <div className="wdt-flex wdt-items-center wdt-gap-2">
+                  <Dashicon icon="database" />
+                  <h2>Database Queries</h2>
+                </div>
+                <div className="wdt-text-sm wdt-text-gray-500">
+                  {filteredQueries.length} queries found
+                </div>
+              </div>
             </div>
-            <div className="wp-dev-toolkit-card-body p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+            <div className="wp-dev-toolkit-card-body wdt-p-0">
+              <div className="wdt-overflow-x-auto">
+                <table className="wdt-w-full">
+                  <thead className="wdt-bg-gray-50 wdt-border-b wdt-border-gray-200">
                     <tr>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                      <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-w-32">
                         Time
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">
                         Query
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">
                         Caller
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                      <th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-w-32">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {queries.length > 0 ? (
-                      queries.map((query, index) => (
-                        <tr key={index} className="hover:bg-gray-50 transition-colors">
-                          <td className="py-3 px-4 font-mono text-sm whitespace-nowrap">
-                            <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                              query.time > 0.1 ? 'bg-red-100 text-red-800' : 
-                              query.time > 0.05 ? 'bg-yellow-100 text-yellow-800' : 
-                              'bg-green-100 text-green-800'
-                            }`}>
+                  <tbody className="wdt-bg-white wdt-divide-y wdt-divide-gray-200">
+                    {filteredQueries.length > 0 ? (
+                      filteredQueries.map((query, index) => (
+                        <tr key={index} className="hover:wdt-bg-gray-50 wdt-transition-colors">
+                          <td className="wdt-py-3 wdt-px-4 wdt-font-mono wdt-text-sm wdt-whitespace-nowrap">
+                            <span className={`wdt-inline-block wdt-px-2 wdt-py-1 wdt-rounded-full wdt-text-xs ${getTimeClass(query.time)}`}>
                               {formatTime(query.time)}
                             </span>
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="max-w-lg truncate font-mono text-xs">{query.query}</div>
+                          <td className="wdt-py-3 wdt-px-4">
+                            <div className="wdt-max-w-lg wdt-truncate wdt-font-mono wdt-text-xs">{query.query}</div>
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="max-w-md truncate text-xs">{query.caller}</div>
+                          <td className="wdt-py-3 wdt-px-4">
+                            <div className="wdt-max-w-md wdt-truncate wdt-text-xs">{query.caller}</div>
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="wdt-py-3 wdt-px-4">
                             <Button 
                               className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
                               onClick={() => viewQueryDetails(query)}
@@ -277,7 +454,7 @@ const QueryMonitor: React.FC = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="py-8 px-4 text-center text-gray-500">
+                        <td colSpan={4} className="wdt-py-8 wdt-px-4 wdt-text-center wdt-text-gray-500">
                           No queries found.
                         </td>
                       </tr>
