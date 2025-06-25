@@ -1,22 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  Button, 
-  Card, 
-  CardBody, 
-  CardHeader, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHeader, 
-  TableRow, 
+  Button,
   TextControl, 
   SelectControl, 
   Spinner,
-  ToggleControl 
+  ToggleControl,
+  Dashicon
 } from '@wordpress/components';
 
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
-import { HookDetails, HookInspectorOptions, HookResponse } from '@/types';
+import { HookDetails, HookInspectorOptions, HookResponse } from '@/types/index';
 
 const HookInspector: React.FC = () => {
   const { hooks, isLoading } = useWPDevToolkit();
@@ -41,8 +34,10 @@ const HookInspector: React.FC = () => {
 
   const fetchHooks = async () => {
     try {
-      const response = await hooks.get(filterOptions) as HookResponse;
-      setHookData(response);
+      const response = await hooks.get(filterOptions) as unknown as HookResponse;
+      if (response) {
+        setHookData(response);
+      }
     } catch (error) {
       console.error('Error fetching hooks:', error);
     }
@@ -93,20 +88,29 @@ const HookInspector: React.FC = () => {
 
   const sortIndicator = (key: string) => {
     if (sortConfig.key !== key) return null;
-    return sortConfig.direction === 'ascending' ? ' ↑' : ' ↓';
+    return sortConfig.direction === 'ascending' ? <Dashicon icon="arrow-up-alt2" size={14} /> : <Dashicon icon="arrow-down-alt2" size={14} />;
+  };
+
+  const getHookTypeClass = (type: string) => {
+    return type === 'action' 
+      ? 'bg-green-100 text-green-800 border-green-200' 
+      : 'bg-blue-100 text-blue-800 border-blue-200';
   };
 
   return (
     <div className="wp-dev-toolkit-hook-inspector">
-      <h2 className="text-xl font-semibold mb-4">Hook Inspector</h2>
+      <div className="wp-dev-toolkit-page-header">
+        <h1>Hook Inspector</h1>
+        <p>Inspect WordPress actions and filters</p>
+      </div>
 
       {/* Filter Controls */}
-      <Card className="mb-4">
-        <CardHeader>
-          <h3 className="text-lg font-medium">Filters</h3>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="wp-dev-toolkit-card mb-6">
+        <div className="wp-dev-toolkit-card-header">
+          <h2>Filter Hooks</h2>
+        </div>
+        <div className="wp-dev-toolkit-card-body">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
             <div>
               <TextControl 
                 label="Search Hooks" 
@@ -128,200 +132,211 @@ const HookInspector: React.FC = () => {
               />
             </div>
           </div>
-          <div className="mt-4 flex justify-between items-center">
+          <div className="flex justify-between items-center">
             <ToggleControl
               label="Show Stack Traces"
               checked={showStackTrace}
               onChange={() => setShowStackTrace(!showStackTrace)}
             />
             <Button 
-              isPrimary 
+              className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
               onClick={fetchHooks} 
-              isBusy={isLoading}
               disabled={isLoading}
+              icon="refresh"
             >
-              Refresh Hooks
+              {isLoading ? 'Refreshing...' : 'Refresh Hooks'}
             </Button>
           </div>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
 
       {/* Statistics Summary */}
       {hookData?.summary && (
-        <Card className="mb-4">
-          <CardHeader>
-            <h3 className="text-lg font-medium">Summary</h3>
-          </CardHeader>
-          <CardBody>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div className="bg-gray-50 p-3 rounded">
-                <div className="text-sm text-gray-500">Total Hooks</div>
-                <div className="text-2xl font-bold">{hookData.summary.total_hooks}</div>
-              </div>
-              <div className="bg-gray-50 p-3 rounded">
-                <div className="text-sm text-gray-500">Total Executions</div>
-                <div className="text-2xl font-bold">{hookData.summary.total_executions}</div>
-              </div>
-              <div className="bg-gray-50 p-3 rounded">
-                <div className="text-sm text-gray-500">Total Time (ms)</div>
-                <div className="text-2xl font-bold">{hookData.summary.total_time.toFixed(2)}</div>
+        <div className="wp-dev-toolkit-dashboard-stats mb-6">
+          <div className="wp-dev-toolkit-dashboard-stat">
+            <div className="wp-dev-toolkit-dashboard-stat-icon blue">
+              <Dashicon icon="admin-plugins" />
+            </div>
+            <div className="wp-dev-toolkit-dashboard-stat-content">
+              <div className="wp-dev-toolkit-dashboard-stat-title">Total Hooks</div>
+              <div className="wp-dev-toolkit-dashboard-stat-value">
+                {hookData.summary.total_hooks}
               </div>
             </div>
-          </CardBody>
-        </Card>
+          </div>
+          <div className="wp-dev-toolkit-dashboard-stat">
+            <div className="wp-dev-toolkit-dashboard-stat-icon green">
+              <Dashicon icon="performance" />
+            </div>
+            <div className="wp-dev-toolkit-dashboard-stat-content">
+              <div className="wp-dev-toolkit-dashboard-stat-title">Total Executions</div>
+              <div className="wp-dev-toolkit-dashboard-stat-value">
+                {hookData.summary.total_executions}
+              </div>
+            </div>
+          </div>
+          <div className="wp-dev-toolkit-dashboard-stat">
+            <div className="wp-dev-toolkit-dashboard-stat-icon amber">
+              <Dashicon icon="clock" />
+            </div>
+            <div className="wp-dev-toolkit-dashboard-stat-content">
+              <div className="wp-dev-toolkit-dashboard-stat-title">Total Time (ms)</div>
+              <div className="wp-dev-toolkit-dashboard-stat-value">
+                {hookData.summary.total_time.toFixed(2)}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {isLoading ? (
-        <div className="flex justify-center my-8">
+        <div className="flex justify-center items-center p-16 bg-white rounded-lg shadow-sm">
           <Spinner /> <span className="ml-2">Loading hooks...</span>
         </div>
       ) : (
         <>
           {/* Hook Details View */}
           {selectedHook && (
-            <Card className="mb-4">
-              <CardHeader>
+            <div className="wp-dev-toolkit-card mb-6">
+              <div className="wp-dev-toolkit-card-header">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">
-                    {selectedHook.name}
-                    <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                      selectedHook.type === 'action' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
+                  <div className="flex items-center">
+                    <h2>{selectedHook.name}</h2>
+                    <span className={`ml-2 px-3 py-1 text-xs rounded-full font-medium ${getHookTypeClass(selectedHook.type)}`}>
                       {selectedHook.type}
                     </span>
-                  </h3>
-                  <Button isSecondary onClick={closeDetails}>
+                  </div>
+                  <Button 
+                    className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
+                    onClick={closeDetails}
+                    icon="no-alt"
+                  >
                     Close Details
                   </Button>
                 </div>
-              </CardHeader>
-              <CardBody>
-                <h4 className="font-medium mb-2">Callbacks ({selectedHook.callbacks.length})</h4>
+              </div>
+              <div className="wp-dev-toolkit-card-body">
+                <h3 className="font-medium text-lg mb-3">Callbacks ({selectedHook.callbacks.length})</h3>
                 <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableCell>Priority</TableCell>
-                        <TableCell>Function</TableCell>
-                        <TableCell>Location</TableCell>
-                        <TableCell>Args</TableCell>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  <table className="wp-dev-toolkit-system-info-table">
+                    <thead>
+                      <tr>
+                        <th>Priority</th>
+                        <th>Function</th>
+                        <th>Location</th>
+                        <th>Args</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {selectedHook.callbacks.map((callback, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{callback.priority}</TableCell>
-                          <TableCell className="font-mono text-sm">{callback.function}</TableCell>
-                          <TableCell className="text-xs">
+                        <tr key={index}>
+                          <td>{callback.priority}</td>
+                          <td className="font-mono text-sm">{callback.function}</td>
+                          <td className="text-xs">
                             {callback.file}:{callback.line}
-                          </TableCell>
-                          <TableCell>{callback.accepted_args}</TableCell>
-                        </TableRow>
+                          </td>
+                          <td>{callback.accepted_args}</td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </table>
                 </div>
-              </CardBody>
-            </Card>
+              </div>
+            </div>
           )}
 
           {/* Hooks List */}
-          <Card>
-            <CardHeader>
+          <div className="wp-dev-toolkit-card">
+            <div className="wp-dev-toolkit-card-header">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Hooks</h3>
+                <h2>Hooks</h2>
                 <div className="text-sm text-gray-500">
                   {sortedHooks.length} hooks found
                 </div>
               </div>
-            </CardHeader>
-            <CardBody>
+            </div>
+            <div className="wp-dev-toolkit-card-body p-0">
               <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableCell 
-                        className="cursor-pointer hover:bg-gray-50" 
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th 
+                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                         onClick={() => handleSort('name')}
                       >
-                        Hook Name{sortIndicator('name')}
-                      </TableCell>
-                      <TableCell 
-                        className="cursor-pointer hover:bg-gray-50" 
+                        <div className="flex items-center">
+                          <span>Hook Name</span>
+                          <span className="ml-1">{sortIndicator('name')}</span>
+                        </div>
+                      </th>
+                      <th 
+                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                         onClick={() => handleSort('type')}
                       >
-                        Type{sortIndicator('type')}
-                      </TableCell>
-                      <TableCell 
-                        className="cursor-pointer hover:bg-gray-50" 
+                        <div className="flex items-center">
+                          <span>Type</span>
+                          <span className="ml-1">{sortIndicator('type')}</span>
+                        </div>
+                      </th>
+                      <th 
+                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                         onClick={() => handleSort('count')}
                       >
-                        Executions{sortIndicator('count')}
-                      </TableCell>
-                      <TableCell 
-                        className="cursor-pointer hover:bg-gray-50" 
+                        <div className="flex items-center">
+                          <span>Count</span>
+                          <span className="ml-1">{sortIndicator('count')}</span>
+                        </div>
+                      </th>
+                      <th 
+                        className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                         onClick={() => handleSort('total_time')}
                       >
-                        Time (ms){sortIndicator('total_time')}
-                      </TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                        <div className="flex items-center">
+                          <span>Time (ms)</span>
+                          <span className="ml-1">{sortIndicator('total_time')}</span>
+                        </div>
+                      </th>
+                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
                     {sortedHooks.length > 0 ? (
                       sortedHooks.map((hook, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{hook.name}</TableCell>
-                          <TableCell>
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              hook.type === 'action' 
-                                ? 'bg-green-100 text-green-800' 
-                                : hook.type === 'filter'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
+                        <tr key={index} className="hover:bg-gray-50 transition-colors">
+                          <td className="py-3 px-4 font-medium">{hook.name}</td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 text-xs rounded-full ${getHookTypeClass(hook.type)}`}>
                               {hook.type}
                             </span>
-                          </TableCell>
-                          <TableCell>{hook.count}</TableCell>
-                          <TableCell>{hook.total_time.toFixed(2)}</TableCell>
-                          <TableCell>
+                          </td>
+                          <td className="py-3 px-4">{hook.count}</td>
+                          <td className="py-3 px-4">{hook.total_time.toFixed(2)}</td>
+                          <td className="py-3 px-4">
                             <Button 
-                              isSecondary 
-                              isSmall 
-                              onClick={() => viewHookDetails(hook as unknown as HookDetails)}
+                              className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
+                              onClick={() => viewHookDetails(hook)}
+                              isSmall
+                              icon="visibility"
                             >
-                              Details
+                              View
                             </Button>
-                            {showStackTrace && hook.backtrace && (
-                              <Button 
-                                isSmall 
-                                className="ml-2"
-                                onClick={() => {
-                                  console.log('Stack trace for', hook.name, hook.backtrace);
-                                  alert(`Stack trace for ${hook.name} logged to console`);
-                                }}
-                              >
-                                Stack
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))
                     ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8">
+                      <tr>
+                        <td colSpan={5} className="py-8 px-4 text-center text-gray-500">
                           No hooks found matching your criteria.
-                        </TableCell>
-                      </TableRow>
+                        </td>
+                      </tr>
                     )}
-                  </TableBody>
-                </Table>
+                  </tbody>
+                </table>
               </div>
-            </CardBody>
-          </Card>
+            </div>
+          </div>
         </>
       )}
     </div>

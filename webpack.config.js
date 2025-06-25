@@ -19,5 +19,5 @@ module.exports = {
       ...defaultConfig.resolve.alias,
       '@': path.resolve(__dirname, 'src/'),
     },
-  },
+  }
 };

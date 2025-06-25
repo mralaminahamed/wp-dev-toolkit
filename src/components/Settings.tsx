@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, ToggleControl, SelectControl, RangeControl, Button, Notice } from '@wordpress/components';
+import { ToggleControl, SelectControl, RangeControl, Button, Spinner, Dashicon } from '@wordpress/components';
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
 
 interface Settings {
@@ -125,112 +125,178 @@ const Settings: React.FC = () => {
   };
 
   if (isLoading) {
-    return null;
+    return (
+      <div className="wp-dev-toolkit-settings">
+        <div className="wp-dev-toolkit-page-header">
+          <h1>Settings</h1>
+          <p>Configure the WordPress Development Toolkit</p>
+        </div>
+        <div className="flex justify-center items-center p-16 bg-white rounded-lg shadow-sm">
+          <Spinner /> <span className="ml-2">Loading settings...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="wp-dev-toolkit-settings">
-      <h2 className="text-xl font-semibold mb-4">Settings</h2>
+      <div className="wp-dev-toolkit-page-header">
+        <h1>Settings</h1>
+        <p>Configure the WordPress Development Toolkit</p>
+      </div>
 
       {saved && (
-        <Notice status="success" isDismissible={false} className="mb-4">
-          Settings saved successfully!
-        </Notice>
+        <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6 flex items-start">
+          <Dashicon icon="yes-alt" className="text-green-500 mr-3 mt-0.5" />
+          <div>
+            <h3 className="font-medium">Success</h3>
+            <p>Settings saved successfully!</p>
+          </div>
+        </div>
       )}
 
       {error && (
-        <Notice status="error" onRemove={() => setError(null)} className="mb-4">
-          {error}
-        </Notice>
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-start">
+          <Dashicon icon="warning" className="text-red-500 mr-3 mt-0.5" />
+          <div>
+            <h3 className="font-medium">Error</h3>
+            <p>{error}</p>
+            <Button 
+              className="mt-2 text-red-700 underline text-sm"
+              onClick={() => setError(null)}
+            >
+              Dismiss
+            </Button>
+          </div>
+        </div>
       )}
 
-      <Card className="mb-4">
-        <CardHeader>
-          <h3 className="text-lg font-medium">General Settings</h3>
-        </CardHeader>
-        <CardBody>
-          <ToggleControl
-            label="Development Mode"
-            checked={settings.dev_mode}
-            onChange={value => updateSetting('dev_mode', value)}
-            help="Enable development mode features across all tools"
-          />
+      <div className="wp-dev-toolkit-card mb-6">
+        <div className="wp-dev-toolkit-card-header">
+          <div className="flex items-center">
+            <Dashicon icon="admin-generic" className="mr-2" />
+            <h2>General Settings</h2>
+          </div>
+        </div>
+        <div className="wp-dev-toolkit-card-body">
+          <div className="space-y-6">
+            <div className="wp-dev-toolkit-settings-option">
+              <ToggleControl
+                label="Development Mode"
+                checked={settings.dev_mode}
+                onChange={value => updateSetting('dev_mode', value)}
+                help="Enable development mode features across all tools"
+              />
+            </div>
 
-          <SelectControl
-            label="Log Level"
-            value={settings.log_level}
-            options={[
-              { label: 'All', value: 'all' },
-              { label: 'Errors Only', value: 'error' },
-              { label: 'Warnings & Errors', value: 'warning' },
-              { label: 'Notices & Above', value: 'notice' },
-              { label: 'Info & Above', value: 'info' }
-            ]}
-            onChange={value => updateSetting('log_level', value)}
-          />
-        </CardBody>
-      </Card>
+            <div className="wp-dev-toolkit-settings-option">
+              <SelectControl
+                label="Log Level"
+                value={settings.log_level}
+                options={[
+                  { label: 'All', value: 'all' },
+                  { label: 'Errors Only', value: 'error' },
+                  { label: 'Warnings & Errors', value: 'warning' },
+                  { label: 'Notices & Above', value: 'notice' },
+                  { label: 'Info & Above', value: 'info' }
+                ]}
+                onChange={value => updateSetting('log_level', value)}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <Card className="mb-4">
-        <CardHeader>
-          <h3 className="text-lg font-medium">Tool Settings</h3>
-        </CardHeader>
-        <CardBody>
-          <ToggleControl
-            label="Error Logger"
-            checked={settings.error_logger}
-            onChange={value => updateSetting('error_logger', value)}
-            help="Enable error logging functionality"
-          />
+      <div className="wp-dev-toolkit-card mb-6">
+        <div className="wp-dev-toolkit-card-header">
+          <div className="flex items-center">
+            <Dashicon icon="admin-tools" className="mr-2" />
+            <h2>Tool Settings</h2>
+          </div>
+        </div>
+        <div className="wp-dev-toolkit-card-body">
+          <div className="space-y-6">
+            <div className="wp-dev-toolkit-settings-option">
+              <ToggleControl
+                label="Error Logger"
+                checked={settings.error_logger}
+                onChange={value => updateSetting('error_logger', value)}
+                help="Enable error logging functionality"
+              />
+            </div>
 
-          <ToggleControl
-            label="Query Monitor"
-            checked={settings.query_monitor}
-            onChange={value => updateSetting('query_monitor', value)}
-            help="Enable database query monitoring"
-          />
+            <div className="wp-dev-toolkit-settings-option">
+              <ToggleControl
+                label="Query Monitor"
+                checked={settings.query_monitor}
+                onChange={value => updateSetting('query_monitor', value)}
+                help="Enable database query monitoring"
+              />
+            </div>
 
-          <ToggleControl
-            label="Hook Inspector"
-            checked={settings.hook_inspector}
-            onChange={value => updateSetting('hook_inspector', value)}
-            help="Enable WordPress hook inspection"
-          />
-        </CardBody>
-      </Card>
+            <div className="wp-dev-toolkit-settings-option">
+              <ToggleControl
+                label="Hook Inspector"
+                checked={settings.hook_inspector}
+                onChange={value => updateSetting('hook_inspector', value)}
+                help="Enable WordPress hook inspection"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <Card className="mb-4">
-        <CardHeader>
-          <h3 className="text-lg font-medium">Performance Settings</h3>
-        </CardHeader>
-        <CardBody>
-          <RangeControl
-            label="Maximum Queries to Log"
-            value={settings.max_queries}
-            onChange={value => updateSetting('max_queries', value || 100)}
-            min={10}
-            max={1000}
-            step={10}
-            help="Number of database queries to keep in memory"
-          />
+      <div className="wp-dev-toolkit-card mb-6">
+        <div className="wp-dev-toolkit-card-header">
+          <div className="flex items-center">
+            <Dashicon icon="performance" className="mr-2" />
+            <h2>Performance Settings</h2>
+          </div>
+        </div>
+        <div className="wp-dev-toolkit-card-body">
+          <div className="space-y-6">
+            <div className="wp-dev-toolkit-settings-option">
+              <RangeControl
+                label="Maximum Queries to Log"
+                value={settings.max_queries}
+                onChange={value => updateSetting('max_queries', value || 100)}
+                min={10}
+                max={1000}
+                step={10}
+                help="Number of database queries to keep in memory"
+              />
+            </div>
 
-          <RangeControl
-            label="Slow Query Threshold (seconds)"
-            value={settings.slow_query_threshold}
-            onChange={value => updateSetting('slow_query_threshold', value || 1.0)}
-            min={0.1}
-            max={10.0}
-            step={0.1}
-            help="Queries taking longer than this will be highlighted"
-          />
-        </CardBody>
-      </Card>
+            <div className="wp-dev-toolkit-settings-option">
+              <RangeControl
+                label="Slow Query Threshold (seconds)"
+                value={settings.slow_query_threshold}
+                onChange={value => updateSetting('slow_query_threshold', value || 1.0)}
+                min={0.1}
+                max={10.0}
+                step={0.1}
+                help="Queries taking longer than this will be highlighted"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="flex space-x-4">
-        <Button isPrimary onClick={saveSettings} isBusy={isSaving} disabled={isSaving}>
-          Save Settings
+        <Button 
+          className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
+          onClick={saveSettings} 
+          disabled={isSaving}
+          icon="yes"
+        >
+          {isSaving ? 'Saving...' : 'Save Settings'}
         </Button>
-        <Button isSecondary onClick={resetSettings} disabled={isSaving}>
+        <Button 
+          className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
+          onClick={resetSettings} 
+          disabled={isSaving}
+          icon="update"
+        >
           Reset to Defaults
         </Button>
       </div>

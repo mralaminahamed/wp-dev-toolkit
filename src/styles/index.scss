@@ -1,8 +1,8 @@
-@use 'tailwindcss';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@config "../../tailwind.config.js";
 
 // Variables
 :root {
@@ -20,338 +20,338 @@
 
 .wp-dev-toolkit {
   &-app {
-    @apply flex h-screen w-full bg-gray-50;
+    @apply wdt-flex wdt-h-screen wdt-w-full wdt-bg-gray-50;
     background-color: var(--wp-dev-toolkit-background);
   }
 
   &-sidebar {
-    @apply flex flex-col w-60 min-w-60 h-full border-r border-gray-200 bg-white;
+    @apply wdt-flex wdt-flex-col wdt-w-60 wdt-min-w-60 wdt-h-full wdt-border-r wdt-border-gray-200 wdt-bg-white;
     width: var(--wp-dev-toolkit-sidebar-width);
     min-width: var(--wp-dev-toolkit-sidebar-width);
   }
   
   &-logo {
-    @apply flex items-center gap-3 p-4 border-b border-gray-200;
+    @apply wdt-flex wdt-items-center wdt-gap-3 wdt-p-4 wdt-border-b wdt-border-gray-200;
     
     img {
-      @apply w-8 h-8;
+      @apply wdt-w-8 wdt-h-8;
     }
     
     h1 {
-      @apply text-lg font-medium;
+      @apply wdt-text-lg wdt-font-medium;
       color: var(--wp-dev-toolkit-primary);
     }
   }
 
   &-content {
-    @apply flex-1 overflow-auto p-6;
+    @apply wdt-flex-1 wdt-overflow-auto wdt-p-6;
   }
   
   &-container {
-    @apply max-w-7xl mx-auto;
+    @apply wdt-max-w-7xl wdt-mx-auto;
   }
 
   &-version {
-    @apply mt-auto p-4 text-center text-xs text-gray-500 border-t border-gray-200;
+    @apply wdt-mt-auto wdt-p-4 wdt-text-center wdt-text-xs wdt-text-gray-500 wdt-border-t wdt-border-gray-200;
   }
 
   &-nav {
-    @apply flex-1 py-2 overflow-auto;
+    @apply wdt-flex-1 wdt-py-2 wdt-overflow-auto;
 
     ul {
-      @apply flex flex-col;
+      @apply wdt-flex wdt-flex-col;
     }
 
     li {
-      @apply relative;
+      @apply wdt-relative;
       
       &.active {
-        @apply bg-blue-50;
+        @apply wdt-bg-blue-50;
         
         &::before {
           content: '';
-          @apply absolute left-0 top-0 h-full w-1 bg-blue-600;
+          @apply wdt-absolute wdt-left-0 wdt-top-0 wdt-h-full wdt-w-1 wdt-bg-blue-600;
         }
       }
     }
 
     a {
-      @apply flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors;
+      @apply wdt-flex wdt-items-center wdt-gap-3 wdt-px-4 wdt-py-3 wdt-text-gray-700 hover:wdt-bg-gray-50 wdt-transition-colors;
       
       .dashicons, .dashicon {
-        @apply text-gray-500;
+        @apply wdt-text-gray-500;
       }
       
       span {
-        @apply font-medium;
+        @apply wdt-font-medium;
       }
       
       &.active {
-        @apply text-blue-600;
+        @apply wdt-text-blue-600;
         
         .dashicons, .dashicon {
-          @apply text-blue-600;
+          @apply wdt-text-blue-600;
         }
       }
       
       &:hover {
-        @apply text-blue-600;
+        @apply wdt-text-blue-600;
       }
     }
   }
 
   &-card {
-    @apply bg-white rounded-lg overflow-hidden mb-6;
+    @apply wdt-bg-white wdt-rounded-lg wdt-overflow-hidden wdt-mb-6;
     box-shadow: var(--wp-dev-toolkit-card-shadow);
 
     &-header {
-      @apply flex justify-between items-center p-4 border-b border-gray-200;
+      @apply wdt-flex wdt-justify-between wdt-items-center wdt-p-4 wdt-border-b wdt-border-gray-200;
       
       h2 {
-        @apply text-lg font-medium text-gray-800;
+        @apply wdt-text-lg wdt-font-medium wdt-text-gray-800;
       }
     }
 
     &-body {
-      @apply p-6;
+      @apply wdt-p-6;
     }
   }
 
   &-dashboard {
     &-stats {
-      @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8;
+      @apply wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-3 wdt-gap-6 wdt-mb-8;
     }
 
     &-stat {
-      @apply bg-white p-6 rounded-lg flex items-center gap-4;
+      @apply wdt-bg-white wdt-p-6 wdt-rounded-lg wdt-flex wdt-items-center wdt-gap-4;
       box-shadow: var(--wp-dev-toolkit-card-shadow);
       
       &-icon {
-        @apply p-3 rounded-full text-white;
+        @apply wdt-p-3 wdt-rounded-full wdt-text-white;
         
         &.blue {
-          @apply bg-blue-500;
+          @apply wdt-bg-blue-500;
         }
         
         &.green {
-          @apply bg-green-500;
+          @apply wdt-bg-green-500;
         }
         
         &.amber {
-          @apply bg-amber-500;
+          @apply wdt-bg-amber-500;
         }
       }
       
       &-content {
-        @apply flex flex-col;
+        @apply wdt-flex wdt-flex-col;
       }
 
       &-title {
-        @apply text-sm text-gray-500;
+        @apply wdt-text-sm wdt-text-gray-500;
       }
 
       &-value {
-        @apply text-2xl font-bold;
+        @apply wdt-text-2xl wdt-font-bold;
       }
     }
     
     &-widgets {
-      @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+      @apply wdt-grid wdt-grid-cols-1 lg:wdt-grid-cols-2 wdt-gap-6;
     }
   }
 
   &-error-log {
     pre {
-      @apply bg-gray-50 p-4 rounded-lg font-mono text-sm overflow-auto max-h-[500px] border border-gray-200;
+      @apply wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-font-mono wdt-text-sm wdt-overflow-auto wdt-max-h-[500px] wdt-border wdt-border-gray-200;
     }
   }
 
   &-query-monitor {
     &-query {
-      @apply border-b border-gray-200 py-3;
+      @apply wdt-border-b wdt-border-gray-200 wdt-py-3;
     }
 
     &-time {
-      @apply text-sm text-gray-500;
+      @apply wdt-text-sm wdt-text-gray-500;
     }
 
     &-sql {
-      @apply font-mono text-sm bg-gray-50 p-3 rounded-lg mt-2 border border-gray-200;
+      @apply wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-mt-2 wdt-border wdt-border-gray-200;
     }
   }
 
   &-hook-inspector {
     &-hook {
-      @apply border-b border-gray-200 py-3;
+      @apply wdt-border-b wdt-border-gray-200 wdt-py-3;
     }
 
     &-name {
-      @apply font-medium;
+      @apply wdt-font-medium;
     }
 
     &-type {
-      @apply text-xs bg-gray-100 px-2 py-0.5 rounded-full ml-2;
+      @apply wdt-text-xs wdt-bg-gray-100 wdt-px-2 wdt-py-0.5 wdt-rounded-full wdt-ml-2;
     }
 
     &-callbacks {
-      @apply mt-2 text-sm;
+      @apply wdt-mt-2 wdt-text-sm;
     }
   }
 
   &-terminal {
     &-container {
-      @apply bg-gray-900 text-white p-4 rounded-lg font-mono text-sm;
+      @apply wdt-bg-gray-900 wdt-text-white wdt-p-4 wdt-rounded-lg wdt-font-mono wdt-text-sm;
     }
 
     &-output {
-      @apply mb-4 max-h-[500px] overflow-auto;
+      @apply wdt-mb-4 wdt-max-h-[500px] wdt-overflow-auto;
     }
 
     &-input {
-      @apply flex;
+      @apply wdt-flex;
 
       input {
-        @apply bg-gray-800 text-white px-3 py-2 rounded flex-grow;
+        @apply wdt-bg-gray-800 wdt-text-white wdt-px-3 wdt-py-2 wdt-rounded wdt-flex-grow;
       }
     }
   }
 
   &-system-info {
     &-section {
-      @apply mb-8;
+      @apply wdt-mb-8;
       
       h2 {
-        @apply text-lg font-medium mb-4 pb-2 border-b border-gray-200;
+        @apply wdt-text-lg wdt-font-medium wdt-mb-4 wdt-pb-2 wdt-border-b wdt-border-gray-200;
       }
     }
 
     &-table {
-      @apply w-full;
+      @apply wdt-w-full;
 
       th {
-        @apply text-left py-2 px-4 bg-gray-50 border-b border-gray-200 font-medium;
+        @apply wdt-text-left wdt-py-2 wdt-px-4 wdt-bg-gray-50 wdt-border-b wdt-border-gray-200 wdt-font-medium;
       }
 
       td {
-        @apply py-2 px-4 border-b border-gray-200;
+        @apply wdt-py-2 wdt-px-4 wdt-border-b wdt-border-gray-200;
       }
     }
   }
 
   &-settings {
     &-section {
-      @apply mb-8;
+      @apply wdt-mb-8;
       
       h2 {
-        @apply text-lg font-medium mb-4 pb-2 border-b border-gray-200;
+        @apply wdt-text-lg wdt-font-medium wdt-mb-4 wdt-pb-2 wdt-border-b wdt-border-gray-200;
       }
     }
 
     &-option {
-      @apply mb-4;
+      @apply wdt-mb-4;
     }
   }
 }
 
 // Page title and header
 .wp-dev-toolkit-page-header {
-  @apply mb-8;
+  @apply wdt-mb-8;
   
   h1 {
-    @apply text-2xl font-bold mb-1;
+    @apply wdt-text-2xl wdt-font-bold wdt-mb-1;
   }
   
   p {
-    @apply text-gray-600;
+    @apply wdt-text-gray-600;
   }
 }
 
 // Buttons
 .wp-dev-toolkit-button {
-  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-medium transition-colors;
+  @apply wdt-inline-flex wdt-items-center wdt-justify-center wdt-px-4 wdt-py-2 wdt-border wdt-border-transparent wdt-rounded-md wdt-font-medium wdt-transition-colors;
   
   &-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
+    @apply wdt-bg-blue-600 wdt-text-white hover:wdt-bg-blue-700;
   }
   
   &-secondary {
-    @apply bg-white text-gray-700 border-gray-300 hover:bg-gray-50;
+    @apply wdt-bg-white wdt-text-gray-700 wdt-border-gray-300 hover:wdt-bg-gray-50;
   }
 }
 
 // Utility classes
 .code {
-  @apply font-mono bg-gray-50 p-1 rounded text-sm border border-gray-200;
+  @apply wdt-font-mono wdt-bg-gray-50 wdt-p-1 wdt-rounded wdt-text-sm wdt-border wdt-border-gray-200;
 }
 
 // Animation
 .spinner {
-  @apply animate-spin h-5 w-5 text-blue-600;
+  @apply wdt-animate-spin wdt-h-5 wdt-w-5 wdt-text-blue-600;
 }
 
 // Form elements
 .wp-dev-toolkit-form {
   &-group {
-    @apply mb-4;
+    @apply wdt-mb-4;
   }
   
   &-label {
-    @apply block mb-1 font-medium text-gray-700;
+    @apply wdt-block wdt-mb-1 wdt-font-medium wdt-text-gray-700;
   }
   
   &-input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    @apply wdt-w-full wdt-px-3 wdt-py-2 wdt-border wdt-border-gray-300 wdt-rounded-md focus:wdt-outline-none focus:wdt-ring-2 focus:wdt-ring-blue-500 focus:wdt-border-blue-500;
   }
 }
 
 // WordPress components overrides
 .components-card {
-  @apply mb-4;
+  @apply wdt-mb-4;
 }
 
 .components-toggle-control {
-  @apply mb-4;
+  @apply wdt-mb-4;
 }
 
 // Responsive adjustments
 @media (max-width: 768px) {
   .wp-dev-toolkit-app {
-    @apply flex-col;
+    @apply wdt-flex-col;
   }
   
   .wp-dev-toolkit-sidebar {
-    @apply w-full min-w-full h-auto border-b border-r-0;
+    @apply wdt-w-full wdt-min-w-full wdt-h-auto wdt-border-b wdt-border-r-0;
   }
   
   .wp-dev-toolkit-logo {
-    @apply justify-center;
+    @apply wdt-justify-center;
   }
   
   .wp-dev-toolkit-nav {
     ul {
-      @apply flex-row flex-wrap justify-center;
+      @apply wdt-flex-row wdt-flex-wrap wdt-justify-center;
     }
     
     li {
       &.active::before {
-        @apply left-0 top-auto bottom-0 h-1 w-full;
+        @apply wdt-left-0 wdt-top-auto wdt-bottom-0 wdt-h-1 wdt-w-full;
       }
     }
     
     a {
-      @apply flex-col gap-1 py-2 px-3;
+      @apply wdt-flex-col wdt-gap-1 wdt-py-2 wdt-px-3;
       
       span {
-        @apply text-xs;
+        @apply wdt-text-xs;
       }
     }
   }
   
   .wp-dev-toolkit-content {
-    @apply p-4;
+    @apply wdt-p-4;
   }
   
   .wp-dev-toolkit-dashboard-stats {
-    @apply grid-cols-1;
+    @apply wdt-grid-cols-1;
   }
 }

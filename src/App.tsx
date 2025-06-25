@@ -9,6 +9,7 @@ import QueryMonitor from '@/components/QueryMonitor';
 import Settings from '@/components/Settings';
 import SystemInfo from '@/components/SystemInfo';
 import Terminal from '@/components/Terminal';
+import TailwindTest from '@/components/TailwindTest';
 
 // Extend Window interface to include our global object
 declare global {
@@ -52,6 +53,7 @@ const MainNavigation: React.FC = () => {
     { name: 'hook-inspector', title: 'Hook Inspector', icon: 'admin-plugins' },
     { name: 'terminal', title: 'Terminal', icon: 'editor-code' },
     { name: 'system-info', title: 'System Info', icon: 'info' },
+    { name: 'tailwind-test', title: 'Tailwind Test', icon: 'admin-appearance' },
     { name: 'settings', title: 'Settings', icon: 'admin-settings' },
   ];
 
@@ -103,6 +105,7 @@ const App: React.FC = () => {
               <Route path="/hook-inspector" element={<HookInspector />} />
               <Route path="/terminal" element={<Terminal />} />
               <Route path="/system-info" element={<SystemInfo />} />
+              <Route path="/tailwind-test" element={<TailwindTest />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<Dashboard />} />
             </Routes>

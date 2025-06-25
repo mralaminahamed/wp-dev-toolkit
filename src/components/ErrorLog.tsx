@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Spinner, Card, CardBody, CardHeader, ToggleControl } from '@wordpress/components';
+import { Button, Spinner, ToggleControl, Dashicon } from '@wordpress/components';
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
-import { ErrorLogResponse } from '@/types';
+import { ErrorLogResponse } from '@/types/index';
 
 interface ParsedLogEntry {
   timestamp: string;
@@ -41,9 +41,11 @@ const ErrorLog: React.FC = () => {
     
     setIsFetching(true);
     try {
-      const response = await errorLog.get() as ErrorLogResponse;
+      const rawResponse = await errorLog.get();
+      // Type assertion with unknown intermediate step
+      const response = rawResponse as unknown as ErrorLogResponse;
       
-      if (response.log_content) {
+      if (response && response.log_content) {
         setLogContent(response.log_content);
         const parsed = parseLogContent(response.log_content);
         setParsedLogs(parsed);
@@ -130,74 +132,85 @@ const ErrorLog: React.FC = () => {
     }
   };
 
+  const getLogLevelIcon = (level: string): string => {
+    switch (level.toUpperCase()) {
+      case 'ERROR':
+        return 'warning';
+      case 'WARNING':
+        return 'info';
+      case 'INFO':
+        return 'admin-comments';
+      case 'DEBUG':
+        return 'code-standards';
+      default:
+        return 'admin-generic';
+    }
+  };
+
   return (
     <div className="wp-dev-toolkit-error-log">
-      <h2 className="text-xl font-semibold mb-4">Error Log</h2>
+      <div className="wp-dev-toolkit-page-header">
+        <h1>Error Log</h1>
+        <p>Monitor and manage PHP errors, warnings and notices</p>
+      </div>
 
-      <Card className="mb-4">
-        <CardHeader>
+      <div className="wp-dev-toolkit-card mb-6">
+        <div className="wp-dev-toolkit-card-header">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-medium">Log Content</h3>
-              <p className="text-sm text-gray-500">
+              <h2>Log Summary</h2>
+              <div className="text-sm text-gray-500">
                 File Size: {formatFileSize(logSize)} | 
                 Entries: {parsedLogs.length}
-              </p>
+              </div>
             </div>
-            <div className="space-x-2">
+            <div className="flex items-center gap-3">
               <Button
-                isPrimary
+                className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
                 onClick={fetchErrorLog}
-                isBusy={isFetching}
                 disabled={isFetching || isClearing}
+                icon="refresh"
               >
-                Refresh
+                {isFetching ? 'Refreshing...' : 'Refresh'}
               </Button>
               <Button
-                isDestructive
+                className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
                 onClick={clearErrorLog}
-                isBusy={isClearing}
                 disabled={isFetching || isClearing}
+                icon="trash"
               >
-                Clear Log
+                {isClearing ? 'Clearing...' : 'Clear Log'}
               </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardBody>
-          <div className="mb-4 flex flex-wrap items-center gap-2">
+        </div>
+        <div className="wp-dev-toolkit-card-body">
+          <div className="mb-4 flex flex-wrap items-center gap-3">
             <span className="text-sm font-medium">Filter by level:</span>
-            <Button 
-              isSmall 
-              variant={filterLevel === null ? 'primary' : 'secondary'} 
+            <button 
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${filterLevel === null ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`} 
               onClick={() => setFilterLevel(null)}
             >
               All ({parsedLogs.length})
-            </Button>
-            <Button 
-              isSmall 
-              variant={filterLevel === 'ERROR' ? 'primary' : 'secondary'} 
+            </button>
+            <button 
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${filterLevel === 'ERROR' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`} 
               onClick={() => setFilterLevel('ERROR')}
-              className="text-red-700"
             >
               Errors ({getLogLevelCount('ERROR')})
-            </Button>
-            <Button 
-              isSmall 
-              variant={filterLevel === 'WARNING' ? 'primary' : 'secondary'} 
+            </button>
+            <button 
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${filterLevel === 'WARNING' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`} 
               onClick={() => setFilterLevel('WARNING')}
-              className="text-yellow-700"
             >
               Warnings ({getLogLevelCount('WARNING')})
-            </Button>
-            <Button 
-              isSmall 
-              variant={filterLevel === 'INFO' ? 'primary' : 'secondary'} 
+            </button>
+            <button 
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${filterLevel === 'INFO' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`} 
               onClick={() => setFilterLevel('INFO')}
-              className="text-blue-700"
             >
               Info ({getLogLevelCount('INFO')})
-            </Button>
+            </button>
             
             <div className="ml-auto">
               <ToggleControl
@@ -209,44 +222,57 @@ const ErrorLog: React.FC = () => {
           </div>
 
           {isFetching ? (
-            <div className="flex justify-center items-center p-4">
+            <div className="flex justify-center items-center p-8">
               <Spinner /> <span className="ml-2">Loading error log...</span>
             </div>
           ) : parsedLogs.length > 0 ? (
-            <div className="bg-white border rounded overflow-hidden">
+            <div className="border rounded-lg overflow-hidden divide-y divide-gray-200">
               {getFilteredLogs().map((log, index) => (
-                <div key={index} className="border-b last:border-b-0 p-3 hover:bg-gray-50">
-                  <div className="flex items-center mb-1">
-                    <span className="text-xs text-gray-500 mr-2">{log.timestamp}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${getLogLevelClass(log.level)}`}>
-                      {log.level}
-                    </span>
+                <div key={index} className="hover:bg-gray-50 transition-colors">
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`flex items-center justify-center w-6 h-6 rounded-full ${
+                        log.level === 'ERROR' ? 'bg-red-500' :
+                        log.level === 'WARNING' ? 'bg-yellow-500' :
+                        log.level === 'INFO' ? 'bg-blue-500' : 'bg-gray-500'
+                      } text-white`}>
+                        <Dashicon icon={getLogLevelIcon(log.level)} size={14} />
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getLogLevelClass(log.level)}`}>
+                        {log.level}
+                      </span>
+                      <span className="text-xs text-gray-500">{log.timestamp}</span>
+                    </div>
+                    <div className="font-mono text-sm bg-gray-50 p-3 rounded-lg whitespace-pre-wrap border border-gray-200">
+                      {log.message}
+                    </div>
                   </div>
-                  <div className="font-mono text-sm whitespace-pre-wrap">{log.message}</div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-gray-50 p-4 rounded text-center">
-              <p className="text-gray-500">No log entries found.</p>
+            <div className="bg-gray-50 p-8 rounded-lg text-center">
+              <Dashicon icon="yes-alt" className="text-green-500 mb-2" size={30} />
+              <p className="text-gray-700">No log entries found. Your application is running smoothly!</p>
             </div>
           )}
-        </CardBody>
-      </Card>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-medium">Log Settings</h3>
-        </CardHeader>
-        <CardBody>
+      <div className="wp-dev-toolkit-card">
+        <div className="wp-dev-toolkit-card-header">
+          <h2>Log Settings</h2>
+        </div>
+        <div className="wp-dev-toolkit-card-body">
           <p className="mb-4">
             The error log captures PHP errors, warnings, and notices based on your WordPress and PHP configurations.
           </p>
-          <p className="text-sm text-gray-600">
-            Log file location: <code className="bg-gray-100 px-1 py-0.5 rounded">{window.wpDevToolkit?.logPath || 'wp-content/wp-dev-toolkit-error.log'}</code>
-          </p>
-        </CardBody>
-      </Card>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div className="font-medium mb-1">Log file location:</div>
+            <code className="code">{window.wpDevToolkit?.logPath || 'wp-content/wp-dev-toolkit-error.log'}</code>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

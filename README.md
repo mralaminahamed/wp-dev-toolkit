@@ -13,6 +13,36 @@ WordPress Development Toolkit is a comprehensive plugin designed to assist WordP
 - REST API Integration
 - Extensible Architecture
 
+## Tailwind CSS Configuration
+
+This plugin uses Tailwind CSS 3 with a custom prefix (`wdt-`) to avoid conflicts with WordPress styles. Here's how it's configured:
+
+### Key Features
+
+- Custom prefix (`wdt-`) for all Tailwind classes to prevent conflicts with WordPress core
+- Extended color palette based on WordPress admin colors
+- Custom fonts matching WordPress admin interface
+- PostCSS configuration for optimal processing
+- Responsive design utility classes
+
+### Usage Example
+
+```jsx
+// Using Tailwind with prefix
+<div className="wdt-flex wdt-items-center wdt-gap-3 wdt-p-4">
+  <div className="wdt-bg-primary-500 wdt-text-white wdt-p-3 wdt-rounded-lg">
+    Primary Color Box
+  </div>
+</div>
+```
+
+### Files
+
+- `tailwind.config.js` - Main Tailwind configuration
+- `postcss.config.js` - PostCSS configuration for Tailwind
+- `src/styles/index.scss` - Main stylesheet with Tailwind imports and custom styles
+- `src/components/TailwindTest.tsx` - Example component demonstrating Tailwind usage
+
 ## Installation
 
 1. Download the plugin zip file or clone the repository:
