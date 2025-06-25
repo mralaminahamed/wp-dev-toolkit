@@ -1,15 +1,43 @@
 import { Dispatch, SetStateAction } from 'react';
 
 export interface Query {
+  id: string;
   sql: string;
   time: number;
-  stackTrace?: string;
+  caller?: string;
+  backtrace?: string[];
+}
+
+export interface QueryResponse {
+  queries: Query[];
+  summary: {
+    total_queries: number;
+    total_time: number;
+    avg_time: number;
+  };
 }
 
 export interface Hook {
   name: string;
-  callback: string;
-  priority: number;
+  type: 'action' | 'filter' | 'unknown';
+  count: number;
+  total_time: number;
+  first_call: number;
+  backtrace?: string[];
+}
+
+export interface HookResponse {
+  hooks: Hook[];
+  grouped_hooks: {
+    action: Hook[];
+    filter: Hook[];
+    unknown: Hook[];
+  };
+  summary: {
+    total_hooks: number;
+    total_executions: number;
+    total_time: number;
+  };
 }
 
 export interface ErrorLogEntry {
@@ -18,6 +46,44 @@ export interface ErrorLogEntry {
   type: string;
   file?: string;
   line?: number;
+}
+
+export interface ErrorLogResponse {
+  log_content: string;
+  log_file: string;
+  file_size: number;
+}
+
+export interface SystemInfoResponse {
+  wordpress: {
+    version: string;
+    site_url: string;
+    home_url: string;
+    is_multisite: boolean;
+    debug_mode: boolean;
+    memory_limit: string;
+    table_prefix: string;
+    active_theme: string;
+    theme_version: string;
+  };
+  server: {
+    php_version: string;
+    mysql_version: string;
+    server_software: string;
+    os: string;
+    max_execution_time: string;
+    memory_limit: string;
+    upload_max_filesize: string;
+    post_max_size: string;
+  };
+  plugin: {
+    name: string;
+    version: string;
+    author: string;
+    plugin_uri: string;
+    text_domain: string;
+    domain_path: string;
+  };
 }
 
 export interface PluginInfo {
@@ -76,8 +142,22 @@ export interface ToolSettings {
 }
 
 export interface ApiResponse<T> {
+  success: boolean;
   data: T;
-  status: number;
+  message?: string;
+}
+
+export interface Config {
+  dev_mode: boolean;
+  error_logging: boolean;
+  query_monitoring: boolean;
+  hook_inspection: boolean;
+  debug_bar_integration?: boolean;
+  log_retention_days?: number;
+  allowed_ip_addresses?: string[];
+  excluded_hooks?: string[];
+  excluded_queries?: string[];
+  [key: string]: any;
 }
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
@@ -96,4 +176,16 @@ export interface QueryMonitorProps {
 
 export interface HookInspectorProps {
   // Add any props specific to the HookInspector component
+}
+
+export interface SystemInfoProps {
+  // Add any props specific to the SystemInfo component
+}
+
+export interface TerminalProps {
+  // Add any props specific to the Terminal component
+}
+
+export interface SettingsProps {
+  // Add any props specific to the Settings component
 }

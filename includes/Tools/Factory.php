@@ -2,6 +2,7 @@
 namespace WPDevToolkit\Tools;
 
 use WPDevToolkit\Base\ToolInterface;
+use WPDevToolkit\Core\Config;
 
 /**
  * Tool Factory
@@ -17,6 +18,34 @@ class Factory {
 	 * @var array
 	 */
 	private $tools = array();
+
+	/**
+	 * Configuration instance
+	 *
+	 * @var Config
+	 */
+	private $config;
+
+	/**
+	 * Constructor
+	 *
+	 * @param Config|null $config Configuration instance
+	 */
+	public function __construct( Config $config = null ) {
+		$this->config = $config ?? new Config();
+		$this->register_default_tools();
+	}
+
+	/**
+	 * Register default tools
+	 *
+	 * @return void
+	 */
+	private function register_default_tools() {
+		$this->register( 'error_logger', ErrorLogger::class );
+		$this->register( 'query_monitor', QueryMonitor::class );
+		$this->register( 'hook_inspector', HookInspector::class );
+	}
 
 	/**
 	 * Register a tool class
@@ -44,6 +73,6 @@ class Factory {
 		}
 
 		$class = $this->tools[ $name ];
-		return new $class();
+		return new $class( $this->config );
 	}
 }

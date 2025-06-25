@@ -1,1 +1,357 @@
 @use 'tailwindcss';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Variables
+:root {
+  --wp-dev-toolkit-primary: #2271b1;
+  --wp-dev-toolkit-primary-dark: #135e96;
+  --wp-dev-toolkit-secondary: #f0f0f1;
+  --wp-dev-toolkit-text: #1d2327;
+  --wp-dev-toolkit-text-light: #50575e;
+  --wp-dev-toolkit-border: #c3c4c7;
+  --wp-dev-toolkit-hover: #e0e0e0;
+  --wp-dev-toolkit-background: #f0f6fc;
+  --wp-dev-toolkit-sidebar-width: 240px;
+  --wp-dev-toolkit-card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.wp-dev-toolkit {
+  &-app {
+    @apply flex h-screen w-full bg-gray-50;
+    background-color: var(--wp-dev-toolkit-background);
+  }
+
+  &-sidebar {
+    @apply flex flex-col w-60 min-w-60 h-full border-r border-gray-200 bg-white;
+    width: var(--wp-dev-toolkit-sidebar-width);
+    min-width: var(--wp-dev-toolkit-sidebar-width);
+  }
+  
+  &-logo {
+    @apply flex items-center gap-3 p-4 border-b border-gray-200;
+    
+    img {
+      @apply w-8 h-8;
+    }
+    
+    h1 {
+      @apply text-lg font-medium;
+      color: var(--wp-dev-toolkit-primary);
+    }
+  }
+
+  &-content {
+    @apply flex-1 overflow-auto p-6;
+  }
+  
+  &-container {
+    @apply max-w-7xl mx-auto;
+  }
+
+  &-version {
+    @apply mt-auto p-4 text-center text-xs text-gray-500 border-t border-gray-200;
+  }
+
+  &-nav {
+    @apply flex-1 py-2 overflow-auto;
+
+    ul {
+      @apply flex flex-col;
+    }
+
+    li {
+      @apply relative;
+      
+      &.active {
+        @apply bg-blue-50;
+        
+        &::before {
+          content: '';
+          @apply absolute left-0 top-0 h-full w-1 bg-blue-600;
+        }
+      }
+    }
+
+    a {
+      @apply flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors;
+      
+      .dashicons, .dashicon {
+        @apply text-gray-500;
+      }
+      
+      span {
+        @apply font-medium;
+      }
+      
+      &.active {
+        @apply text-blue-600;
+        
+        .dashicons, .dashicon {
+          @apply text-blue-600;
+        }
+      }
+      
+      &:hover {
+        @apply text-blue-600;
+      }
+    }
+  }
+
+  &-card {
+    @apply bg-white rounded-lg overflow-hidden mb-6;
+    box-shadow: var(--wp-dev-toolkit-card-shadow);
+
+    &-header {
+      @apply flex justify-between items-center p-4 border-b border-gray-200;
+      
+      h2 {
+        @apply text-lg font-medium text-gray-800;
+      }
+    }
+
+    &-body {
+      @apply p-6;
+    }
+  }
+
+  &-dashboard {
+    &-stats {
+      @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8;
+    }
+
+    &-stat {
+      @apply bg-white p-6 rounded-lg flex items-center gap-4;
+      box-shadow: var(--wp-dev-toolkit-card-shadow);
+      
+      &-icon {
+        @apply p-3 rounded-full text-white;
+        
+        &.blue {
+          @apply bg-blue-500;
+        }
+        
+        &.green {
+          @apply bg-green-500;
+        }
+        
+        &.amber {
+          @apply bg-amber-500;
+        }
+      }
+      
+      &-content {
+        @apply flex flex-col;
+      }
+
+      &-title {
+        @apply text-sm text-gray-500;
+      }
+
+      &-value {
+        @apply text-2xl font-bold;
+      }
+    }
+    
+    &-widgets {
+      @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+    }
+  }
+
+  &-error-log {
+    pre {
+      @apply bg-gray-50 p-4 rounded-lg font-mono text-sm overflow-auto max-h-[500px] border border-gray-200;
+    }
+  }
+
+  &-query-monitor {
+    &-query {
+      @apply border-b border-gray-200 py-3;
+    }
+
+    &-time {
+      @apply text-sm text-gray-500;
+    }
+
+    &-sql {
+      @apply font-mono text-sm bg-gray-50 p-3 rounded-lg mt-2 border border-gray-200;
+    }
+  }
+
+  &-hook-inspector {
+    &-hook {
+      @apply border-b border-gray-200 py-3;
+    }
+
+    &-name {
+      @apply font-medium;
+    }
+
+    &-type {
+      @apply text-xs bg-gray-100 px-2 py-0.5 rounded-full ml-2;
+    }
+
+    &-callbacks {
+      @apply mt-2 text-sm;
+    }
+  }
+
+  &-terminal {
+    &-container {
+      @apply bg-gray-900 text-white p-4 rounded-lg font-mono text-sm;
+    }
+
+    &-output {
+      @apply mb-4 max-h-[500px] overflow-auto;
+    }
+
+    &-input {
+      @apply flex;
+
+      input {
+        @apply bg-gray-800 text-white px-3 py-2 rounded flex-grow;
+      }
+    }
+  }
+
+  &-system-info {
+    &-section {
+      @apply mb-8;
+      
+      h2 {
+        @apply text-lg font-medium mb-4 pb-2 border-b border-gray-200;
+      }
+    }
+
+    &-table {
+      @apply w-full;
+
+      th {
+        @apply text-left py-2 px-4 bg-gray-50 border-b border-gray-200 font-medium;
+      }
+
+      td {
+        @apply py-2 px-4 border-b border-gray-200;
+      }
+    }
+  }
+
+  &-settings {
+    &-section {
+      @apply mb-8;
+      
+      h2 {
+        @apply text-lg font-medium mb-4 pb-2 border-b border-gray-200;
+      }
+    }
+
+    &-option {
+      @apply mb-4;
+    }
+  }
+}
+
+// Page title and header
+.wp-dev-toolkit-page-header {
+  @apply mb-8;
+  
+  h1 {
+    @apply text-2xl font-bold mb-1;
+  }
+  
+  p {
+    @apply text-gray-600;
+  }
+}
+
+// Buttons
+.wp-dev-toolkit-button {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-medium transition-colors;
+  
+  &-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+  }
+  
+  &-secondary {
+    @apply bg-white text-gray-700 border-gray-300 hover:bg-gray-50;
+  }
+}
+
+// Utility classes
+.code {
+  @apply font-mono bg-gray-50 p-1 rounded text-sm border border-gray-200;
+}
+
+// Animation
+.spinner {
+  @apply animate-spin h-5 w-5 text-blue-600;
+}
+
+// Form elements
+.wp-dev-toolkit-form {
+  &-group {
+    @apply mb-4;
+  }
+  
+  &-label {
+    @apply block mb-1 font-medium text-gray-700;
+  }
+  
+  &-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+}
+
+// WordPress components overrides
+.components-card {
+  @apply mb-4;
+}
+
+.components-toggle-control {
+  @apply mb-4;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .wp-dev-toolkit-app {
+    @apply flex-col;
+  }
+  
+  .wp-dev-toolkit-sidebar {
+    @apply w-full min-w-full h-auto border-b border-r-0;
+  }
+  
+  .wp-dev-toolkit-logo {
+    @apply justify-center;
+  }
+  
+  .wp-dev-toolkit-nav {
+    ul {
+      @apply flex-row flex-wrap justify-center;
+    }
+    
+    li {
+      &.active::before {
+        @apply left-0 top-auto bottom-0 h-1 w-full;
+      }
+    }
+    
+    a {
+      @apply flex-col gap-1 py-2 px-3;
+      
+      span {
+        @apply text-xs;
+      }
+    }
+  }
+  
+  .wp-dev-toolkit-content {
+    @apply p-4;
+  }
+  
+  .wp-dev-toolkit-dashboard-stats {
+    @apply grid-cols-1;
+  }
+}

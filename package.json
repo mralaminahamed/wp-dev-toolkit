@@ -1,7 +1,26 @@
 {
   "name": "wp-dev-toolkit",
   "version": "1.0.0",
-  "description": "WordPress Development Toolkit with React-based control panel",
+  "description": "A comprehensive toolkit for WordPress plugin development with React-based admin interface, debugging tools, and developer utilities",
+  "author": "Mr Alamin Ahamed <contact@mralaminahamed.com> (https://mralaminahamed.com)",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/mralaminahamed/wp-dev-toolkit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mralaminahamed/wp-dev-toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mralaminahamed/wp-dev-toolkit/issues"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "development",
+    "toolkit",
+    "react",
+    "debugging",
+    "developer-tools"
+  ],
   "scripts": {
     "start": "wp-scripts start",
     "build": "wp-scripts build",
@@ -9,13 +28,16 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
-    "test": "wp-scripts test-unit-js"
+    "test": "wp-scripts test-unit-js",
+    "prepare": "husky install",
+    "dev": "concurrently \"npm:start\" \"npm:check-types -- --watch\""
   },
   "devDependencies": {
     "@playwright/test": "^1.53.1",
-    "@types/node": "^24.0.3",
+    "@types/node": "^24.0.4",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/react-router-dom": "^5.3.3",
     "@types/wordpress__api-fetch": "^3.23.1",
     "@types/wordpress__components": "^23.8.0",
     "@types/wordpress__element": "^2.14.1",
@@ -33,10 +55,10 @@
     "eslint-plugin-prettier": "^5.5.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^9.1.7",
     "postcss": "^8.5.6",
     "postcss-loader": "^8.1.1",
-    "prettier": "^3.6.0",
-    "react-router": "^7.6.2",
+    "prettier": "^3.6.1",
     "sass-loader": "^16.0.5",
     "scss": "^0.2.4",
     "style-loader": "^4.0.0",
@@ -53,7 +75,18 @@
     "@wordpress/data": "^10.25.0",
     "@wordpress/element": "^6.25.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2"
   },
-  "packageManager": "yarn@4.9.2"
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=7.0.0"
+  },
+  "packageManager": "yarn@4.9.2",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11"
+  ]
 }

@@ -6,7 +6,7 @@ use WPDevToolkit\Core\Plugin;
 /**
  * Admin Menu Handler
  *
- * Handles the admin menu registration and assets loading
+ * Handles the admin menu registration and page rendering
  *
  * @package WPDevToolkit\Admin
  */
@@ -34,7 +34,6 @@ class Menu {
 	 */
 	public function init() {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 	}
 
 	/**
@@ -43,14 +42,80 @@ class Menu {
 	 * @return void
 	 */
 	public function add_admin_menu() {
+		$icon_url = WP_DEV_TOOLKIT_PLUGIN_URL . 'assets/images/wp-dev-toolkit-icon.svg';
+		
 		add_menu_page(
 			__( 'Dev Toolkit', 'wp-dev-toolkit' ),
 			__( 'Dev Toolkit', 'wp-dev-toolkit' ),
 			'manage_options',
 			'wp-dev-toolkit',
 			array( $this, 'render_admin_page' ),
-			'dashicons-admin-tools',
+			$icon_url,
 			100
+		);
+		
+		// Add submenu pages
+		add_submenu_page(
+			'wp-dev-toolkit',
+			__( 'Dashboard', 'wp-dev-toolkit' ),
+			__( 'Dashboard', 'wp-dev-toolkit' ),
+			'manage_options',
+			'wp-dev-toolkit',
+			array( $this, 'render_admin_page' )
+		);
+		
+		add_submenu_page(
+			'wp-dev-toolkit',
+			__( 'Error Log', 'wp-dev-toolkit' ),
+			__( 'Error Log', 'wp-dev-toolkit' ),
+			'manage_options',
+			'wp-dev-toolkit-error-log',
+			array( $this, 'render_admin_page' )
+		);
+		
+		add_submenu_page(
+			'wp-dev-toolkit',
+			__( 'Query Monitor', 'wp-dev-toolkit' ),
+			__( 'Query Monitor', 'wp-dev-toolkit' ),
+			'manage_options',
+			'wp-dev-toolkit-query-monitor',
+			array( $this, 'render_admin_page' )
+		);
+		
+		add_submenu_page(
+			'wp-dev-toolkit',
+			__( 'Hook Inspector', 'wp-dev-toolkit' ),
+			__( 'Hook Inspector', 'wp-dev-toolkit' ),
+			'manage_options',
+			'wp-dev-toolkit-hook-inspector',
+			array( $this, 'render_admin_page' )
+		);
+		
+		add_submenu_page(
+			'wp-dev-toolkit',
+			__( 'Terminal', 'wp-dev-toolkit' ),
+			__( 'Terminal', 'wp-dev-toolkit' ),
+			'manage_options',
+			'wp-dev-toolkit-terminal',
+			array( $this, 'render_admin_page' )
+		);
+		
+		add_submenu_page(
+			'wp-dev-toolkit',
+			__( 'System Info', 'wp-dev-toolkit' ),
+			__( 'System Info', 'wp-dev-toolkit' ),
+			'manage_options',
+			'wp-dev-toolkit-system-info',
+			array( $this, 'render_admin_page' )
+		);
+		
+		add_submenu_page(
+			'wp-dev-toolkit',
+			__( 'Settings', 'wp-dev-toolkit' ),
+			__( 'Settings', 'wp-dev-toolkit' ),
+			'manage_options',
+			'wp-dev-toolkit-settings',
+			array( $this, 'render_admin_page' )
 		);
 	}
 
@@ -60,63 +125,19 @@ class Menu {
 	 * @return void
 	 */
 	public function render_admin_page() {
+		// Get the current page slug
+		$screen = get_current_screen();
+		$page = str_replace('wp-dev-toolkit-', '', $screen->id);
+		
+		// For the main page, use 'dashboard'
+		if ($page === 'toplevel_page_wp-dev-toolkit') {
+			$page = 'dashboard';
+		}
+		
+		// Add script to initialize the route
+		echo '<script>window.wpDevToolkitInitialRoute = "' . esc_js($page) . '";</script>';
+		
+		// Render the app container
 		echo '<div id="wp-dev-toolkit-app"></div>';
-	}
-
-	/**
-	 * Enqueue admin assets
-	 *
-	 * @param string $hook Current admin page hook
-	 *
-	 * @return void
-	 */
-	public function enqueue_admin_assets( $hook ): void {
-		if ( 'toplevel_page_wp-dev-toolkit' !== $hook ) {
-			return;
-		}
-
-		$asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/index.asset.php';
-		if ( ! file_exists( $asset_file ) ) {
-			return; // Asset file not found, skip enqueueing
-		}
-
-		$asset        = include $asset_file;
-		$dependencies = $asset['dependencies'] ?? array();
-		$version      = $asset['version'] ?? WP_DEV_TOOLKIT_VERSION;
-
-		wp_enqueue_script(
-			'wp-dev-toolkit-app',
-			WP_DEV_TOOLKIT_PLUGIN_URL . 'build/index.js',
-			$dependencies,
-			$version,
-			true
-		);
-
-		wp_enqueue_style(
-			'wp-dev-toolkit-styles',
-			WP_DEV_TOOLKIT_PLUGIN_URL . 'build/index.css',
-			array( 'wp-components' ),
-			$version
-		);
-
-		// Enhanced global configuration object
-		$log_path          = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
-		$log_path_relative = str_replace( ABSPATH, '', $log_path );
-
-		$debug_mode = defined( 'WP_DEBUG' ) && WP_DEBUG;
-
-		wp_localize_script(
-			'wp-dev-toolkit-app',
-			'wpDevToolkit',
-			array(
-				'nonce'      => wp_create_nonce( 'wp_rest' ),
-				'apiUrl'     => rest_url( 'wp-dev-toolkit/v1' ),
-				'version'    => WP_DEV_TOOLKIT_VERSION,
-				'logPath'    => $log_path_relative,
-				'debugMode'  => $debug_mode,
-				'wpVersion'  => get_bloginfo( 'version' ),
-				'phpVersion' => phpversion(),
-			)
-		);
 	}
 }

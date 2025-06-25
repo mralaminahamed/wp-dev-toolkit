@@ -12,6 +12,13 @@ use WPDevToolkit\Core\Config;
  */
 abstract class ToolBase implements ToolInterface {
 	/**
+	 * Tool key for configuration
+	 * 
+	 * Each child class should define this constant
+	 */
+	const TOOL_KEY = '';
+	
+	/**
 	 * Configuration instance
 	 *
 	 * @var Config
@@ -25,6 +32,11 @@ abstract class ToolBase implements ToolInterface {
 	 */
 	public function __construct( Config $config ) {
 		$this->config = $config;
+		
+		// Validate that child class has defined TOOL_KEY
+		if ( static::TOOL_KEY === '' ) {
+			throw new \LogicException( sprintf( 'Tool class %s must define TOOL_KEY constant', get_class( $this ) ) );
+		}
 	}
 
 	/**
@@ -57,5 +69,23 @@ abstract class ToolBase implements ToolInterface {
 	 */
 	public function check_admin_permissions() {
 		return current_user_can( 'manage_options' );
+	}
+	
+	/**
+	 * Get the tool key
+	 *
+	 * @return string
+	 */
+	public function get_tool_key() {
+		return static::TOOL_KEY;
+	}
+	
+	/**
+	 * Get the tool name
+	 *
+	 * @return string
+	 */
+	public function get_tool_name() {
+		return ucwords( str_replace( '_', ' ', static::TOOL_KEY ) );
 	}
 }

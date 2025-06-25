@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader } from '@wordpress/components';
-import React from 'react';
-import { HashRouter as Router, Routes, Route, Link } from 'react-router';
+import React, { useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Dashicon } from '@wordpress/components';
 
 import Dashboard from '@/components/Dashboard';
 import ErrorLog from '@/components/ErrorLog';
@@ -10,44 +10,104 @@ import Settings from '@/components/Settings';
 import SystemInfo from '@/components/SystemInfo';
 import Terminal from '@/components/Terminal';
 
-const App: React.FC = () => {
+// Extend Window interface to include our global object
+declare global {
+  interface Window {
+    wpDevToolkit: {
+      apiUrl: string;
+      nonce: string;
+      version: string;
+      logPath?: string;
+      debugMode?: boolean;
+      pluginUrl?: string;
+    };
+    wpDevToolkitInitialRoute?: string;
+  }
+}
+
+// Route initializer component
+const RouteInitializer: React.FC = () => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Check if we have an initial route from the server
+    if (window.wpDevToolkitInitialRoute) {
+      // Navigate to the initial route
+      navigate(`/${window.wpDevToolkitInitialRoute}`);
+    }
+  }, [navigate]);
+  
+  return null;
+};
+
+// Main navigation component
+const MainNavigation: React.FC = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
   const tabs = [
-    { name: 'dashboard', title: 'Dashboard', component: Dashboard },
-    { name: 'error-log', title: 'Error Log', component: ErrorLog },
-    { name: 'query-monitor', title: 'Query Monitor', component: QueryMonitor },
-    { name: 'hook-inspector', title: 'Hook Inspector', component: HookInspector },
-    { name: 'terminal', title: 'Terminal', component: Terminal },
-    { name: 'system-info', title: 'System Info', component: SystemInfo },
-    { name: 'settings', title: 'Settings', component: Settings },
+    { name: 'dashboard', title: 'Dashboard', icon: 'dashboard' },
+    { name: 'error-log', title: 'Error Log', icon: 'warning' },
+    { name: 'query-monitor', title: 'Query Monitor', icon: 'database' },
+    { name: 'hook-inspector', title: 'Hook Inspector', icon: 'admin-plugins' },
+    { name: 'terminal', title: 'Terminal', icon: 'editor-code' },
+    { name: 'system-info', title: 'System Info', icon: 'info' },
+    { name: 'settings', title: 'Settings', icon: 'admin-settings' },
   ];
 
   return (
+    <aside className="wp-dev-toolkit-sidebar">
+      <div className="wp-dev-toolkit-logo">
+        <img 
+          src={`${window.wpDevToolkit?.pluginUrl || ''}assets/images/wp-dev-toolkit-icon.svg`} 
+          alt="WP Dev Toolkit Logo" 
+        />
+        <h1>Dev Toolkit</h1>
+      </div>
+      <nav className="wp-dev-toolkit-nav">
+        <ul>
+          {tabs.map(tab => (
+            <li key={tab.name} className={currentPath === `/${tab.name}` || (tab.name === 'dashboard' && currentPath === '/') ? 'active' : ''}>
+              <NavLink 
+                to={`/${tab.name}`} 
+                className={({ isActive }) => isActive ? 'active' : ''}
+                end={tab.name === 'dashboard'}
+              >
+                <Dashicon icon={tab.icon as any} />
+                <span>{tab.title}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className="wp-dev-toolkit-version">
+        <span>v{window.wpDevToolkit?.version || '1.0.0'}</span>
+      </div>
+    </aside>
+  );
+};
+
+const App: React.FC = () => {
+  return (
     <Router>
+      <RouteInitializer />
       <div className="wp-dev-toolkit-app">
-        <Card>
-          <CardHeader>
-            <h1 className="text-2xl font-bold">WordPress Development Toolkit</h1>
-          </CardHeader>
-          <CardBody>
-            <nav className="mb-4">
-              <ul className="flex space-x-4">
-                {tabs.map(tab => (
-                  <li key={tab.name}>
-                    <Link to={`/${tab.name}`} className="text-blue-500 hover:text-blue-700">
-                      {tab.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+        <MainNavigation />
+        <main className="wp-dev-toolkit-content">
+          <div className="wp-dev-toolkit-container">
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              {tabs.map(tab => (
-                <Route key={tab.name} path={`/${tab.name}`} element={<tab.component />} />
-              ))}
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/error-log" element={<ErrorLog />} />
+              <Route path="/query-monitor" element={<QueryMonitor />} />
+              <Route path="/hook-inspector" element={<HookInspector />} />
+              <Route path="/terminal" element={<Terminal />} />
+              <Route path="/system-info" element={<SystemInfo />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<Dashboard />} />
             </Routes>
-          </CardBody>
-        </Card>
+          </div>
+        </main>
       </div>
     </Router>
   );
