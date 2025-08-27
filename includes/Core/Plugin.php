@@ -228,19 +228,27 @@ class Plugin {
 	 * @return void
 	 */
 	private function init_tools() {
+		// Use the factory to create tools
+		$tool_factory = $this->tool_factory;
+		
 		// Default tools to register
-		$tool_classes = array(
-			'error_logging'    => 'WPDevToolkit\\Tools\\ErrorLogger',
-			'query_monitoring' => 'WPDevToolkit\\Tools\\QueryMonitor',
-			'hook_inspection'  => 'WPDevToolkit\\Tools\\HookInspector',
+		$tool_names = array(
+			'error_logging',
+			'query_monitoring', 
+			'hook_inspection',
 		);
 		
-		// Allow plugins to register additional tools
-		$tool_classes = apply_filters( 'wp_dev_toolkit_tools', $tool_classes );
+		// Allow plugins to modify tool list
+		$tool_names = apply_filters( 'wp_dev_toolkit_tool_names', $tool_names );
 
-		foreach ( $tool_classes as $tool_name => $tool_class ) {
+		foreach ( $tool_names as $tool_name ) {
 			if ( $this->config->get( $tool_name, true ) ) {
-				$this->register_tool( $tool_name, $tool_class );
+				try {
+					$tool = $tool_factory->create( $tool_name );
+					$this->tools[ $tool_name ] = $tool;
+				} catch ( \Exception $e ) {
+					Logger::log( sprintf( 'Failed to create tool %s: %s', $tool_name, $e->getMessage() ), 'error' );
+				}
 			}
 		}
 

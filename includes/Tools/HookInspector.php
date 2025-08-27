@@ -25,7 +25,7 @@ class HookInspector extends ToolBase {
 	/**
 	 * Tool key for configuration
 	 */
-	const TOOL_KEY = 'hook_inspector';
+	const TOOL_KEY = 'hook_inspection';
 
 	/**
 	 * Tracked hooks
@@ -67,7 +67,7 @@ class HookInspector extends ToolBase {
 	 *
 	 * @return void
 	 */
-	public function init() {
+	public function init(): void {
 		if ( ! $this->is_enabled() ) {
 			return;
 		}
@@ -85,7 +85,7 @@ class HookInspector extends ToolBase {
 	 *
 	 * @return void
 	 */
-	public function register_rest_routes() {
+	public function register_rest_routes(): void {
 		register_rest_route(
 			'wp-dev-toolkit/v1',
 			'/hooks',
@@ -339,7 +339,4 @@ class HookInspector extends ToolBase {
 		) );
 	}
 
-	public function check_admin_permissions() {
-		return current_user_can( 'manage_options' );
-	}
 }

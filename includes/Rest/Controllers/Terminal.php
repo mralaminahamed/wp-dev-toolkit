@@ -112,47 +112,11 @@ class Terminal extends Base {
 	 * @return \WP_REST_Response
 	 */
 	public function execute_command( $request ) {
-		$command = $request->get_param( 'command' );
-
-		// Security check - abort if command was sanitized to empty
-		if ( empty( $command ) ) {
-			return $this->send_json_error( __( 'Invalid command', 'wp-dev-toolkit' ) );
-		}
-
-		// Check if this is an allowed command
-		if ( ! $this->is_command_allowed( $command ) ) {
-			return $this->send_json_error( __( 'Command not allowed', 'wp-dev-toolkit' ) );
-		}
-
-		// Store in history
-		$this->add_to_history( $command );
-
-		// Safety - limit execution time
-		$old_time_limit = ini_get( 'max_execution_time' );
-		set_time_limit( 30 );
-
-		// Execute the command
-		$output     = array();
-		$return_var = 0;
-
-		// Execute in a safe environment
-		$result = $this->execute_safe_command( $command, $output, $return_var );
-
-		// Restore time limit
-		set_time_limit( $old_time_limit );
-
-		if ( $result ) {
-			return $this->send_json_success(
-				array(
-					'command'     => $command,
-					'output'      => implode( "\n", $output ),
-					'exit_code'   => $return_var,
-					'executed_at' => current_time( 'mysql' ),
-				)
-			);
-		}
-
-		return $this->send_json_error( __( 'Failed to execute command', 'wp-dev-toolkit' ) );
+		// SECURITY: Terminal functionality disabled for safety
+		return $this->send_json_error( 
+			__( 'Terminal functionality is disabled for security reasons. Please use WP-CLI directly or enable this feature in a secure environment only.', 'wp-dev-toolkit' ), 
+			403 
+		);
 	}
 
 	/**

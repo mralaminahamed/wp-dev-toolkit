@@ -1,6 +1,5 @@
 <?php
 
-// src/Tools/QueryMonitor.php
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
@@ -51,7 +50,7 @@ class QueryMonitor extends ToolBase {
 	 *
 	 * @return void
 	 */
-	public function init() {
+	public function init(): void {
 		if ( ! $this->is_enabled() ) {
 			return;
 		}
@@ -70,7 +69,7 @@ class QueryMonitor extends ToolBase {
 	 *
 	 * @return void
 	 */
-	public function register_rest_routes() {
+	public function register_rest_routes(): void {
 		register_rest_route(
 			'wp-dev-toolkit/v1',
 			'/queries',
@@ -273,7 +272,4 @@ class QueryMonitor extends ToolBase {
 		));
 	}
 
-	public function check_admin_permissions() {
-		return current_user_can( 'manage_options' );
-	}
 }
