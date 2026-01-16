@@ -44,17 +44,3 @@
 
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
-
-/* Custom variables */
-:root {
-  --wp-dev-toolkit-primary: #2271b1;
-  --wp-dev-toolkit-primary-dark: #135e96;
-  --wp-dev-toolkit-secondary: #f0f0f1;
-  --wp-dev-toolkit-text: #1d2327;
-  --wp-dev-toolkit-text-light: #50575e;
-  --wp-dev-toolkit-border: #c3c4c7;
-  --wp-dev-toolkit-hover: #e0e0e0;
-  --wp-dev-toolkit-background: #f0f6fc;
-  --wp-dev-toolkit-sidebar-width: 240px;
-  --wp-dev-toolkit-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
