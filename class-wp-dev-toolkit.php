@@ -65,7 +65,7 @@ class WP_Dev_Toolkit {
 	 * REST controller loader
 	 *
 	 * @since 1.0.0
-	 * @var WPDevToolkit\Rest\ControllerLoader
+	 * @var WPDevToolkit\REST\ControllerLoader
 	 */
 	private $controller_loader;
 
@@ -159,8 +159,8 @@ class WP_Dev_Toolkit {
 		$this->config            = new WPDevToolkit\Core\Config();
 		$this->tool_factory      = new WPDevToolkit\Tools\Factory();
 		$this->menu              = new WPDevToolkit\Admin\Menu();
-		$this->controller_loader = new WPDevToolkit\Rest\ControllerLoader();
-		$this->assets            = new WPDevToolkit\Core\Assets();
+		$this->controller_loader = new WPDevToolkit\REST\ControllerLoader();
+		$this->assets            = new WPDevToolkit\Frontend\Assets();
 
 		// Initialize components
 		$this->menu->init();
