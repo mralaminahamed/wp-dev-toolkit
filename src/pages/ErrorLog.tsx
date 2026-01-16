@@ -12,13 +12,13 @@ import {
   Wrench,
   AlertTriangle,
   Info,
+  CheckCircle,
 } from "lucide-react";
 
 import { useSelect, useDispatch } from "@wordpress/data";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { STORE_NAME as ERROR_LOG_STORE } from "@/stores/error-log/constants";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
 
@@ -349,7 +349,6 @@ const ErrorLog: React.FC = () => {
             className=""
             onClick={fetchErrorLog}
             disabled={isFetching || isClearing}
-            icon="refresh"
           >
             {isFetching ? "Refreshing..." : "Refresh Log"}
           </Button>
@@ -381,19 +380,19 @@ const ErrorLog: React.FC = () => {
             </label>
 
             {autoRefresh && (
-              <SelectControl
-                label="Refresh rate"
-                value={refreshRate.toString()}
-                options={[
-                  { label: "5 seconds", value: "5" },
-                  { label: "10 seconds", value: "10" },
-                  { label: "30 seconds", value: "30" },
-                  { label: "60 seconds", value: "60" },
-                ]}
-                onChange={(value: string) =>
-                  setRefreshRate(parseInt(value, 10))
-                }
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">Refresh rate</span>
+                <select
+                  value={refreshRate.toString()}
+                  onChange={(e) => setRefreshRate(parseInt(e.target.value, 10))}
+                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                >
+                  <option value="5">5 seconds</option>
+                  <option value="10">10 seconds</option>
+                  <option value="30">30 seconds</option>
+                  <option value="60">60 seconds</option>
+                </select>
+              </label>
             )}
           </div>
         </div>
@@ -450,13 +449,15 @@ const ErrorLog: React.FC = () => {
           {/* Filters */}
           <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-4 wdt:mb-6">
             <div className="wdt:flex-1 wdt:min-w-[200px]">
-              <TextControl
-                label="Search logs"
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search for error messages or files..."
-                className="wdt:w-full"
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">Search logs</span>
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for error messages or files..."
+                  className="wdt:mt-1"
+                />
+              </label>
             </div>
 
             <div className="wdt:flex wdt:flex-col">
@@ -496,28 +497,26 @@ const ErrorLog: React.FC = () => {
                 <label className="wdt:text-xs wdt:font-medium wdt:text-gray-700 wdt:mb-1">
                   Filter by date
                 </label>
-                <SelectControl
+                <select
                   value={dateFilter || ""}
-                  options={[
-                    { label: "All dates", value: "" },
-                    ...getUniqueDates().map((date) => ({
-                      label: date,
-                      value: date,
-                    })),
-                  ]}
-                  onChange={(value: string) => setDateFilter(value || null)}
-                />
+                  onChange={(e) => setDateFilter(e.target.value || null)}
+                  className="wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                >
+                  <option value="">All dates</option>
+                  {getUniqueDates().map((date) => (
+                    <option key={date} value={date}>
+                      {date}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
 
             <div className="wdt:ml-auto">
               <Button
-                icon={
-                  sortDirection === "desc" ? "arrow-down-alt2" : "arrow-up-alt2"
-                }
                 onClick={toggleSortDirection}
                 variant="secondary"
-                iconSize={16}
+                size="sm"
               >
                 {sortDirection === "desc" ? "Newest first" : "Oldest first"}
               </Button>
@@ -527,7 +526,8 @@ const ErrorLog: React.FC = () => {
           {/* Log Content */}
           {isFetching ? (
             <div className="wdt:flex wdt:justify-center wdt:items-center wdt:p-8">
-              <Spinner /> <span className="wdt:ml-2">Loading error log...</span>
+              <div className="wdt:animate-spin wdt:rounded-full wdt:h-8 wdt:w-8 wdt:border-b-2 wdt:border-blue-600"></div>
+              <span className="wdt:ml-2">Loading error log...</span>
             </div>
           ) : parsedLogs.length > 0 ? (
             <>
