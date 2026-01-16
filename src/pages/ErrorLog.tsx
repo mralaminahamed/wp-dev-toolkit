@@ -17,6 +17,7 @@ import {
 import { useSelect, useDispatch } from "@wordpress/data";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import { STORE_NAME as ERROR_LOG_STORE } from "@/stores/error-log/constants";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
@@ -369,11 +370,15 @@ const ErrorLog: React.FC = () => {
           </Button>
 
           <div className="wdt:ml-auto wdt:flex wdt:items-center wdt:gap-2">
-            <ToggleControl
-              label="Auto-refresh"
-              checked={autoRefresh}
-              onChange={() => setAutoRefresh(!autoRefresh)}
-            />
+            <label className="wdt:flex wdt:items-center wdt:gap-2 wdt:cursor-pointer">
+              <input
+                type="checkbox"
+                checked={autoRefresh}
+                onChange={() => setAutoRefresh(!autoRefresh)}
+                className="wdt:rounded wdt:border-gray-300 wdt:text-blue-600 wdt:focus:ring-blue-500"
+              />
+              <span className="wdt:text-sm wdt:font-medium">Auto-refresh</span>
+            </label>
 
             {autoRefresh && (
               <SelectControl
