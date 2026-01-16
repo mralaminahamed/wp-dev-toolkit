@@ -2,7 +2,7 @@ import React from 'react';
 
 const TailwindTest: React.FC = () => {
 	return (
-		<div className="wp-dev-toolkit-page-header">
+		<div className="wdt:space-y-2">
 			<h1>Tailwind Test Component</h1>
 			<p>This component demonstrates the wdt prefix in action</p>
 

@@ -133,8 +133,8 @@ const SystemInfo: React.FC = () => {
 
 	if ( isLoading ) {
 		return (
-			<div className="wp-dev-toolkit-system-info">
-				<div className="wp-dev-toolkit-page-header">
+			<div className="wdt:space-y-6 wdt:p-6">
+				<div className="wdt:space-y-2">
 					<h1>System Information</h1>
 					<p>View details about your WordPress environment</p>
 				</div>
@@ -149,14 +149,14 @@ const SystemInfo: React.FC = () => {
 
 	if ( error ) {
 		return (
-			<div className="wp-dev-toolkit-system-info">
-				<div className="wp-dev-toolkit-page-header">
+			<div className="wdt:space-y-6 wdt:p-6">
+				<div className="wdt:space-y-2">
 					<h1>System Information</h1>
 					<p>View details about your WordPress environment</p>
 				</div>
 
-				<div className="wp-dev-toolkit-card wdt:bg-red-50 wdt:border wdt:border-red-200">
-					<div className="wp-dev-toolkit-card-body">
+				<div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:bg-red-50 wdt:border wdt:border-red-200">
+					<div className="wdt:px-6">
 						<div className="wdt:flex wdt:items-start">
 							<span className="wdt:text-red-500 wdt:mr-3 wdt:mt-1">⚠️</span>
 							<div>
@@ -175,14 +175,14 @@ const SystemInfo: React.FC = () => {
 
 	if ( ! systemInfo ) {
 		return (
-			<div className="wp-dev-toolkit-system-info">
-				<div className="wp-dev-toolkit-page-header">
+			<div className="wdt:space-y-6 wdt:p-6">
+				<div className="wdt:space-y-2">
 					<h1>System Information</h1>
 					<p>View details about your WordPress environment</p>
 				</div>
 
-				<div className="wp-dev-toolkit-card">
-					<div className="wp-dev-toolkit-card-body">
+				<div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm">
+					<div className="wdt:px-6">
 						<p>No system information available.</p>
 					</div>
 				</div>
@@ -198,14 +198,14 @@ const SystemInfo: React.FC = () => {
 	];
 
 	return (
-		<div className="wp-dev-toolkit-system-info">
-			<div className="wp-dev-toolkit-page-header">
+		<div className="wdt:space-y-6 wdt:p-6">
+			<div className="wdt:space-y-2">
 				<h1>System Information</h1>
 				<p>View details about your WordPress environment</p>
 			</div>
 
-			<div className="wp-dev-toolkit-card wdt:mb-6">
-				<div className="wp-dev-toolkit-card-header">
+			<div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:mb-6">
+				<div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
 					<div className="wdt:flex wdt:justify-between wdt:items-center">
 						<div className="wdt:flex wdt:items-center wdt:gap-2">
 							<span>ℹ️</span>
@@ -219,7 +219,7 @@ const SystemInfo: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="wp-dev-toolkit-card-body">
+				<div className="wdt:px-6">
 					<div className="wdt:grid wdt:grid-cols-1 md:wdt:grid-cols-2 lg:wdt:grid-cols-4 wdt:gap-6">
 						<div className="wdt:bg-white wdt:p-4 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:shadow-sm">
 							<div className="wdt:flex wdt:items-center wdt:mb-2">
@@ -283,14 +283,14 @@ const SystemInfo: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="wp-dev-toolkit-card">
-				<div className="wp-dev-toolkit-card-header">
+			<div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm">
+				<div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
 					<div className="wdt:flex wdt:items-center wdt:gap-2">
 						<Dashicon icon="list-view" />
 						<h2>Detailed Information</h2>
 					</div>
 				</div>
-				<div className="wp-dev-toolkit-card-body wdt:p-0">
+				<div className="wdt:px-6 wdt:p-0">
 					<div className="wdt:border-b wdt:border-gray-200">
 						<nav className="wdt:flex">
 							{ tabs.map( ( tab ) => (
@@ -316,7 +316,7 @@ const SystemInfo: React.FC = () => {
 								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
 									WordPress Environment
 								</h3>
-								<table className="wp-dev-toolkit-system-info-table">
+								<table className="wdt:w-full wdt:text-sm">
 									<tbody>
 										<InfoRow
 											label="WordPress Version"
@@ -370,7 +370,7 @@ const SystemInfo: React.FC = () => {
 								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
 									Server Environment
 								</h3>
-								<table className="wp-dev-toolkit-system-info-table">
+								<table className="wdt:w-full wdt:text-sm">
 									<tbody>
 										<InfoRow
 											label="PHP Version"
@@ -422,7 +422,7 @@ const SystemInfo: React.FC = () => {
 								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
 									WordPress Constants
 								</h3>
-								<table className="wp-dev-toolkit-system-info-table">
+								<table className="wdt:w-full wdt:text-sm">
 									<tbody>
 										{ Object.entries( systemInfo.constants ).map(
 											( [ key, value ] ) => (
@@ -439,7 +439,7 @@ const SystemInfo: React.FC = () => {
 								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
 									File Permissions
 								</h3>
-								<table className="wp-dev-toolkit-system-info-table">
+								<table className="wdt:w-full wdt:text-sm">
 									<tbody>
 										{ Object.entries( systemInfo.permissions ).map(
 											( [ key, value ] ) => (
