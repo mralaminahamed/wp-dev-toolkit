@@ -14,6 +14,7 @@ import {
 import { useSelect, useDispatch } from "@wordpress/data";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import { STORE_NAME as HOOK_INSPECTOR_STORE } from "@/stores/hook-inspector/constants";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
@@ -273,12 +274,7 @@ const HookInspector: React.FC = () => {
       {/* Quick Actions */}
       <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:mb-6">
         <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-4">
-          <Button
-            className=""
-            onClick={fetchHookData}
-            disabled={isFetching}
-            icon="refresh"
-          >
+          <Button onClick={fetchHookData} disabled={isFetching}>
             {isFetching ? "Refreshing..." : "Refresh Hooks"}
           </Button>
 
@@ -292,11 +288,17 @@ const HookInspector: React.FC = () => {
           </Button>
 
           <div className="wdt:ml-auto wdt:flex wdt:items-center wdt:gap-2">
-            <ToggleControl
-              label="Show Stack Traces"
-              checked={showStackTrace}
-              onChange={() => setShowStackTrace(!showStackTrace)}
-            />
+            <label className="wdt:flex wdt:items-center wdt:gap-2 wdt:cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showStackTrace}
+                onChange={() => setShowStackTrace(!showStackTrace)}
+                className="wdt:rounded wdt:border-gray-300 wdt:text-blue-600 wdt:focus:ring-blue-500"
+              />
+              <span className="wdt:text-sm wdt:font-medium">
+                Show Stack Traces
+              </span>
+            </label>
           </div>
         </div>
       </div>
@@ -312,24 +314,33 @@ const HookInspector: React.FC = () => {
         <div className="wdt:px-6">
           <div className="wdt:grid wdt:grid-cols-1 md:wdt:grid-cols-2 wdt:gap-6 wdt:mb-4">
             <div>
-              <TextControl
-                label="Search Hooks"
-                value={filterOptions.search}
-                onChange={handleSearch}
-                placeholder="Enter hook name..."
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Search Hooks
+                </span>
+                <Input
+                  value={filterOptions.search}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Enter hook name..."
+                  className="wdt:mt-1"
+                />
+              </label>
             </div>
             <div>
-              <SelectControl
-                label="Hook Type"
-                value={filterOptions.type}
-                options={[
-                  { label: "All", value: "all" },
-                  { label: "Actions", value: "action" },
-                  { label: "Filters", value: "filter" },
-                ]}
-                onChange={handleTypeChange}
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Hook Type
+                </span>
+                <select
+                  value={filterOptions.type}
+                  onChange={(e) => handleTypeChange(e.target.value)}
+                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                >
+                  <option value="all">All</option>
+                  <option value="action">Actions</option>
+                  <option value="filter">Filters</option>
+                </select>
+              </label>
             </div>
           </div>
 
@@ -421,7 +432,8 @@ const HookInspector: React.FC = () => {
 
       {isFetching ? (
         <div className="wdt:flex wdt:justify-center wdt:items-center wdt:p-16 wdt:bg-white wdt:rounded-lg wdt:shadow-sm">
-          <Spinner /> <span className="wdt:ml-2">Loading hooks...</span>
+          <div className="wdt:animate-spin wdt:rounded-full wdt:h-8 wdt:w-8 wdt:border-b-2 wdt:border-blue-600"></div>
+          <span className="wdt:ml-2">Loading hooks...</span>
         </div>
       ) : (
         <>
@@ -624,8 +636,7 @@ const HookInspector: React.FC = () => {
                             <Button
                               variant="secondary"
                               onClick={() => viewHookDetails(hook)}
-                              isSmall
-                              icon="visibility"
+                              size="sm"
                             >
                               View
                             </Button>
