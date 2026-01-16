@@ -1,0 +1,113 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+build/
+dist/
+*.min.js
+*.min.css
+
+# WordPress core files
+wp-admin/
+wp-includes/
+
+# PHP files (ESLint is configured for JS/TS)
+*.php
+
+# Legacy code that may not follow modern standards
+legacy/
+
+# Assets (images, fonts, etc.)
+assets/
+spa/static/images/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# Documentation
+docs/
+*.md
+readme.txt
+
+# Configuration files
+.eslintrc.js
+..config.js
+webpack-*.js
+webpack-*-*.js
+composer.json
+package.json
+package-lock.json
+yarn.lock
+phpunit.xml
+phpcs.xml.dist
+jest.config.js
+jest.setup.js
+tsconfig.json
+.ncurc.json
+.yarnrc.yml
+
+# Git and version control
+.git/
+.gitignore
+.github/
+
+# Test coverage and reports
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# WordPress specific
+wp-content/uploads/
+wp-content/plugins/
+wp-content/themes/
+wp-content/mu-plugins/
+
+# Exclude everything except spa/ directory for linting
+!spa/
