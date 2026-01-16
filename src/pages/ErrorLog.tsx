@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Spinner, ToggleControl, Dashicon, TextControl, SelectControl } from '@wordpress/components';
-import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
+
+import {
+	Button,
+	Spinner,
+	ToggleControl,
+	Dashicon,
+	TextControl,
+	SelectControl,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+
+import { STORE_NAME as ERROR_LOG_STORE } from '@/stores/error-log/constants';
+import { STORE_NAME as SETTINGS_STORE } from '@/stores/settings/constants';
+
 import { ErrorLogResponse } from '@/types';
 
 interface ParsedLogEntry {
@@ -22,549 +34,681 @@ interface LogStats {
 }
 
 const ErrorLog: React.FC = () => {
-  const { errorLog, config, toggleTool } = useWPDevToolkit();
-  const [logContent, setLogContent] = useState('');
-  const [parsedLogs, setParsedLogs] = useState<ParsedLogEntry[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
-  const [logSize, setLogSize] = useState(0);
-  const [filterLevel, setFilterLevel] = useState<string | null>(null);
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [refreshRate, setRefreshRate] = useState(10);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [logStats, setLogStats] = useState<LogStats>({
-    total: 0,
-    errors: 0,
-    warnings: 0,
-    info: 0,
-    debug: 0,
-    other: 0
-  });
-  const [expandedLogs, setExpandedLogs] = useState<Set<number>>(new Set());
-  const [expanded, setExpanded] = useState<number | null>(null);
-  const [dateFilter, setDateFilter] = useState<string | null>(null);
-  const logEndRef = useRef<HTMLDivElement>(null);
+	const {
+		entries: errorLog,
+		isResolving,
+		getError,
+	} = useSelect(
+		( select: any ) => ( {
+			entries: select( ERROR_LOG_STORE ).getEntries(),
+			isResolving: ( key: string ) => select( ERROR_LOG_STORE ).isResolving( key ),
+			getError: ( key: string ) => select( ERROR_LOG_STORE ).getError( key ),
+		} ),
+		[],
+	);
 
-  useEffect(() => {
-    fetchErrorLog();
+	const { config } = useSelect(
+		( select: any ) => ( {
+			config: select( SETTINGS_STORE ).getConfig(),
+		} ),
+		[],
+	);
 
-    // Set up auto-refresh if enabled
-    let intervalId: NodeJS.Timeout | null = null;
-    if (autoRefresh) {
-      intervalId = setInterval(fetchErrorLog, refreshRate * 1000);
-    }
+	const { fetchEntries, clearLog } = useDispatch( ERROR_LOG_STORE );
+	const { toggleTool } = useDispatch( SETTINGS_STORE );
+	const [ logContent, setLogContent ] = useState( '' );
+	const [ parsedLogs, setParsedLogs ] = useState<ParsedLogEntry[]>( [] );
+	const [ isFetching, setIsFetching ] = useState( false );
+	const [ isClearing, setIsClearing ] = useState( false );
+	const [ logSize, setLogSize ] = useState( 0 );
+	const [ filterLevel, setFilterLevel ] = useState<string | null>( null );
+	const [ autoRefresh, setAutoRefresh ] = useState( false );
+	const [ refreshRate, setRefreshRate ] = useState( 10 );
+	const [ searchQuery, setSearchQuery ] = useState( '' );
+	const [ sortDirection, setSortDirection ] = useState<'asc' | 'desc'>( 'desc' );
+	const [ logStats, setLogStats ] = useState<LogStats>( {
+		total: 0,
+		errors: 0,
+		warnings: 0,
+		info: 0,
+		debug: 0,
+		other: 0,
+	} );
+	const [ expandedLogs, setExpandedLogs ] = useState<Set<number>>( new Set() );
+	const [ expanded, setExpanded ] = useState<number | null>( null );
+	const [ dateFilter, setDateFilter ] = useState<string | null>( null );
+	const logEndRef = useRef<HTMLDivElement>( null );
 
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [autoRefresh, refreshRate]);
+	useEffect( () => {
+		fetchErrorLog();
 
-  // Calculate log statistics when parsedLogs change
-  useEffect(() => {
-    const stats: LogStats = {
-      total: parsedLogs.length,
-      errors: getLogLevelCount('ERROR'),
-      warnings: getLogLevelCount('WARNING'),
-      info: getLogLevelCount('INFO'),
-      debug: getLogLevelCount('DEBUG'),
-      other: 0
-    };
+		// Set up auto-refresh if enabled
+		let intervalId: NodeJS.Timeout | null = null;
+		if ( autoRefresh ) {
+			intervalId = setInterval( fetchErrorLog, refreshRate * 1000 );
+		}
 
-    stats.other = stats.total - (stats.errors + stats.warnings + stats.info + stats.debug);
-    setLogStats(stats);
-  }, [parsedLogs]);
+		return () => {
+			if ( intervalId ) {
+				clearInterval( intervalId );
+			}
+		};
+	}, [ autoRefresh, refreshRate ] );
 
-  const fetchErrorLog = async () => {
-    if (isFetching) return; // Prevent multiple simultaneous requests
+	// Calculate log statistics when parsedLogs change
+	useEffect( () => {
+		const stats: LogStats = {
+			total: parsedLogs.length,
+			errors: getLogLevelCount( 'ERROR' ),
+			warnings: getLogLevelCount( 'WARNING' ),
+			info: getLogLevelCount( 'INFO' ),
+			debug: getLogLevelCount( 'DEBUG' ),
+			other: 0,
+		};
 
-    setIsFetching(true);
-    try {
-      const rawResponse = await errorLog.get();
-      // Type assertion with unknown intermediate step
-      const response = rawResponse as unknown as ErrorLogResponse;
+		stats.other =
+      stats.total - ( stats.errors + stats.warnings + stats.info + stats.debug );
+		setLogStats( stats );
+	}, [ parsedLogs ] );
 
-      if (response && response.log_content) {
-        setLogContent(response.log_content);
-        const parsed = parseLogContent(response.log_content);
-        setParsedLogs(parsed);
-        setLogSize(response.file_size || 0);
-      } else {
-        setLogContent('No errors logged.');
-        setParsedLogs([]);
-      }
-    } catch (error) {
-      console.error('Error fetching error log:', error);
-      setLogContent('Failed to fetch error log.');
-      setParsedLogs([]);
-    }
-    setIsFetching(false);
-  };
+	const fetchErrorLog = async () => {
+		if ( isFetching ) {
+			return;
+		} // Prevent multiple simultaneous requests
 
-  const parseLogContent = (content: string): ParsedLogEntry[] => {
-    if (!content) return [];
+		setIsFetching( true );
+		try {
+			await fetchEntries();
+			// The store will update the entries automatically
+			// For now, we'll keep the local state for backward compatibility
+			const entries = errorLog || [];
+			if ( entries.length > 0 ) {
+				// Convert entries to log content format
+				const logContent = entries
+					.map(
+						( entry: any ) =>
+							`[${ entry.timestamp }] ${ entry.level }: ${ entry.message }`,
+					)
+					.join( '\n' );
+				setLogContent( logContent );
+				setParsedLogs( entries );
+				setLogSize( logContent.length );
+			} else {
+				setLogContent( 'No errors logged.' );
+				setParsedLogs( [] );
+				setLogSize( 0 );
+			}
+		} catch ( error: any ) {
+			console.error( 'Failed to fetch error log:', error );
+			setLogContent( 'Error loading log file.' );
+			setParsedLogs( [] );
+		} finally {
+			setIsFetching( false );
+		}
+	};
 
-    // More comprehensive regex to extract file and line information
-    const logEntryRegex = /\[([\d\s\-:.]+)\]\s*\[([A-Z]+)\]\s*(.*?)(?:\s+in\s+(\S+)\s+on\s+line\s+(\d+))?(?=\n\[\d|\n\s*$|$)/gs;
-    const entries: ParsedLogEntry[] = [];
+	const parseLogContent = ( content: string ): ParsedLogEntry[] => {
+		if ( ! content ) {
+			return [];
+		}
 
-    let match;
-    while ((match = logEntryRegex.exec(content)) !== null) {
-      entries.push({
-        timestamp: match[1]?.trim() || '',
-        level: match[2]?.trim() || '',
-        message: match[3]?.trim() || '',
-        file: match[4] ? match[4].trim() : undefined,
-        line: match[5] ? parseInt(match[5].trim(), 10) : undefined,
-        raw: match[0] || '',
-      });
-    }
+		// More comprehensive regex to extract file and line information
+		const logEntryRegex =
+      /\[([\d\s\-:.]+)\]\s*\[([A-Z]+)\]\s*(.*?)(?:\s+in\s+(\S+)\s+on\s+line\s+(\d+))?(?=\n\[\d|\n\s*$|$)/gs;
+		const entries: ParsedLogEntry[] = [];
 
-    return sortDirection === 'desc' ? entries.reverse() : entries;
-  };
+		let match;
+		while ( ( match = logEntryRegex.exec( content ) ) !== null ) {
+			entries.push( {
+				timestamp: match[ 1 ]?.trim() || '',
+				level: match[ 2 ]?.trim() || '',
+				message: match[ 3 ]?.trim() || '',
+				file: match[ 4 ] ? match[ 4 ].trim() : undefined,
+				line: match[ 5 ] ? parseInt( match[ 5 ].trim(), 10 ) : undefined,
+				raw: match[ 0 ] || '',
+			} );
+		}
 
-  const clearErrorLog = async () => {
-    if (!window.confirm('Are you sure you want to clear the error log?')) {
-      return;
-    }
+		return sortDirection === 'desc' ? entries.reverse() : entries;
+	};
 
-    setIsClearing(true);
-    try {
-      await errorLog.clear();
-      setLogContent('Error log cleared successfully.');
-      setParsedLogs([]);
-      setLogSize(0);
-    } catch (error) {
-      console.error('Error clearing error log:', error);
-      setLogContent('Failed to clear error log.');
-    }
-    setIsClearing(false);
-  };
+	const clearErrorLog = async () => {
+		if ( ! window.confirm( 'Are you sure you want to clear the error log?' ) ) {
+			return;
+		}
 
-  const toggleLogging = () => {
-    toggleTool('error_logging');
-  };
+		setIsClearing( true );
+		try {
+			await clearLog();
+			setLogContent( 'Error log cleared successfully.' );
+			setParsedLogs( [] );
+			setLogSize( 0 );
+		} catch ( error ) {
+			console.error( 'Error clearing error log:', error );
+			setLogContent( 'Failed to clear error log.' );
+		}
+		setIsClearing( false );
+	};
 
-  const getFilteredLogs = () => {
-    let filtered = parsedLogs;
+	const toggleLogging = () => {
+		toggleTool( 'error_logging' );
+	};
 
-    // Apply level filter if set
-    if (filterLevel) {
-      filtered = filtered.filter(log => log.level === filterLevel);
-    }
+	const getFilteredLogs = () => {
+		let filtered = parsedLogs;
 
-    // Apply search filter if set
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(log =>
-        log.message.toLowerCase().includes(query) ||
-        (log.file && log.file.toLowerCase().includes(query))
-      );
-    }
+		// Apply level filter if set
+		if ( filterLevel ) {
+			filtered = filtered.filter( ( log ) => log.level === filterLevel );
+		}
 
-    // Apply date filter if set
-    if (dateFilter) {
-      filtered = filtered.filter(log => {
-        const logDate = log.timestamp.split(' ')[0]; // Extract date part
-        return logDate === dateFilter;
-      });
-    }
+		// Apply search filter if set
+		if ( searchQuery ) {
+			const query = searchQuery.toLowerCase();
+			filtered = filtered.filter(
+				( log ) =>
+					log.message.toLowerCase().includes( query ) ||
+          ( log.file && log.file.toLowerCase().includes( query ) ),
+			);
+		}
 
-    return filtered;
-  };
+		// Apply date filter if set
+		if ( dateFilter ) {
+			filtered = filtered.filter( ( log ) => {
+				const logDate = log.timestamp.split( ' ' )[ 0 ]; // Extract date part
+				return logDate === dateFilter;
+			} );
+		}
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+		return filtered;
+	};
 
-  const getLogLevelCount = (level: string): number => {
-    return parsedLogs.filter(log => log.level === level).length;
-  };
+	const formatFileSize = ( bytes: number ): string => {
+		if ( bytes === 0 ) {
+			return '0 Bytes';
+		}
+		const k = 1024;
+		const sizes = [ 'Bytes', 'KB', 'MB', 'GB' ];
+		const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
+		return `${ parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( 2 ) ) } ${ sizes[ i ] }`;
+	};
 
-  const getLogLevelClass = (level: string): string => {
-    switch (level.toUpperCase()) {
-      case 'ERROR':
-        return 'wdt-bg-red-100 wdt-text-red-800';
-      case 'WARNING':
-        return 'wdt-bg-yellow-100 wdt-text-yellow-800';
-      case 'INFO':
-        return 'wdt-bg-blue-100 wdt-text-blue-800';
-      case 'DEBUG':
-        return 'wdt-bg-gray-100 wdt-text-gray-800';
-      default:
-        return 'wdt-bg-gray-100 wdt-text-gray-800';
-    }
-  };
+	const getLogLevelCount = ( level: string ): number => {
+		return parsedLogs.filter( ( log ) => log.level === level ).length;
+	};
 
-  const getLogLevelBgClass = (level: string): string => {
-    switch (level.toUpperCase()) {
-      case 'ERROR':
-        return 'wdt-bg-red-500';
-      case 'WARNING':
-        return 'wdt-bg-yellow-500';
-      case 'INFO':
-        return 'wdt-bg-blue-500';
-      case 'DEBUG':
-        return 'wdt-bg-gray-500';
-      default:
-        return 'wdt-bg-gray-500';
-    }
-  };
+	const getLogLevelClass = ( level: string ): string => {
+		switch ( level.toUpperCase() ) {
+			case 'ERROR':
+				return 'wdt-bg-red-100 wdt-text-red-800';
+			case 'WARNING':
+				return 'wdt-bg-yellow-100 wdt-text-yellow-800';
+			case 'INFO':
+				return 'wdt-bg-blue-100 wdt-text-blue-800';
+			case 'DEBUG':
+				return 'wdt-bg-gray-100 wdt-text-gray-800';
+			default:
+				return 'wdt-bg-gray-100 wdt-text-gray-800';
+		}
+	};
 
-  const getLogLevelIcon = (level: string): string => {
-    switch (level.toUpperCase()) {
-      case 'ERROR':
-        return 'warning';
-      case 'WARNING':
-        return 'info';
-      case 'INFO':
-        return 'admin-comments';
-      case 'DEBUG':
-        return 'code-standards';
-      default:
-        return 'admin-generic';
-    }
-  };
+	const getLogLevelBgClass = ( level: string ): string => {
+		switch ( level.toUpperCase() ) {
+			case 'ERROR':
+				return 'wdt-bg-red-500';
+			case 'WARNING':
+				return 'wdt-bg-yellow-500';
+			case 'INFO':
+				return 'wdt-bg-blue-500';
+			case 'DEBUG':
+				return 'wdt-bg-gray-500';
+			default:
+				return 'wdt-bg-gray-500';
+		}
+	};
 
-  const toggleExpandLog = (index: number) => {
-    if (expanded === index) {
-      setExpanded(null);
-    } else {
-      setExpanded(index);
-      // Scroll to the expanded log after a short delay to allow rendering
-      setTimeout(() => {
-        logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-  };
+	const getLogLevelIcon = ( level: string ): string => {
+		switch ( level.toUpperCase() ) {
+			case 'ERROR':
+				return 'warning';
+			case 'WARNING':
+				return 'info';
+			case 'INFO':
+				return 'admin-comments';
+			case 'DEBUG':
+				return 'code-standards';
+			default:
+				return 'admin-generic';
+		}
+	};
 
-  const toggleSortDirection = () => {
-    const newDirection = sortDirection === 'desc' ? 'asc' : 'desc';
-    setSortDirection(newDirection);
+	const toggleExpandLog = ( index: number ) => {
+		if ( expanded === index ) {
+			setExpanded( null );
+		} else {
+			setExpanded( index );
+			// Scroll to the expanded log after a short delay to allow rendering
+			setTimeout( () => {
+				logEndRef.current?.scrollIntoView( { behavior: 'smooth' } );
+			}, 100 );
+		}
+	};
 
-    // Re-sort the logs based on the new direction
-    setParsedLogs(prevLogs =>
-      newDirection === 'desc' ? [...prevLogs].reverse() : [...prevLogs].reverse()
-    );
-  };
+	const toggleSortDirection = () => {
+		const newDirection = sortDirection === 'desc' ? 'asc' : 'desc';
+		setSortDirection( newDirection );
 
-  // Get unique dates from logs for the date filter
-  const getUniqueDates = (): string[] => {
-    const dates = new Set<string>();
-    parsedLogs.forEach(log => {
-      const datePart = log.timestamp.split(' ')[0]; // Extract date part
-      if (datePart) dates.add(datePart);
-    });
-    return Array.from(dates).sort((a, b) => b.localeCompare(a)); // Sort descending
-  };
+		// Re-sort the logs based on the new direction
+		setParsedLogs( ( prevLogs ) =>
+			newDirection === 'desc'
+				? [ ...prevLogs ].reverse()
+				: [ ...prevLogs ].reverse(),
+		);
+	};
 
-  return (
-    <div className="wp-dev-toolkit-error-log">
-      <div className="wp-dev-toolkit-page-header">
-        <h1>Error Log</h1>
-        <p>Monitor and manage PHP errors, warnings and notices</p>
-      </div>
+	// Get unique dates from logs for the date filter
+	const getUniqueDates = (): string[] => {
+		const dates = new Set<string>();
+		parsedLogs.forEach( ( log ) => {
+			const datePart = log.timestamp.split( ' ' )[ 0 ]; // Extract date part
+			if ( datePart ) {
+				dates.add( datePart );
+			}
+		} );
+		return Array.from( dates ).sort( ( a, b ) => b.localeCompare( a ) ); // Sort descending
+	};
 
-      {/* Control Panel */}
-      <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-mb-6">
-        <div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-4">
-          <Button
-            className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
-            onClick={fetchErrorLog}
-            disabled={isFetching || isClearing}
-            icon="refresh"
-          >
-            {isFetching ? 'Refreshing...' : 'Refresh Log'}
-          </Button>
+	return (
+		<div className="wp-dev-toolkit-error-log">
+			<div className="wp-dev-toolkit-page-header">
+				<h1>Error Log</h1>
+				<p>Monitor and manage PHP errors, warnings and notices</p>
+			</div>
 
-          <Button
-            className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
-            onClick={clearErrorLog}
-            disabled={isFetching || isClearing || parsedLogs.length === 0}
-            icon="trash"
-          >
-            {isClearing ? 'Clearing...' : 'Clear Log'}
-          </Button>
+			{ /* Control Panel */ }
+			<div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-mb-6">
+				<div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-4">
+					<Button
+						className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
+						onClick={ fetchErrorLog }
+						disabled={ isFetching || isClearing }
+						icon="refresh"
+					>
+						{ isFetching ? 'Refreshing...' : 'Refresh Log' }
+					</Button>
 
-          <Button
-            className={`wp-dev-toolkit-button ${config.error_logging ? 'wp-dev-toolkit-button-secondary' : 'wp-dev-toolkit-button-primary'}`}
-            onClick={toggleLogging}
-            icon={config.error_logging ? 'no-alt' : 'yes-alt'}
-          >
-            {config.error_logging ? 'Disable Logging' : 'Enable Logging'}
-          </Button>
+					<Button
+						className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
+						onClick={ clearErrorLog }
+						disabled={ isFetching || isClearing || parsedLogs.length === 0 }
+						icon="trash"
+					>
+						{ isClearing ? 'Clearing...' : 'Clear Log' }
+					</Button>
 
-          <div className="wdt-ml-auto wdt-flex wdt-items-center wdt-gap-2">
-            <ToggleControl
-              label="Auto-refresh"
-              checked={autoRefresh}
-              onChange={() => setAutoRefresh(!autoRefresh)}
-            />
+					<Button
+						className={ `wp-dev-toolkit-button ${ config.error_logging ? 'wp-dev-toolkit-button-secondary' : 'wp-dev-toolkit-button-primary' }` }
+						onClick={ toggleLogging }
+						icon={ config.error_logging ? 'no-alt' : 'yes-alt' }
+					>
+						{ config.error_logging ? 'Disable Logging' : 'Enable Logging' }
+					</Button>
 
-            {autoRefresh && (
-              <SelectControl
-                label="Refresh rate"
-                value={refreshRate.toString()}
-                options={[
-                  { label: '5 seconds', value: '5' },
-                  { label: '10 seconds', value: '10' },
-                  { label: '30 seconds', value: '30' },
-                  { label: '60 seconds', value: '60' },
-                ]}
-                onChange={(value: string) => setRefreshRate(parseInt(value, 10))}
-              />
-            )}
-          </div>
-        </div>
-      </div>
+					<div className="wdt-ml-auto wdt-flex wdt-items-center wdt-gap-2">
+						<ToggleControl
+							label="Auto-refresh"
+							checked={ autoRefresh }
+							onChange={ () => setAutoRefresh( ! autoRefresh ) }
+						/>
 
-      {/* Stats Panel */}
-      <div className="wdt-grid wdt-grid-cols-2 sm:wdt-grid-cols-3 md:wdt-grid-cols-5 wdt-gap-4 wdt-mb-6">
-        <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
-          <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Total Entries</div>
-          <div className="wdt-text-2xl wdt-font-bold">{logStats.total}</div>
-        </div>
+						{ autoRefresh && (
+							<SelectControl
+								label="Refresh rate"
+								value={ refreshRate.toString() }
+								options={ [
+									{ label: '5 seconds', value: '5' },
+									{ label: '10 seconds', value: '10' },
+									{ label: '30 seconds', value: '30' },
+									{ label: '60 seconds', value: '60' },
+								] }
+								onChange={ ( value: string ) =>
+									setRefreshRate( parseInt( value, 10 ) )
+								}
+							/>
+						) }
+					</div>
+				</div>
+			</div>
 
-        <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
-          <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Errors</div>
-          <div className="wdt-text-2xl wdt-font-bold wdt-text-red-600">{logStats.errors}</div>
-        </div>
+			{ /* Stats Panel */ }
+			<div className="wdt-grid wdt-grid-cols-2 sm:wdt-grid-cols-3 md:wdt-grid-cols-5 wdt-gap-4 wdt-mb-6">
+				<div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
+					<div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">
+						Total Entries
+					</div>
+					<div className="wdt-text-2xl wdt-font-bold">{ logStats.total }</div>
+				</div>
 
-        <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
-          <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Warnings</div>
-          <div className="wdt-text-2xl wdt-font-bold wdt-text-yellow-600">{logStats.warnings}</div>
-        </div>
+				<div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
+					<div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Errors</div>
+					<div className="wdt-text-2xl wdt-font-bold wdt-text-red-600">
+						{ logStats.errors }
+					</div>
+				</div>
 
-        <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
-          <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Info</div>
-          <div className="wdt-text-2xl wdt-font-bold wdt-text-blue-600">{logStats.info}</div>
-        </div>
+				<div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
+					<div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Warnings</div>
+					<div className="wdt-text-2xl wdt-font-bold wdt-text-yellow-600">
+						{ logStats.warnings }
+					</div>
+				</div>
 
-        <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
-          <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">File Size</div>
-          <div className="wdt-text-2xl wdt-font-bold">{formatFileSize(logSize)}</div>
-        </div>
-      </div>
+				<div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
+					<div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Info</div>
+					<div className="wdt-text-2xl wdt-font-bold wdt-text-blue-600">
+						{ logStats.info }
+					</div>
+				</div>
 
-      <div className="wp-dev-toolkit-card">
-        <div className="wp-dev-toolkit-card-header">
-          <div className="wdt-flex wdt-items-center wdt-gap-2">
-            <Dashicon icon="warning" />
-            <h2>Error Log</h2>
-          </div>
-        </div>
-        <div className="wp-dev-toolkit-card-body">
-          {/* Filters */}
-          <div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-4 wdt-mb-6">
-            <div className="wdt-flex-1 wdt-min-w-[200px]">
-              <TextControl
-                label="Search logs"
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search for error messages or files..."
-                className="wdt-w-full"
-              />
-            </div>
+				<div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
+					<div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">
+						File Size
+					</div>
+					<div className="wdt-text-2xl wdt-font-bold">
+						{ formatFileSize( logSize ) }
+					</div>
+				</div>
+			</div>
 
-            <div className="wdt-flex wdt-flex-col">
-              <label className="wdt-text-xs wdt-font-medium wdt-text-gray-700 wdt-mb-1">Filter by level</label>
-              <div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-2">
-                <button
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === null ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
-                  onClick={() => setFilterLevel(null)}
-                >
-                  All ({logStats.total})
-                </button>
-                <button
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'ERROR' ? 'wdt-bg-red-100 wdt-text-red-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
-                  onClick={() => setFilterLevel('ERROR')}
-                >
-                  Errors ({logStats.errors})
-                </button>
-                <button
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'WARNING' ? 'wdt-bg-yellow-100 wdt-text-yellow-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
-                  onClick={() => setFilterLevel('WARNING')}
-                >
-                  Warnings ({logStats.warnings})
-                </button>
-                <button
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'INFO' ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
-                  onClick={() => setFilterLevel('INFO')}
-                >
-                  Info ({logStats.info})
-                </button>
-              </div>
-            </div>
+			<div className="wp-dev-toolkit-card">
+				<div className="wp-dev-toolkit-card-header">
+					<div className="wdt-flex wdt-items-center wdt-gap-2">
+						<Dashicon icon="warning" />
+						<h2>Error Log</h2>
+					</div>
+				</div>
+				<div className="wp-dev-toolkit-card-body">
+					{ /* Filters */ }
+					<div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-4 wdt-mb-6">
+						<div className="wdt-flex-1 wdt-min-w-[200px]">
+							<TextControl
+								label="Search logs"
+								value={ searchQuery }
+								onChange={ setSearchQuery }
+								placeholder="Search for error messages or files..."
+								className="wdt-w-full"
+							/>
+						</div>
 
-            {getUniqueDates().length > 0 && (
-              <div>
-                <label className="wdt-text-xs wdt-font-medium wdt-text-gray-700 wdt-mb-1">Filter by date</label>
-                <SelectControl
-                  value={dateFilter || ''}
-                  options={[
-                    { label: 'All dates', value: '' },
-                    ...getUniqueDates().map(date => ({ label: date, value: date }))
-                  ]}
-                  onChange={(value: string) => setDateFilter(value || null)}
-                />
-              </div>
-            )}
+						<div className="wdt-flex wdt-flex-col">
+							<label className="wdt-text-xs wdt-font-medium wdt-text-gray-700 wdt-mb-1">
+								Filter by level
+							</label>
+							<div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-2">
+								<button
+									className={ `wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${ filterLevel === null ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200' }` }
+									onClick={ () => setFilterLevel( null ) }
+								>
+									All ({ logStats.total })
+								</button>
+								<button
+									className={ `wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${ filterLevel === 'ERROR' ? 'wdt-bg-red-100 wdt-text-red-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200' }` }
+									onClick={ () => setFilterLevel( 'ERROR' ) }
+								>
+									Errors ({ logStats.errors })
+								</button>
+								<button
+									className={ `wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${ filterLevel === 'WARNING' ? 'wdt-bg-yellow-100 wdt-text-yellow-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200' }` }
+									onClick={ () => setFilterLevel( 'WARNING' ) }
+								>
+									Warnings ({ logStats.warnings })
+								</button>
+								<button
+									className={ `wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${ filterLevel === 'INFO' ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200' }` }
+									onClick={ () => setFilterLevel( 'INFO' ) }
+								>
+									Info ({ logStats.info })
+								</button>
+							</div>
+						</div>
 
-            <div className="wdt-ml-auto">
-              <Button
-                icon={sortDirection === 'desc' ? 'arrow-down-alt2' : 'arrow-up-alt2'}
-                onClick={toggleSortDirection}
-                className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
-                iconSize={16}
-              >
-                {sortDirection === 'desc' ? 'Newest first' : 'Oldest first'}
-              </Button>
-            </div>
-          </div>
+						{ getUniqueDates().length > 0 && (
+							<div>
+								<label className="wdt-text-xs wdt-font-medium wdt-text-gray-700 wdt-mb-1">
+									Filter by date
+								</label>
+								<SelectControl
+									value={ dateFilter || '' }
+									options={ [
+										{ label: 'All dates', value: '' },
+										...getUniqueDates().map( ( date ) => ( {
+											label: date,
+											value: date,
+										} ) ),
+									] }
+									onChange={ ( value: string ) => setDateFilter( value || null ) }
+								/>
+							</div>
+						) }
 
-          {/* Log Content */}
-          {isFetching ? (
-            <div className="wdt-flex wdt-justify-center wdt-items-center wdt-p-8">
-              <Spinner /> <span className="wdt-ml-2">Loading error log...</span>
-            </div>
-          ) : parsedLogs.length > 0 ? (
-            <>
-              <div className="wdt-border wdt-rounded-lg wdt-overflow-hidden wdt-divide-y wdt-divide-gray-200">
-                {getFilteredLogs().length > 0 ? (
-                  getFilteredLogs().map((log, index) => (
-                    <div
-                      key={index}
-                      className={`wdt-transition-colors ${expanded === index ? 'wdt-bg-gray-50' : 'hover:wdt-bg-gray-50'}`}
-                    >
-                      <div className="wdt-p-4">
-                        <div className="wdt-flex wdt-items-center wdt-gap-2 wdt-mb-2">
-                          <button
-                            onClick={() => toggleExpandLog(index)}
-                            className="wdt-flex wdt-items-center wdt-justify-center wdt-w-6 wdt-h-6 wdt-rounded-full wdt-text-white"
-                            aria-label={expanded === index ? "Collapse log entry" : "Expand log entry"}
-                            style={{ backgroundColor: log.level === 'ERROR' ? '#ef4444' :
-                                                      log.level === 'WARNING' ? '#f59e0b' :
-                                                      log.level === 'INFO' ? '#3b82f6' : '#6b7280' }}
-                          >
-                            <Dashicon icon={getLogLevelIcon(log.level)} size={14} />
-                          </button>
-                          <span className={`wdt-px-2 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium ${getLogLevelClass(log.level)}`}>
-                            {log.level}
-                          </span>
-                          <span className="wdt-text-xs wdt-text-gray-500">{log.timestamp}</span>
+						<div className="wdt-ml-auto">
+							<Button
+								icon={
+									sortDirection === 'desc' ? 'arrow-down-alt2' : 'arrow-up-alt2'
+								}
+								onClick={ toggleSortDirection }
+								className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
+								iconSize={ 16 }
+							>
+								{ sortDirection === 'desc' ? 'Newest first' : 'Oldest first' }
+							</Button>
+						</div>
+					</div>
 
-                          {log.file && (
-                            <span className="wdt-text-xs wdt-bg-gray-100 wdt-px-2 wdt-py-0.5 wdt-rounded wdt-truncate wdt-max-w-[200px] wdt-hidden md:wdt-inline-block">
-                              {log.file} {log.line && `(line ${log.line})`}
-                            </span>
-                          )}
+					{ /* Log Content */ }
+					{ isFetching ? (
+						<div className="wdt-flex wdt-justify-center wdt-items-center wdt-p-8">
+							<Spinner /> <span className="wdt-ml-2">Loading error log...</span>
+						</div>
+					) : parsedLogs.length > 0 ? (
+						<>
+							<div className="wdt-border wdt-rounded-lg wdt-overflow-hidden wdt-divide-y wdt-divide-gray-200">
+								{ getFilteredLogs().length > 0 ? (
+									getFilteredLogs().map( ( log, index ) => (
+										<div
+											key={ index }
+											className={ `wdt-transition-colors ${ expanded === index ? 'wdt-bg-gray-50' : 'hover:wdt-bg-gray-50' }` }
+										>
+											<div className="wdt-p-4">
+												<div className="wdt-flex wdt-items-center wdt-gap-2 wdt-mb-2">
+													<button
+														onClick={ () => toggleExpandLog( index ) }
+														className="wdt-flex wdt-items-center wdt-justify-center wdt-w-6 wdt-h-6 wdt-rounded-full wdt-text-white"
+														aria-label={
+															expanded === index
+																? 'Collapse log entry'
+																: 'Expand log entry'
+														}
+														style={ {
+															backgroundColor:
+                                log.level === 'ERROR'
+                                	? '#ef4444'
+                                	: log.level === 'WARNING'
+                                		? '#f59e0b'
+                                		: log.level === 'INFO'
+                                			? '#3b82f6'
+                                			: '#6b7280',
+														} }
+													>
+														<Dashicon
+															icon={ getLogLevelIcon( log.level ) }
+															size={ 14 }
+														/>
+													</button>
+													<span
+														className={ `wdt-px-2 wdt-py-0.5 wdt-rounded-full wdt-text-xs wdt-font-medium ${ getLogLevelClass( log.level ) }` }
+													>
+														{ log.level }
+													</span>
+													<span className="wdt-text-xs wdt-text-gray-500">
+														{ log.timestamp }
+													</span>
 
-                          <button
-                            onClick={() => toggleExpandLog(index)}
-                            className="wdt-ml-auto wdt-text-gray-400 hover:wdt-text-gray-600"
-                            aria-label={expanded === index ? "Collapse log entry" : "Expand log entry"}
-                          >
-                            <Dashicon icon={expanded === index ? "arrow-up-alt2" : "arrow-down-alt2"} size={16} />
-                          </button>
-                        </div>
+													{ log.file && (
+														<span className="wdt-text-xs wdt-bg-gray-100 wdt-px-2 wdt-py-0.5 wdt-rounded wdt-truncate wdt-max-w-[200px] wdt-hidden md:wdt-inline-block">
+															{ log.file } { log.line && `(line ${ log.line })` }
+														</span>
+													) }
 
-                        {/* Truncated message for collapsed view */}
-                        {expanded !== index && (
-                          <div className="wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-truncate">
-                            {log.message}
-                          </div>
-                        )}
+													<button
+														onClick={ () => toggleExpandLog( index ) }
+														className="wdt-ml-auto wdt-text-gray-400 hover:wdt-text-gray-600"
+														aria-label={
+															expanded === index
+																? 'Collapse log entry'
+																: 'Expand log entry'
+														}
+													>
+														<Dashicon
+															icon={
+																expanded === index
+																	? 'arrow-up-alt2'
+																	: 'arrow-down-alt2'
+															}
+															size={ 16 }
+														/>
+													</button>
+												</div>
 
-                        {/* Full details for expanded view */}
-                        {expanded === index && (
-                          <div className="wdt-mt-3 wdt-space-y-3">
-                            <div className="wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-whitespace-pre-wrap wdt-border wdt-border-gray-200">
-                              {log.message}
-                            </div>
+												{ /* Truncated message for collapsed view */ }
+												{ expanded !== index && (
+													<div className="wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-truncate">
+														{ log.message }
+													</div>
+												) }
 
-                            {log.file && (
-                              <div className="wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200">
-                                <div className="wdt-font-medium wdt-mb-1">File Location:</div>
-                                <div className="wdt-font-mono">{log.file} {log.line && `(line ${log.line})`}</div>
-                              </div>
-                            )}
+												{ /* Full details for expanded view */ }
+												{ expanded === index && (
+													<div className="wdt-mt-3 wdt-space-y-3">
+														<div className="wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-whitespace-pre-wrap wdt-border wdt-border-gray-200">
+															{ log.message }
+														</div>
 
-                            <div className="wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200">
-                              <div className="wdt-font-medium wdt-mb-1">Timestamp:</div>
-                              <div>{log.timestamp}</div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="wdt-p-8 wdt-text-center wdt-text-gray-500">
-                    No logs match your search criteria. Try adjusting your filters.
-                  </div>
-                )}
-              </div>
-              <div ref={logEndRef}></div> {/* Reference for scrolling to expanded log */}
-            </>
-          ) : (
-            <div className="wdt-bg-gray-50 wdt-p-8 wdt-rounded-lg wdt-text-center">
-              <Dashicon icon="yes-alt" className="wdt-text-green-500 wdt-mb-2" size={30} />
-              <p className="wdt-text-gray-700">No log entries found. Your application is running smoothly!</p>
-            </div>
-          )}
+														{ log.file && (
+															<div className="wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200">
+																<div className="wdt-font-medium wdt-mb-1">
+																	File Location:
+																</div>
+																<div className="wdt-font-mono">
+																	{ log.file } { log.line && `(line ${ log.line })` }
+																</div>
+															</div>
+														) }
 
-          {/* Log entry count */}
-          {parsedLogs.length > 0 && (
-            <div className="wdt-mt-4 wdt-text-sm wdt-text-gray-500 wdt-text-right">
-              Showing {getFilteredLogs().length} of {parsedLogs.length} log entries
-            </div>
-          )}
-        </div>
-      </div>
+														<div className="wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200">
+															<div className="wdt-font-medium wdt-mb-1">
+																Timestamp:
+															</div>
+															<div>{ log.timestamp }</div>
+														</div>
+													</div>
+												) }
+											</div>
+										</div>
+									) )
+								) : (
+									<div className="wdt-p-8 wdt-text-center wdt-text-gray-500">
+										No logs match your search criteria. Try adjusting your
+										filters.
+									</div>
+								) }
+							</div>
+							<div ref={ logEndRef }></div>{ ' ' }
+							{ /* Reference for scrolling to expanded log */ }
+						</>
+					) : (
+						<div className="wdt-bg-gray-50 wdt-p-8 wdt-rounded-lg wdt-text-center">
+							<Dashicon
+								icon="yes-alt"
+								className="wdt-text-green-500 wdt-mb-2"
+								size={ 30 }
+							/>
+							<p className="wdt-text-gray-700">
+								No log entries found. Your application is running smoothly!
+							</p>
+						</div>
+					) }
 
-      <div className="wp-dev-toolkit-card wdt-mt-6">
-        <div className="wp-dev-toolkit-card-header">
-          <div className="wdt-flex wdt-items-center wdt-gap-2">
-            <Dashicon icon="admin-tools" />
-            <h2>Log Settings</h2>
-          </div>
-        </div>
-        <div className="wp-dev-toolkit-card-body">
-          <div className="wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-2 wdt-gap-6">
-            <div>
-              <p className="wdt-mb-4">
-                The error log captures PHP errors, warnings, and notices based on your WordPress and PHP configurations.
-              </p>
-              <div className="wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200">
-                <div className="wdt-font-medium wdt-mb-1">Log file location:</div>
-                <code className="code">{window.wpDevToolkit?.logPath || 'wp-content/wp-dev-toolkit-error.log'}</code>
-              </div>
-            </div>
-            <div className="wdt-bg-blue-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-blue-100">
-              <div className="wdt-flex wdt-items-start wdt-gap-3">
-                <Dashicon icon="info-outline" className="wdt-text-blue-500 wdt-mt-0.5" />
-                <div>
-                  <div className="wdt-font-medium wdt-text-blue-800 wdt-mb-1">PHP Error Levels</div>
-                  <ul className="wdt-text-sm wdt-text-blue-700 wdt-space-y-1">
-                    <li><strong>E_ERROR:</strong> Fatal run-time errors that cannot be recovered from</li>
-                    <li><strong>E_WARNING:</strong> Run-time warnings that do not interrupt script execution</li>
-                    <li><strong>E_NOTICE:</strong> Notices indicating possible coding issues</li>
-                    <li><strong>E_DEPRECATED:</strong> Functions or features that will be removed in future PHP versions</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+					{ /* Log entry count */ }
+					{ parsedLogs.length > 0 && (
+						<div className="wdt-mt-4 wdt-text-sm wdt-text-gray-500 wdt-text-right">
+							Showing { getFilteredLogs().length } of { parsedLogs.length } log
+							entries
+						</div>
+					) }
+				</div>
+			</div>
+
+			<div className="wp-dev-toolkit-card wdt-mt-6">
+				<div className="wp-dev-toolkit-card-header">
+					<div className="wdt-flex wdt-items-center wdt-gap-2">
+						<Dashicon icon="admin-tools" />
+						<h2>Log Settings</h2>
+					</div>
+				</div>
+				<div className="wp-dev-toolkit-card-body">
+					<div className="wdt-grid wdt-grid-cols-1 md:wdt-grid-cols-2 wdt-gap-6">
+						<div>
+							<p className="wdt-mb-4">
+								The error log captures PHP errors, warnings, and notices based
+								on your WordPress and PHP configurations.
+							</p>
+							<div className="wdt-bg-gray-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-gray-200">
+								<div className="wdt-font-medium wdt-mb-1">
+									Log file location:
+								</div>
+								<code className="code">
+									{ window.wpDevToolkit?.logPath ||
+                    'wp-content/wp-dev-toolkit-error.log' }
+								</code>
+							</div>
+						</div>
+						<div className="wdt-bg-blue-50 wdt-p-4 wdt-rounded-lg wdt-border wdt-border-blue-100">
+							<div className="wdt-flex wdt-items-start wdt-gap-3">
+								<Dashicon
+									icon="info-outline"
+									className="wdt-text-blue-500 wdt-mt-0.5"
+								/>
+								<div>
+									<div className="wdt-font-medium wdt-text-blue-800 wdt-mb-1">
+										PHP Error Levels
+									</div>
+									<ul className="wdt-text-sm wdt-text-blue-700 wdt-space-y-1">
+										<li>
+											<strong>E_ERROR:</strong> Fatal run-time errors that
+											cannot be recovered from
+										</li>
+										<li>
+											<strong>E_WARNING:</strong> Run-time warnings that do not
+											interrupt script execution
+										</li>
+										<li>
+											<strong>E_NOTICE:</strong> Notices indicating possible
+											coding issues
+										</li>
+										<li>
+											<strong>E_DEPRECATED:</strong> Functions or features that
+											will be removed in future PHP versions
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default ErrorLog;
