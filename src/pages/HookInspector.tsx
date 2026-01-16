@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
-
 import {
-  Button,
-  TextControl,
-  SelectControl,
-  Spinner,
-  ToggleControl,
-  Dashicon,
-} from "@wordpress/components";
+  ChevronUp,
+  ChevronDown,
+  Filter,
+  Search,
+  X,
+  Puzzle,
+  BarChart3,
+  Clock,
+  Code,
+} from "lucide-react";
+
 import { useSelect, useDispatch } from "@wordpress/data";
+
+import { Button } from "@/components/ui/button";
 
 import { STORE_NAME as HOOK_INSPECTOR_STORE } from "@/stores/hook-inspector/constants";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
@@ -181,9 +186,9 @@ const HookInspector: React.FC = () => {
       return null;
     }
     return sortConfig.direction === "ascending" ? (
-      <Dashicon icon="arrow-up-alt2" size={14} />
+      <ChevronUp size={14} />
     ) : (
-      <Dashicon icon="arrow-down-alt2" size={14} />
+      <ChevronDown size={14} />
     );
   };
 
@@ -300,7 +305,7 @@ const HookInspector: React.FC = () => {
       <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:mb-6">
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:items-center wdt:gap-2">
-            <Dashicon icon="filter" />
+            <Filter />
             <h2>Filter Hooks</h2>
           </div>
         </div>
@@ -331,7 +336,7 @@ const HookInspector: React.FC = () => {
           {filterOptions.search && (
             <div className="wdt:bg-blue-50 wdt:p-3 wdt:rounded-md wdt:border wdt:border-blue-100 wdt:mb-4">
               <div className="wdt:flex wdt:items-center wdt:gap-2">
-                <Dashicon icon="search" className="wdt:text-blue-500" />
+                <Search className="wdt:text-blue-500" />
                 <span className="wdt:text-blue-700">
                   Searching for: <strong>{filterOptions.search}</strong>
                 </span>
@@ -342,7 +347,7 @@ const HookInspector: React.FC = () => {
                   className="wdt:ml-auto wdt:text-blue-700 hover:wdt:text-blue-900"
                   aria-label="Clear search"
                 >
-                  <Dashicon icon="no-alt" />
+                  <X />
                 </button>
               </div>
             </div>
@@ -355,7 +360,7 @@ const HookInspector: React.FC = () => {
         <div className="wdt:grid wdt:gap-4 md:wdt:grid-cols-3 wdt:mb-6 wdt:mb-6">
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon blue">
-              <Dashicon icon="admin-plugins" />
+              <Puzzle />
             </div>
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
               <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
@@ -372,7 +377,7 @@ const HookInspector: React.FC = () => {
           </div>
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon green">
-              <Dashicon icon="performance" />
+              <BarChart3 />
             </div>
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
               <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
@@ -393,7 +398,7 @@ const HookInspector: React.FC = () => {
           </div>
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon amber">
-              <Dashicon icon="clock" />
+              <Clock />
             </div>
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
               <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
@@ -504,11 +509,7 @@ const HookInspector: React.FC = () => {
                             </td>
                             <td className="wdt:py-3 wdt:px-4 wdt:text-xs wdt:truncate wdt:max-w-[200px]">
                               <div className="wdt:flex wdt:items-center wdt:gap-1">
-                                <Dashicon
-                                  icon="admin-page"
-                                  size={14}
-                                  className="wdt:text-gray-400"
-                                />
+                                <Code size={14} className="wdt:text-gray-400" />
                                 <span title={callback.file}>
                                   {formatFilePath(callback.file)}
                                 </span>
@@ -536,7 +537,7 @@ const HookInspector: React.FC = () => {
             <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
               <div className="wdt:flex wdt:justify-between wdt:items-center">
                 <div className="wdt:flex wdt:items-center wdt:gap-2">
-                  <Dashicon icon="editor-code" />
+                  <Code />
                   <h2>Hooks</h2>
                 </div>
                 <div className="wdt:text-sm wdt:text-gray-500">
