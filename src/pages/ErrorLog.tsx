@@ -1,14 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
-
 import {
-  Button,
-  Spinner,
-  ToggleControl,
-  Dashicon,
-  TextControl,
-  SelectControl,
-} from "@wordpress/components";
+  ChevronUp,
+  ChevronDown,
+  Filter,
+  Search,
+  X,
+  Database,
+  Zap,
+  Clock,
+  Code,
+  Wrench,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
+
 import { useSelect, useDispatch } from "@wordpress/data";
+
+import { Button } from "@/components/ui/button";
 
 import { STORE_NAME as ERROR_LOG_STORE } from "@/stores/error-log/constants";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
@@ -267,19 +275,27 @@ const ErrorLog: React.FC = () => {
     }
   };
 
-  const getLogLevelIcon = (level: string): string => {
+  const getLogLevelIcon = (
+    level: string,
+  ): React.ComponentType<{ size?: number; className?: string }> => {
     switch (level.toUpperCase()) {
       case "ERROR":
-        return "warning";
+        return AlertTriangle;
       case "WARNING":
-        return "info";
+        return Zap;
       case "INFO":
-        return "admin-comments";
+        return Info;
       case "DEBUG":
-        return "code-standards";
+        return Code;
       default:
-        return "admin-generic";
+        return Wrench;
     }
+  };
+
+  const getExpandIcon = (
+    isExpanded: boolean,
+  ): React.ComponentType<{ size?: number; className?: string }> => {
+    return isExpanded ? ChevronUp : ChevronDown;
   };
 
   const toggleExpandLog = (index: number) => {
@@ -421,7 +437,7 @@ const ErrorLog: React.FC = () => {
       <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm">
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:items-center wdt:gap-2">
-            <Dashicon icon="warning" />
+            <AlertTriangle />
             <h2>Error Log</h2>
           </div>
         </div>
@@ -538,10 +554,9 @@ const ErrorLog: React.FC = () => {
                                       : "#6b7280",
                             }}
                           >
-                            <Dashicon
-                              icon={getLogLevelIcon(log.level)}
-                              size={14}
-                            />
+                            {React.createElement(getLogLevelIcon(log.level), {
+                              size: 14,
+                            })}
                           </button>
                           <span
                             className={`wdt:px-2 wdt:py-0.5 wdt:rounded-full wdt:text-xs wdt:font-medium ${getLogLevelClass(log.level)}`}
@@ -567,13 +582,7 @@ const ErrorLog: React.FC = () => {
                                 : "Expand log entry"
                             }
                           >
-                            <Dashicon
-                              icon={
-                                expanded === index
-                                  ? "arrow-up-alt2"
-                                  : "arrow-down-alt2"
-                              }
-                              size={16}
+                            {React.createElement(getExpandIcon(expanded === index), { size: 16 })}
                             />
                           </button>
                         </div>
@@ -626,8 +635,7 @@ const ErrorLog: React.FC = () => {
             </>
           ) : (
             <div className="wdt:bg-gray-50 wdt:p-8 wdt:rounded-lg wdt:text-center">
-              <Dashicon
-                icon="yes-alt"
+              <CheckCircle
                 className="wdt:text-green-500 wdt:mb-2"
                 size={30}
               />
@@ -650,7 +658,7 @@ const ErrorLog: React.FC = () => {
       <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:mt-6">
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:items-center wdt:gap-2">
-            <Dashicon icon="admin-tools" />
+            <Wrench />
             <h2>Log Settings</h2>
           </div>
         </div>
@@ -673,8 +681,7 @@ const ErrorLog: React.FC = () => {
             </div>
             <div className="wdt:bg-blue-50 wdt:p-4 wdt:rounded-lg wdt:border wdt:border-blue-100">
               <div className="wdt:flex wdt:items-start wdt:gap-3">
-                <Dashicon
-                  icon="info-outline"
+                <Info
                   className="wdt:text-blue-500 wdt:mt-0.5"
                 />
                 <div>
