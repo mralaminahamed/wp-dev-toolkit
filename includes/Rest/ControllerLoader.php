@@ -62,7 +62,7 @@ class ControllerLoader {
 	 *
 	 * @return mixed|null Controller instance or null if not found
 	 */
-	public function get_controller( $name ) {
-		return isset( $this->controllers[ $name ] ) ? $this->controllers[ $name ] : null;
+	public function get_controller( string $name ) {
+		return $this->controllers[ $name ] ?? null;
 	}
 }

@@ -111,6 +111,7 @@ class WP_Dev_Toolkit {
 
 		 \add_action( 'init', array( $this, 'init_components' ) );
 		 \add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
+		 \add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 	}
 
 	/**
@@ -126,7 +127,7 @@ class WP_Dev_Toolkit {
 
 		$this->load_dependencies();
 		$this->setup_components();
-		$this->init_tools();
+		// $this->init_tools();
 		$this->setup_error_handling();
 
 		// Allow other plugins to hook into our initialization
@@ -226,6 +227,10 @@ class WP_Dev_Toolkit {
 	 * @return void
 	 */
 	public function register_rest_routes() {
+		if ( ! $this->check_dependencies() ) {
+			return;
+		}
+
 		// Register core settings routes
 		register_rest_route(
 			'wp-dev-toolkit/v1',
@@ -259,20 +264,23 @@ class WP_Dev_Toolkit {
 	 * @since 1.0.0
 	 * @return WP_REST_Response
 	 */
-	public function get_config_api() {
+	public function get_config_api(): WP_REST_Response {
 		return rest_ensure_response( $this->config->get_all() );
 	}
 
 	/**
 	 * Update configuration endpoint handler
 	 *
-	 * @since 1.0.0
 	 * @param WP_REST_Request $request Request object
+	 *
 	 * @return WP_REST_Response
+	 *@since 1.0.0
 	 */
-	public function update_config( $request ) {
+	public function update_config( WP_REST_Request $request ): WP_REST_Response {
 		$new_config = $request->get_json_params();
+
 		$this->config->update( $new_config );
+
 		return rest_ensure_response( $this->config->get_all() );
 	}
 
@@ -282,7 +290,7 @@ class WP_Dev_Toolkit {
 	 * @since 1.0.0
 	 * @return bool
 	 */
-	public function check_admin_permissions() {
+	public function check_admin_permissions(): bool {
 		return current_user_can( 'manage_options' );
 	}
 

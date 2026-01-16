@@ -35,7 +35,7 @@ abstract class Base extends WP_REST_Controller {
 	 *
 	 * @return bool
 	 */
-	public function validate_boolean( $param, $request, $key ): bool {
+	public function validate_boolean( $param, object $request, string $key ): bool {
 		return is_bool( $param );
 	}
 
@@ -47,7 +47,7 @@ abstract class Base extends WP_REST_Controller {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	protected function send_json_success( $data = null, $status_code = 200 ) {
+	protected function send_json_success( $data = null, $status_code = 200 ): \WP_REST_Response {
 		return $this->send_json_response( true, $data, $status_code );
 	}
 
@@ -55,28 +55,29 @@ abstract class Base extends WP_REST_Controller {
 	 * Send error response
 	 *
 	 * @param string $message     Error message
-	 * @param int    $status_code HTTP status code
+	 * @param int $status_code HTTP status code
 	 *
 	 * @return \WP_REST_Response
 	 */
-	protected function send_json_error( $message = '', $status_code = 400 ) {
+	protected function send_json_error( string $message = '', int $status_code = 400 ): \WP_REST_Response {
 		return $this->send_json_response( false, array( 'message' => $message ), $status_code );
 	}
 
 	/**
 	 * Send JSON response
 	 *
-	 * @param bool  $success     Success status
+	 * @param bool $success     Success status
 	 * @param mixed $data        Response data
-	 * @param int   $status_code HTTP status code
+	 * @param int $status_code HTTP status code
 	 *
 	 * @return \WP_REST_Response
 	 */
-	private function send_json_response( $success, $data, $status_code ) {
+	private function send_json_response( bool $success, $data, int $status_code ): \WP_REST_Response {
 		$response = array(
 			'success' => $success,
 			'data'    => $data,
 		);
+
 		return rest_ensure_response( $response );
 	}
 }

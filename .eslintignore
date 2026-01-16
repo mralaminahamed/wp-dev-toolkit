@@ -102,12 +102,3 @@ temp/
 # Cache directories
 .cache/
 .parcel-cache/
-
-# WordPress specific
-wp-content/uploads/
-wp-content/plugins/
-wp-content/themes/
-wp-content/mu-plugins/
-
-# Exclude everything except spa/ directory for linting
-!spa/
