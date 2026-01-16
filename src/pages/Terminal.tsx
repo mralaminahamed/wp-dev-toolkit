@@ -158,13 +158,13 @@ const Terminal: React.FC = () => {
 	// Terminal theme classes
 	const terminalClasses =
     terminalTheme === 'dark'
-    	? 'wdt-bg-gray-900 wdt-text-green-400'
-    	: 'wdt-bg-white wdt-text-gray-800 wdt-border wdt-border-gray-300';
+    	? 'wdt:-bg-gray-900 wdt:-text-green-400'
+    	: 'wdt:-bg-white wdt:-text-gray-800 wdt:-border wdt:-border-gray-300';
 
 	const terminalInputClasses =
     terminalTheme === 'dark'
-    	? 'wdt-bg-gray-800 wdt-text-white wdt-border-t wdt-border-gray-700'
-    	: 'wdt-bg-gray-100 wdt-text-gray-800 wdt-border-t wdt-border-gray-300';
+    	? 'wdt:-bg-gray-800 wdt:-text-white wdt:-border-t wdt:-border-gray-700'
+    	: 'wdt:-bg-gray-100 wdt:-text-gray-800 wdt:-border-t wdt:-border-gray-300';
 
 	return (
 		<div className="wp-dev-toolkit-terminal">
@@ -173,14 +173,14 @@ const Terminal: React.FC = () => {
 				<p>Execute WordPress CLI and system commands</p>
 			</div>
 
-			<div className="wp-dev-toolkit-card wdt-mb-6">
+			<div className="wp-dev-toolkit-card wdt:-mb-6">
 				<div className="wp-dev-toolkit-card-header">
-					<div className="wdt-flex wdt-justify-between wdt-items-center">
-						<div className="wdt-flex wdt-items-center wdt-gap-2">
+					<div className="wdt:-flex wdt:-justify-between wdt:-items-center">
+						<div className="wdt:-flex wdt:-items-center wdt:-gap-2">
 							<Dashicon icon="editor-code" />
 							<h2>Command Line Interface</h2>
 						</div>
-						<div className="wdt-flex wdt-gap-2">
+						<div className="wdt:-flex wdt:-gap-2">
 							<Button
 								className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
 								onClick={ changeTerminalTheme }
@@ -198,10 +198,10 @@ const Terminal: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="wp-dev-toolkit-card-body wdt-p-0">
-					<div className="wdt-p-4 wdt-bg-gray-50 wdt-border-b wdt-border-gray-200">
-						<div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-4">
-							<div className="wdt-w-64">
+				<div className="wp-dev-toolkit-card-body wdt:-p-0">
+					<div className="wdt:-p-4 wdt:-bg-gray-50 wdt:-border-b wdt:-border-gray-200">
+						<div className="wdt:-flex wdt:-flex-wrap wdt:-items-center wdt:-gap-4">
+							<div className="wdt:-w-64">
 								<SelectControl
 									label="Common Commands"
 									value={ commonCommands }
@@ -209,8 +209,8 @@ const Terminal: React.FC = () => {
 									onChange={ handleCommonCommandSelect }
 								/>
 							</div>
-							<div className="wdt-flex wdt-items-center wdt-text-sm wdt-text-gray-500 wdt-ml-auto">
-								<Dashicon icon="info-outline" className="wdt-mr-2" />
+							<div className="wdt:-flex wdt:-items-center wdt:-text-sm wdt:-text-gray-500 wdt:-ml-auto">
+								<Dashicon icon="info-outline" className="wdt:-mr-2" />
 								<span>Press Tab for command completion</span>
 							</div>
 						</div>
@@ -218,22 +218,22 @@ const Terminal: React.FC = () => {
 					<div className="wp-dev-toolkit-terminal-container">
 						<div
 							ref={ outputRef }
-							className={ `wp-dev-toolkit-terminal-output ${ terminalClasses } wdt-font-mono wdt-p-5 wdt-h-96 wdt-overflow-auto wdt-whitespace-pre-wrap wdt-rounded-t-lg` }
+							className={ `wp-dev-toolkit-terminal-output ${ terminalClasses } wdt:-font-mono wdt:-p-5 wdt:-h-96 wdt:-overflow-auto wdt:-whitespace-pre-wrap wdt:-rounded-t-lg` }
 						>
 							{ output }
 							{ isLoading && (
-								<div className="wdt-flex wdt-items-center wdt-text-white wdt-mt-2">
+								<div className="wdt:-flex wdt:-items-center wdt:-text-white wdt:-mt-2">
 									<Spinner />{ ' ' }
-									<span className="wdt-ml-2">Executing command...</span>
+									<span className="wdt:-ml-2">Executing command...</span>
 								</div>
 							) }
 						</div>
 						<form
 							onSubmit={ handleSubmit }
-							className={ `wdt-flex wdt-items-center ${ terminalInputClasses } wdt-rounded-b-lg wdt-p-2` }
+							className={ `wdt:-flex wdt:-items-center ${ terminalInputClasses } wdt:-rounded-b-lg wdt:-p-2` }
 						>
 							<div
-								className={ `${ terminalTheme === 'dark' ? 'wdt-text-green-400' : 'wdt-text-gray-600' } wdt-px-2 wdt-flex wdt-items-center` }
+								className={ `${ terminalTheme === 'dark' ? 'wdt:-text-green-400' : 'wdt:-text-gray-600' } wdt:-px-2 wdt:-flex wdt:-items-center` }
 							>
 								<Dashicon icon="arrow-right-alt2" />
 							</div>
@@ -241,7 +241,7 @@ const Terminal: React.FC = () => {
 								ref={ inputRef }
 								value={ input }
 								onChange={ ( e ) => setInput( e.target.value ) }
-								className={ `wdt-flex-grow wdt-bg-transparent wdt-border-0 ${ terminalTheme === 'dark' ? 'wdt-text-white' : 'wdt-text-gray-800' } wdt-px-2 wdt-py-2 focus:wdt-outline-none wdt-font-mono` }
+								className={ `wdt:-flex-grow wdt:-bg-transparent wdt:-border-0 ${ terminalTheme === 'dark' ? 'wdt:-text-white' : 'wdt:-text-gray-800' } wdt:-px-2 wdt:-py-2 focus:wdt:-outline-none wdt:-font-mono` }
 								onKeyDown={ handleKeyDown }
 								placeholder="Enter command..."
 							/>
@@ -255,9 +255,9 @@ const Terminal: React.FC = () => {
 							</Button>
 						</form>
 					</div>
-					<div className="wdt-p-4 wdt-border-t wdt-border-gray-200 wdt-bg-gray-50 wdt-rounded-b-lg">
-						<div className="wdt-flex wdt-items-center wdt-text-sm wdt-text-gray-500">
-							<Dashicon icon="info-outline" className="wdt-mr-2" />
+					<div className="wdt:-p-4 wdt:-border-t wdt:-border-gray-200 wdt:-bg-gray-50 wdt:-rounded-b-lg">
+						<div className="wdt:-flex wdt:-items-center wdt:-text-sm wdt:-text-gray-500">
+							<Dashicon icon="info-outline" className="wdt:-mr-2" />
 							<span>
 								Use the up/down arrow keys to navigate command history.
 							</span>
@@ -266,42 +266,42 @@ const Terminal: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="wp-dev-toolkit-card wdt-mt-6">
+			<div className="wp-dev-toolkit-card wdt:-mt-6">
 				<div className="wp-dev-toolkit-card-header">
-					<div className="wdt-flex wdt-items-center wdt-gap-2">
+					<div className="wdt:-flex wdt:-items-center wdt:-gap-2">
 						<Dashicon icon="list-view" />
 						<h2>Command History</h2>
 					</div>
 				</div>
-				<div className="wp-dev-toolkit-card-body wdt-p-0">
+				<div className="wp-dev-toolkit-card-body wdt:-p-0">
 					{ history.length > 0 ? (
-						<table className="wdt-w-full">
-							<thead className="wdt-bg-gray-50 wdt-border-b wdt-border-gray-200">
+						<table className="wdt:-w-full">
+							<thead className="wdt:-bg-gray-50 wdt:-border-b wdt:-border-gray-200">
 								<tr>
-									<th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider">
+									<th className="wdt:-py-3 wdt:-px-4 wdt:-text-left wdt:-text-xs wdt:-font-medium wdt:-text-gray-500 wdt:-uppercase wdt:-tracking-wider">
 										Command
 									</th>
-									<th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-w-32">
+									<th className="wdt:-py-3 wdt:-px-4 wdt:-text-left wdt:-text-xs wdt:-font-medium wdt:-text-gray-500 wdt:-uppercase wdt:-tracking-wider wdt:-w-32">
 										Executed At
 									</th>
-									<th className="wdt-py-3 wdt-px-4 wdt-text-left wdt-text-xs wdt-font-medium wdt-text-gray-500 wdt-uppercase wdt-tracking-wider wdt-w-24">
+									<th className="wdt:-py-3 wdt:-px-4 wdt:-text-left wdt:-text-xs wdt:-font-medium wdt:-text-gray-500 wdt:-uppercase wdt:-tracking-wider wdt:-w-24">
 										Action
 									</th>
 								</tr>
 							</thead>
-							<tbody className="wdt-bg-white wdt-divide-y wdt-divide-gray-200">
+							<tbody className="wdt:-bg-white wdt:-divide-y wdt:-divide-gray-200">
 								{ history.map( ( cmd, index ) => (
 									<tr
 										key={ index }
-										className="hover:wdt-bg-gray-50 wdt-transition-colors"
+										className="hover:wdt:-bg-gray-50 wdt:-transition-colors"
 									>
-										<td className="wdt-py-3 wdt-px-4 wdt-font-mono wdt-text-sm">
+										<td className="wdt:-py-3 wdt:-px-4 wdt:-font-mono wdt:-text-sm">
 											{ cmd.command }
 										</td>
-										<td className="wdt-py-3 wdt-px-4 wdt-text-sm wdt-text-gray-500">
+										<td className="wdt:-py-3 wdt:-px-4 wdt:-text-sm wdt:-text-gray-500">
 											{ cmd.executed_at }
 										</td>
-										<td className="wdt-py-3 wdt-px-4">
+										<td className="wdt:-py-3 wdt:-px-4">
 											<Button
 												isSmall
 												className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
@@ -316,7 +316,7 @@ const Terminal: React.FC = () => {
 							</tbody>
 						</table>
 					) : (
-						<div className="wdt-py-8 wdt-px-4 wdt-text-center wdt-text-gray-500">
+						<div className="wdt:-py-8 wdt:-px-4 wdt:-text-center wdt:-text-gray-500">
 							No command history available.
 						</div>
 					) }

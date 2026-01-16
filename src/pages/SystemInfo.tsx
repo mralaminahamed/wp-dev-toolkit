@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import { Button, Spinner, TabPanel, Dashicon } from '@wordpress/components';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 interface SystemInfo {
   wordpress: {
@@ -47,11 +48,14 @@ const SystemInfo: React.FC = () => {
 		setIsLoading( true );
 		setError( null );
 		try {
-			const response = await fetch( `${ window.wpDevToolkit.apiUrl }/system-info`, {
-				headers: {
-					'X-WP-Nonce': window.wpDevToolkit.nonce,
+			const response = await fetch(
+				`${ window.wpDevToolkit.apiUrl }/system-info`,
+				{
+					headers: {
+						'X-WP-Nonce': window.wpDevToolkit.nonce,
+					},
 				},
-			} );
+			);
 			const data = await response.json();
 
 			if ( data.success ) {
@@ -105,17 +109,19 @@ const SystemInfo: React.FC = () => {
 	};
 
 	const InfoRow = ( { label, value }: { label: string; value: any } ) => (
-		<tr className="wdtborder-b wdtborder-gray-200">
-			<td className="wdtpy-3 wdtpx-4 wdtfont-medium wdttext-gray-700">{ label }</td>
-			<td className="wdtpy-3 wdtpx-4">
+		<tr className="wdt:border-b wdt:border-gray-200">
+			<td className="wdt:py-3 wdt:px-4 wdt:font-medium wdt:text-gray-700">
+				{ label }
+			</td>
+			<td className="wdt:py-3 wdt:px-4">
 				{ typeof value === 'boolean' ? (
 					value ? (
-						<span className="wdtinline-flex wdtitems-center wdtpx-2.5 wdtpy-0.5 wdtrounded-full wdttext-xs wdtfont-medium wdtbg-green-100 wdttext-green-800">
-							<Dashicon icon="yes" size={ 14 } className="wdtmr-1" /> Yes
+						<span className="wdt:inline-flex wdt:items-center wdt:px-2.5 wdt:py-0.5 wdt:rounded-full wdt:text-xs wdt:font-medium wdt:bg-green-100 wdt:text-green-800">
+							<span className="wdt:mr-1">✓</span> Yes
 						</span>
 					) : (
-						<span className="wdtinline-flex wdtitems-center wdtpx-2.5 wdtpy-0.5 wdtrounded-full wdttext-xs wdtfont-medium wdtbg-red-100 wdttext-red-800">
-							<Dashicon icon="no-alt" size={ 14 } className="wdtmr-1" /> No
+						<span className="wdt:inline-flex wdt:items-center wdt:px-2.5 wdt:py-0.5 wdt:rounded-full wdt:text-xs wdt:font-medium wdt:bg-red-100 wdt:text-red-800">
+							<span className="wdt:mr-1">✗</span> No
 						</span>
 					)
 				) : (
@@ -133,8 +139,9 @@ const SystemInfo: React.FC = () => {
 					<p>View details about your WordPress environment</p>
 				</div>
 
-				<div className="wdtflex wdtjustify-center wdtitems-center wdtp-16 wdtbg-white wdtrounded-lg wdtshadow-sm">
-					<Spinner /> <span className="wdtml-2">Loading system information...</span>
+				<div className="wdt:flex wdt:justify-center wdt:items-center wdt:p-16 wdt:bg-white wdt:rounded-lg wdt:shadow-sm">
+					<div className="wdt:animate-spin wdt:rounded-full wdt:h-8 wdt:w-8 wdt:border-b-2 wdt:border-blue-600"></div>
+					<span className="wdt:ml-2">Loading system information...</span>
 				</div>
 			</div>
 		);
@@ -148,16 +155,16 @@ const SystemInfo: React.FC = () => {
 					<p>View details about your WordPress environment</p>
 				</div>
 
-				<div className="wp-dev-toolkit-card wdtbg-red-50 wdtborder wdtborder-red-200">
+				<div className="wp-dev-toolkit-card wdt:bg-red-50 wdt:border wdt:border-red-200">
 					<div className="wp-dev-toolkit-card-body">
-						<div className="wdtflex wdtitems-start">
-							<Dashicon icon="warning" className="wdttext-red-500 wdtmr-3 wdtmt-1" />
+						<div className="wdt:flex wdt:items-start">
+							<span className="wdt:text-red-500 wdt:mr-3 wdt:mt-1">⚠️</span>
 							<div>
-								<h3 className="wdttext-red-800 wdtfont-medium wdtmb-2">Error Loading System Information</h3>
-								<p className="wdttext-red-700 wdtmb-4">{ error }</p>
-								<Button className="wp-dev-toolkit-button wp-dev-toolkit-button-primary" onClick={ fetchSystemInfo } icon="update">
-									Retry
-								</Button>
+								<h3 className="wdt:text-red-800 wdt:font-medium wdt:mb-2">
+									Error Loading System Information
+								</h3>
+								<p className="wdt:text-red-700 wdt:mb-4">{ error }</p>
+								<Button onClick={ fetchSystemInfo }>Retry</Button>
 							</div>
 						</div>
 					</div>
@@ -197,59 +204,80 @@ const SystemInfo: React.FC = () => {
 				<p>View details about your WordPress environment</p>
 			</div>
 
-			<div className="wp-dev-toolkit-card wdtmb-6">
+			<div className="wp-dev-toolkit-card wdt:mb-6">
 				<div className="wp-dev-toolkit-card-header">
-					<div className="wdtflex wdtjustify-between wdtitems-center">
-						<div className="wdtflex wdtitems-center wdtgap-2">
-							<Dashicon icon="info-outline" />
+					<div className="wdt:flex wdt:justify-between wdt:items-center">
+						<div className="wdt:flex wdt:items-center wdt:gap-2">
+							<span>ℹ️</span>
 							<h2>System Overview</h2>
 						</div>
-						<div className="wdtflex wdtgap-2">
-							<Button className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary" onClick={ copyToClipboard } icon="clipboard">
+						<div className="wdt:flex wdt:gap-2">
+							<Button variant="secondary" onClick={ copyToClipboard }>
 								{ copySuccess ? 'Copied!' : 'Copy All Info' }
 							</Button>
-							<Button className="wp-dev-toolkit-button wp-dev-toolkit-button-primary" onClick={ fetchSystemInfo } icon="update">
-								Refresh Info
-							</Button>
+							<Button onClick={ fetchSystemInfo }>Refresh Info</Button>
 						</div>
 					</div>
 				</div>
 				<div className="wp-dev-toolkit-card-body">
-					<div className="wdtgrid wdtgrid-cols-1 md:wdtgrid-cols-2 lg:wdtgrid-cols-4 wdtgap-6">
-						<div className="wdtbg-white wdtp-4 wdtrounded-lg wdtborder wdtborder-gray-200 wdtshadow-sm">
-							<div className="wdtflex wdtitems-center wdtmb-2">
-								<Dashicon icon="wordpress" className="wdttext-blue-600 wdtmr-2" />
-								<h3 className="wdttext-lg wdtfont-medium">WordPress</h3>
+					<div className="wdt:grid wdt:grid-cols-1 md:wdt:grid-cols-2 lg:wdt:grid-cols-4 wdt:gap-6">
+						<div className="wdt:bg-white wdt:p-4 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:shadow-sm">
+							<div className="wdt:flex wdt:items-center wdt:mb-2">
+								<span className="wdt:text-blue-600 wdt:mr-2">W</span>
+								<h3 className="wdt:text-lg wdt:font-medium">WordPress</h3>
 							</div>
-							<div className="wdttext-xl wdtfont-bold">{ systemInfo.wordpress.version }</div>
-							<div className="wdttext-sm wdttext-gray-500 wdtmt-1">{ systemInfo.wordpress.debug_mode ? <span className="wdttext-amber-600">Debug Mode Enabled</span> : 'Debug Mode Disabled' }</div>
+							<div className="wdt:text-xl wdt:font-bold">
+								{ systemInfo.wordpress.version }
+							</div>
+							<div className="wdt:text-sm wdt:text-gray-500 wdt:mt-1">
+								{ systemInfo.wordpress.debug_mode ? (
+									<span className="wdt:text-amber-600">Debug Mode Enabled</span>
+								) : (
+									'Debug Mode Disabled'
+								) }
+							</div>
 						</div>
 
-						<div className="wdtbg-white wdtp-4 wdtrounded-lg wdtborder wdtborder-gray-200 wdtshadow-sm">
-							<div className="wdtflex wdtitems-center wdtmb-2">
-								<Dashicon icon="admin-site-alt3" className="wdttext-purple-600 wdtmr-2" />
-								<h3 className="wdttext-lg wdtfont-medium">PHP</h3>
+						<div className="wdt:bg-white wdt:p-4 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:shadow-sm">
+							<div className="wdt:flex wdt:items-center wdt:mb-2">
+								<span className="wdt:text-purple-600 wdt:mr-2">🌐</span>
+								<h3 className="wdt:text-lg wdt:font-medium">PHP</h3>
 							</div>
-							<div className="wdttext-xl wdtfont-bold">{ systemInfo.server.php_version }</div>
-							<div className="wdttext-sm wdttext-gray-500 wdtmt-1">Memory: { systemInfo.server.php_memory_limit }</div>
+							<div className="wdt:text-xl wdt:font-bold">
+								{ systemInfo.server.php_version }
+							</div>
+							<div className="wdt:text-sm wdt:text-gray-500 wdt:mt-1">
+								Memory: { systemInfo.server.php_memory_limit }
+							</div>
 						</div>
 
-						<div className="wdtbg-white wdtp-4 wdtrounded-lg wdtborder wdtborder-gray-200 wdtshadow-sm">
-							<div className="wdtflex wdtitems-center wdtmb-2">
-								<Dashicon icon="database" className="wdttext-green-600 wdtmr-2" />
-								<h3 className="wdttext-lg wdtfont-medium">MySQL</h3>
+						<div className="wdt:bg-white wdt:p-4 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:shadow-sm">
+							<div className="wdt:flex wdt:items-center wdt:mb-2">
+								<span className="wdt:text-green-600 wdt:mr-2">🗄️</span>
+								<h3 className="wdt:text-lg wdt:font-medium">MySQL</h3>
 							</div>
-							<div className="wdttext-xl wdtfont-bold">{ systemInfo.server.mysql_version }</div>
-							<div className="wdttext-sm wdttext-gray-500 wdtmt-1">{ systemInfo.server.web_server }</div>
+							<div className="wdt:text-xl wdt:font-bold">
+								{ systemInfo.server.mysql_version }
+							</div>
+							<div className="wdt:text-sm wdt:text-gray-500 wdt:mt-1">
+								{ systemInfo.server.web_server }
+							</div>
 						</div>
 
-						<div className="wdtbg-white wdtp-4 wdtrounded-lg wdtborder wdtborder-gray-200 wdtshadow-sm">
-							<div className="wdtflex wdtitems-center wdtmb-2">
-								<Dashicon icon="admin-appearance" className="wdttext-amber-600 wdtmr-2" />
-								<h3 className="wdttext-lg wdtfont-medium">Theme</h3>
+						<div className="wdt:bg-white wdt:p-4 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:shadow-sm">
+							<div className="wdt:flex wdt:items-center wdt:mb-2">
+								<Dashicon
+									icon="admin-appearance"
+									className="wdt:text-amber-600 wdt:mr-2"
+								/>
+								<h3 className="wdt:text-lg wdt:font-medium">Theme</h3>
 							</div>
-							<div className="wdttext-xl wdtfont-bold">{ systemInfo.wordpress.theme }</div>
-							<div className="wdttext-sm wdttext-gray-500 wdtmt-1">Version: { systemInfo.wordpress.theme_version }</div>
+							<div className="wdt:text-xl wdt:font-bold">
+								{ systemInfo.wordpress.theme }
+							</div>
+							<div className="wdt:text-sm wdt:text-gray-500 wdt:mt-1">
+								Version: { systemInfo.wordpress.theme_version }
+							</div>
 						</div>
 					</div>
 				</div>
@@ -257,45 +285,81 @@ const SystemInfo: React.FC = () => {
 
 			<div className="wp-dev-toolkit-card">
 				<div className="wp-dev-toolkit-card-header">
-					<div className="wdtflex wdtitems-center wdtgap-2">
+					<div className="wdt:flex wdt:items-center wdt:gap-2">
 						<Dashicon icon="list-view" />
 						<h2>Detailed Information</h2>
 					</div>
 				</div>
-				<div className="wp-dev-toolkit-card-body wdtp-0">
-					<div className="wdtborder-b wdtborder-gray-200">
-						<nav className="wdtflex">
+				<div className="wp-dev-toolkit-card-body wdt:p-0">
+					<div className="wdt:border-b wdt:border-gray-200">
+						<nav className="wdt:flex">
 							{ tabs.map( ( tab ) => (
 								<button
 									key={ tab.name }
-									className={ `wdtpx-6 wdtpy-3 wdtfont-medium wdtflex wdtitems-center ${
-										activeTab === tab.name ? 'wdtborder-b-2 wdtborder-blue-500 wdttext-blue-600' : 'wdttext-gray-600 hover:wdttext-gray-800 hover:wdtbg-gray-50'
+									className={ `wdt:px-6 wdt:py-3 wdt:font-medium wdt:flex wdt:items-center ${
+										activeTab === tab.name
+											? 'wdt:border-b-2 wdt:border-blue-500 wdt:text-blue-600'
+											: 'wdt:text-gray-600 hover:wdt:text-gray-800 hover:wdt:bg-gray-50'
 									}` }
 									onClick={ () => setActiveTab( tab.name ) }
 								>
-									<Dashicon icon={ tab.icon as any } className="wdtmr-2" />
+									<Dashicon icon={ tab.icon as any } className="wdt:mr-2" />
 									{ tab.title }
 								</button>
 							) ) }
 						</nav>
 					</div>
 
-					<div className="wdtp-6">
+					<div className="wdt:p-6">
 						{ activeTab === 'wordpress' && (
 							<div>
-								<h3 className="wdttext-lg wdtfont-medium wdtmb-4">WordPress Environment</h3>
+								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
+									WordPress Environment
+								</h3>
 								<table className="wp-dev-toolkit-system-info-table">
 									<tbody>
-										<InfoRow label="WordPress Version" value={ systemInfo.wordpress.version } />
-										<InfoRow label="Home URL" value={ systemInfo.wordpress.home_url } />
-										<InfoRow label="Site URL" value={ systemInfo.wordpress.site_url } />
-										<InfoRow label="Multisite" value={ systemInfo.wordpress.is_multisite } />
-										<InfoRow label="Debug Mode" value={ systemInfo.wordpress.debug_mode } />
-										<InfoRow label="Memory Limit" value={ systemInfo.wordpress.memory_limit } />
-										<InfoRow label="Permalink Structure" value={ systemInfo.wordpress.permalink_structure || 'Default' } />
-										<InfoRow label="Active Theme" value={ `${ systemInfo.wordpress.theme } ${ systemInfo.wordpress.theme_version }` } />
-										<InfoRow label="Active Plugins" value={ systemInfo.wordpress.active_plugins } />
-										<InfoRow label="Site Language" value={ systemInfo.wordpress.language } />
+										<InfoRow
+											label="WordPress Version"
+											value={ systemInfo.wordpress.version }
+										/>
+										<InfoRow
+											label="Home URL"
+											value={ systemInfo.wordpress.home_url }
+										/>
+										<InfoRow
+											label="Site URL"
+											value={ systemInfo.wordpress.site_url }
+										/>
+										<InfoRow
+											label="Multisite"
+											value={ systemInfo.wordpress.is_multisite }
+										/>
+										<InfoRow
+											label="Debug Mode"
+											value={ systemInfo.wordpress.debug_mode }
+										/>
+										<InfoRow
+											label="Memory Limit"
+											value={ systemInfo.wordpress.memory_limit }
+										/>
+										<InfoRow
+											label="Permalink Structure"
+											value={
+												systemInfo.wordpress.permalink_structure || 'Default'
+											}
+										/>
+										<InfoRow
+											label="Active Theme"
+											value={ `${ systemInfo.wordpress.theme } ${ systemInfo.wordpress.theme_version }` }
+										/>
+										<InfoRow
+											label="Active Plugins"
+											value={ systemInfo.wordpress.active_plugins }
+										/>
+										<InfoRow
+											label="Site Language"
+											value={ systemInfo.wordpress.language }
+										/>
 									</tbody>
 								</table>
 							</div>
@@ -303,18 +367,51 @@ const SystemInfo: React.FC = () => {
 
 						{ activeTab === 'server' && (
 							<div>
-								<h3 className="wdttext-lg wdtfont-medium wdtmb-4">Server Environment</h3>
+								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
+									Server Environment
+								</h3>
 								<table className="wp-dev-toolkit-system-info-table">
 									<tbody>
-										<InfoRow label="PHP Version" value={ systemInfo.server.php_version } />
-										<InfoRow label="MySQL Version" value={ systemInfo.server.mysql_version } />
-										<InfoRow label="Web Server" value={ systemInfo.server.web_server } />
-										<InfoRow label="PHP Memory Limit" value={ systemInfo.server.php_memory_limit } />
-										<InfoRow label="PHP Execution Time" value={ `${ systemInfo.server.php_max_execution_time } seconds` } />
-										<InfoRow label="PHP Post Max Size" value={ systemInfo.server.php_post_max_size } />
-										<InfoRow label="PHP Upload Max Size" value={ systemInfo.server.php_upload_max_filesize } />
-										<InfoRow label="PHP Max Input Vars" value={ systemInfo.server.php_max_input_vars } />
-										<InfoRow label="PHP Extensions" value={ <div className="wdtmax-h-32 wdtoverflow-y-auto wdttext-xs">{ systemInfo.server.php_extensions }</div> } />
+										<InfoRow
+											label="PHP Version"
+											value={ systemInfo.server.php_version }
+										/>
+										<InfoRow
+											label="MySQL Version"
+											value={ systemInfo.server.mysql_version }
+										/>
+										<InfoRow
+											label="Web Server"
+											value={ systemInfo.server.web_server }
+										/>
+										<InfoRow
+											label="PHP Memory Limit"
+											value={ systemInfo.server.php_memory_limit }
+										/>
+										<InfoRow
+											label="PHP Execution Time"
+											value={ `${ systemInfo.server.php_max_execution_time } seconds` }
+										/>
+										<InfoRow
+											label="PHP Post Max Size"
+											value={ systemInfo.server.php_post_max_size }
+										/>
+										<InfoRow
+											label="PHP Upload Max Size"
+											value={ systemInfo.server.php_upload_max_filesize }
+										/>
+										<InfoRow
+											label="PHP Max Input Vars"
+											value={ systemInfo.server.php_max_input_vars }
+										/>
+										<InfoRow
+											label="PHP Extensions"
+											value={
+												<div className="wdt:max-h-32 wdt:overflow-y-auto wdt:text-xs">
+													{ systemInfo.server.php_extensions }
+												</div>
+											}
+										/>
 									</tbody>
 								</table>
 							</div>
@@ -322,12 +419,16 @@ const SystemInfo: React.FC = () => {
 
 						{ activeTab === 'constants' && (
 							<div>
-								<h3 className="wdttext-lg wdtfont-medium wdtmb-4">WordPress Constants</h3>
+								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
+									WordPress Constants
+								</h3>
 								<table className="wp-dev-toolkit-system-info-table">
 									<tbody>
-										{ Object.entries( systemInfo.constants ).map( ( [ key, value ] ) => (
-											<InfoRow key={ key } label={ key } value={ value } />
-										) ) }
+										{ Object.entries( systemInfo.constants ).map(
+											( [ key, value ] ) => (
+												<InfoRow key={ key } label={ key } value={ value } />
+											),
+										) }
 									</tbody>
 								</table>
 							</div>
@@ -335,12 +436,22 @@ const SystemInfo: React.FC = () => {
 
 						{ activeTab === 'permissions' && (
 							<div>
-								<h3 className="wdttext-lg wdtfont-medium wdtmb-4">File Permissions</h3>
+								<h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
+									File Permissions
+								</h3>
 								<table className="wp-dev-toolkit-system-info-table">
 									<tbody>
-										{ Object.entries( systemInfo.permissions ).map( ( [ key, value ] ) => (
-											<InfoRow key={ key } label={ key.replace( /_/g, ' ' ).replace( /\b\w/g, ( l ) => l.toUpperCase() ) } value={ value } />
-										) ) }
+										{ Object.entries( systemInfo.permissions ).map(
+											( [ key, value ] ) => (
+												<InfoRow
+													key={ key }
+													label={ key
+														.replace( /_/g, ' ' )
+														.replace( /\b\w/g, ( l ) => l.toUpperCase() ) }
+													value={ value }
+												/>
+											),
+										) }
 									</tbody>
 								</table>
 							</div>

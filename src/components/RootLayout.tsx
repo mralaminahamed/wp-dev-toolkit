@@ -4,18 +4,6 @@ import { useNavigate, Outlet } from 'react-router-dom';
 import MainNavigation from '@/components/MainNavigation';
 
 const RootLayout: React.FC = () => {
-	const navigate = useNavigate();
-
-	useEffect( () => {
-		// Check if we have an initial route from the server
-		if ( window.wpDevToolkitInitialRoute ) {
-			const route = window.wpDevToolkitInitialRoute === 'dashboard' ? '/' : `/${ window.wpDevToolkitInitialRoute }`;
-			console.log( 'Initializing with route:', route );
-			// Navigate to the initial route
-			navigate( route );
-		}
-	}, [ navigate ] );
-
 	return (
 		<div className="wdt:flex wdt:h-screen wdt:bg-gray-50">
 			<MainNavigation />
