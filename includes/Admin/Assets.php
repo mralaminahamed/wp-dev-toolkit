@@ -58,6 +58,27 @@ class Assets {
 		return wp_dev_toolkit()->get_config();
 	}
 
+	/**
+	 * Get asset data from asset file
+	 *
+	 * @param string $asset_file Path to the asset file
+	 * @return array|false Asset data or false if file doesn't exist
+	 */
+	protected function get_asset_data( $asset_file ) {
+		if ( ! file_exists( $asset_file ) ) {
+			return false;
+		}
+
+		$asset = require $asset_file;
+
+		// Validate asset data structure
+		if ( ! is_array( $asset ) || ! isset( $asset['version'] ) || ! isset( $asset['dependencies'] ) ) {
+			return false;
+		}
+
+		return $asset;
+	}
+
     /**
      * Register all assets
      *
@@ -68,31 +89,32 @@ class Assets {
         $this->register_styles();
     }
 
-    /**
-     * Register scripts
-     *
-     * @return void
-     */
-    private function register_scripts() {
-        $asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/index.asset.php';
+	/**
+	 * Register scripts
+	 *
+	 * @return void
+	 */
+	private function register_scripts() {
+		$asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/app.asset.php';
+		$asset_data = $this->get_asset_data( $asset_file );
 
-        // Get version and dependencies from asset file if it exists
-        if ( file_exists( $asset_file ) ) {
-            $asset = require $asset_file;
-            $version = $asset['version'];
-            $this->script_deps = array_merge( $this->script_deps, $asset['dependencies'] );
-        } else {
-            $version = WP_DEV_TOOLKIT_VERSION;
-        }
+		// Get version and dependencies from asset file
+		if ( $asset_data ) {
+			$version = $asset_data['version'];
+			$dependencies = $asset_data['dependencies'];
+		} else {
+			$version = WP_DEV_TOOLKIT_VERSION;
+			$dependencies = $this->script_deps;
+		}
 
-        // Main app script
-        wp_register_script(
-            'wp-dev-toolkit-app',
-            WP_DEV_TOOLKIT_PLUGIN_URL . 'build/index.js',
-            $this->script_deps,
-            $version,
-            true
-        );
+		// Main app script
+		wp_register_script(
+			'wp-dev-toolkit-app',
+			WP_DEV_TOOLKIT_PLUGIN_URL . 'build/app.js',
+			$dependencies,
+			$version,
+			true
+		);
 
         // Localize script with plugin data
         wp_localize_script(
@@ -109,38 +131,34 @@ class Assets {
         );
     }
 
-    /**
-     * Register styles
-     *
-     * @return void
-     */
-    private function register_styles() {
-        $asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/index.asset.php';
+	/**
+	 * Register styles
+	 *
+	 * @return void
+	 */
+	private function register_styles() {
+		$asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/app.asset.php';
+		$asset_data = $this->get_asset_data( $asset_file );
 
-        // Get version from asset file if it exists
-        if ( file_exists( $asset_file ) ) {
-            $asset = require $asset_file;
-            $version = $asset['version'];
-        } else {
-            $version = WP_DEV_TOOLKIT_VERSION;
-        }
+		// Get version from asset file
+		$version = $asset_data ? $asset_data['version'] : WP_DEV_TOOLKIT_VERSION;
 
-        // Main app styles
-        wp_register_style(
-            'wp-dev-toolkit-app',
-            WP_DEV_TOOLKIT_PLUGIN_URL . 'build/index.css',
-            $this->style_deps,
-            $version
-        );
+		// Main app styles
+		wp_register_style(
+			'wp-dev-toolkit-app',
+			WP_DEV_TOOLKIT_PLUGIN_URL . 'build/app.css',
+			$this->style_deps,
+			$version
+		);
 
-        // Admin styles (for menu icon, etc.)
-        wp_register_style(
-            'wp-dev-toolkit-admin',
-            WP_DEV_TOOLKIT_PLUGIN_URL . 'assets/css/admin.css',
-            [],
-            $version
-        );
-    }
+		// Admin styles (for menu icon, etc.) - use plugin version for this
+		wp_register_style(
+			'wp-dev-toolkit-admin',
+			WP_DEV_TOOLKIT_PLUGIN_URL . 'assets/css/admin.css',
+			array(),
+			WP_DEV_TOOLKIT_VERSION
+		);
+	}
 
     /**
      * Enqueue assets for admin pages
