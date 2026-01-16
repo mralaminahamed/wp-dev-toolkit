@@ -11,6 +11,15 @@ import { useSelect, useDispatch } from "@wordpress/data";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
 
 interface Settings {
@@ -22,34 +31,6 @@ interface Settings {
   max_log_entries: number;
   log_retention_days: number;
 }
-
-// Helper component for toggle switches
-const ToggleSwitch: React.FC<{
-  label: string;
-  help?: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}> = ({ label, help, checked, onChange }) => (
-  <label className="wdt:flex wdt:items-center wdt:justify-between wdt:p-3 wdt:border wdt:border-gray-200 wdt:rounded-lg wdt:bg-white">
-    <div>
-      <div className="wdt:font-medium wdt:text-gray-900">{label}</div>
-      {help && <div className="wdt:text-sm wdt:text-gray-500">{help}</div>}
-    </div>
-    <button
-      type="button"
-      className={`wdt:relative wdt:inline-flex wdt:h-6 wdt:w-11 wdt:items-center wdt:rounded-full wdt:transition-colors wdt:focus:outline-none wdt:focus:ring-2 wdt:focus:ring-blue-500 wdt:focus:ring-offset-2 ${
-        checked ? "wdt:bg-blue-600" : "wdt:bg-gray-200"
-      }`}
-      onClick={() => onChange(!checked)}
-    >
-      <span
-        className={`wdt:inline-block wdt:h-4 wdt:w-4 wdt:transform wdt:rounded-full wdt:bg-white wdt:transition-transform ${
-          checked ? "wdt:translate-x-6" : "wdt:translate-x-1"
-        }`}
-      />
-    </button>
-  </label>
-);
 
 const Settings: React.FC = () => {
   const { config, isResolving } = useSelect(
@@ -278,17 +259,21 @@ const Settings: React.FC = () => {
                 <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
                   Log Level
                 </span>
-                <select
+                <Select
                   value={settings.log_level}
-                  onChange={(e) => updateSetting("log_level", e.target.value)}
-                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                  onValueChange={(value) => updateSetting("log_level", value)}
                 >
-                  <option value="all">All</option>
-                  <option value="error">Errors Only</option>
-                  <option value="warning">Warnings & Errors</option>
-                  <option value="notice">Notices & Above</option>
-                  <option value="none">None</option>
-                </select>
+                  <SelectTrigger className="wdt:mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="error">Errors Only</SelectItem>
+                    <SelectItem value="warning">Warnings & Errors</SelectItem>
+                    <SelectItem value="notice">Notices & Above</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
+                  </SelectContent>
+                </Select>
                 <span className="wdt:text-sm wdt:text-gray-500">
                   Control which log messages are displayed
                 </span>
@@ -308,30 +293,60 @@ const Settings: React.FC = () => {
         <div className="wdt:px-6">
           <div className="wdt:space-y-6">
             <div className="wdt:space-y-2">
-              <ToggleSwitch
-                label="Error Logger"
-                checked={settings.error_logging}
-                onChange={(value) => updateSetting("error_logging", value)}
-                help="Enable error logging functionality"
-              />
+              <div className="wdt:flex wdt:items-center wdt:justify-between wdt:p-3 wdt:border wdt:border-gray-200 wdt:rounded-lg wdt:bg-white">
+                <div>
+                  <div className="wdt:font-medium wdt:text-gray-900">
+                    Error Logger
+                  </div>
+                  <div className="wdt:text-sm wdt:text-gray-500">
+                    Enable error logging functionality
+                  </div>
+                </div>
+                <Switch
+                  checked={settings.error_logging}
+                  onCheckedChange={(checked) =>
+                    updateSetting("error_logging", checked)
+                  }
+                />
+              </div>
             </div>
 
             <div className="wdt:space-y-2">
-              <ToggleSwitch
-                label="Query Monitor"
-                checked={settings.query_monitoring}
-                onChange={(value) => updateSetting("query_monitoring", value)}
-                help="Enable database query monitoring"
-              />
+              <div className="wdt:flex wdt:items-center wdt:justify-between wdt:p-3 wdt:border wdt:border-gray-200 wdt:rounded-lg wdt:bg-white">
+                <div>
+                  <div className="wdt:font-medium wdt:text-gray-900">
+                    Query Monitor
+                  </div>
+                  <div className="wdt:text-sm wdt:text-gray-500">
+                    Enable database query monitoring
+                  </div>
+                </div>
+                <Switch
+                  checked={settings.query_monitoring}
+                  onCheckedChange={(checked) =>
+                    updateSetting("query_monitoring", checked)
+                  }
+                />
+              </div>
             </div>
 
             <div className="wdt:space-y-2">
-              <ToggleSwitch
-                label="Hook Inspector"
-                checked={settings.hook_inspection}
-                onChange={(value) => updateSetting("hook_inspection", value)}
-                help="Enable WordPress hook inspection"
-              />
+              <div className="wdt:flex wdt:items-center wdt:justify-between wdt:p-3 wdt:border wdt:border-gray-200 wdt:rounded-lg wdt:bg-white">
+                <div>
+                  <div className="wdt:font-medium wdt:text-gray-900">
+                    Hook Inspector
+                  </div>
+                  <div className="wdt:text-sm wdt:text-gray-500">
+                    Enable WordPress hook inspection
+                  </div>
+                </div>
+                <Switch
+                  checked={settings.hook_inspection}
+                  onCheckedChange={(checked) =>
+                    updateSetting("hook_inspection", checked)
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -349,60 +364,59 @@ const Settings: React.FC = () => {
         <div className="wdt:px-6">
           <div className="wdt:space-y-6">
             <div className="wdt:space-y-2">
-              <label className="wdt:block">
-                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
-                  Maximum Log Entries
-                </span>
-                <input
-                  type="range"
-                  min={10}
-                  max={1000}
-                  step={10}
-                  value={settings.max_log_entries}
-                  onChange={(e) =>
-                    updateSetting("max_log_entries", parseInt(e.target.value))
-                  }
-                  className="wdt:mt-1 wdt:block wdt:w-full"
-                />
-                <div className="wdt:flex wdt:justify-between wdt:text-sm wdt:text-gray-500">
-                  <span>10</span>
-                  <span>{settings.max_log_entries}</span>
-                  <span>1000</span>
-                </div>
+              <div className="wdt:space-y-2">
+                <label className="wdt:block">
+                  <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                    Maximum Log Entries
+                  </span>
+                  <Slider
+                    value={[settings.max_log_entries]}
+                    onValueChange={(value) =>
+                      updateSetting("max_log_entries", value[0])
+                    }
+                    min={10}
+                    max={1000}
+                    step={10}
+                    className="wdt:mt-3"
+                  />
+                  <div className="wdt:flex wdt:justify-between wdt:text-sm wdt:text-gray-500 wdt:mt-1">
+                    <span>10</span>
+                    <span>{settings.max_log_entries}</span>
+                    <span>1000</span>
+                  </div>
+                </label>
                 <span className="wdt:text-sm wdt:text-gray-500">
                   Number of log entries to keep in memory
                 </span>
-              </label>
+              </div>
             </div>
 
             <div className="wdt:space-y-2">
-              <label className="wdt:block">
-                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
-                  Log Retention (days)
-                </span>
-                <input
-                  type="range"
-                  min={1}
-                  max={90}
-                  step={1}
-                  value={settings.log_retention_days}
-                  onChange={(e) =>
-                    updateSetting(
-                      "log_retention_days",
-                      parseInt(e.target.value),
-                    )
-                  }
-                  className="wdt:mt-1 wdt:block wdt:w-full"
-                />
-                <div className="wdt:flex wdt:justify-between wdt:text-sm wdt:text-gray-500">
-                  <span>1</span>
-                  <span>{settings.log_retention_days}</span>
-                  <span>90</span>
-                </div>
+              <div className="wdt:space-y-2">
+                <label className="wdt:block">
+                  <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                    Log Retention (days)
+                  </span>
+                  <Slider
+                    value={[settings.log_retention_days]}
+                    onValueChange={(value) =>
+                      updateSetting("log_retention_days", value[0])
+                    }
+                    min={1}
+                    max={90}
+                    step={1}
+                    className="wdt:mt-3"
+                  />
+                  <div className="wdt:flex wdt:justify-between wdt:text-sm wdt:text-gray-500 wdt:mt-1">
+                    <span>1</span>
+                    <span>{settings.log_retention_days}</span>
+                    <span>90</span>
+                  </div>
+                </label>
                 <span className="wdt:text-sm wdt:text-gray-500">
                   Days to retain log files before cleanup
                 </span>
-              </label>
+              </div>
             </div>
           </div>
         </div>
