@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
-import { DevModeState, ErrorLogResponse, QueryResponse, HookResponse, SystemInfoResponse, ApiResponse } from '@/types/index';
+import { DevModeState, ErrorLogResponse, QueryResponse, HookResponse, SystemInfoResponse, ApiResponse } from '@/types';
 
 interface Stats {
   errorCount: number;

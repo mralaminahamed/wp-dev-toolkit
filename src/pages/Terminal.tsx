@@ -1,7 +1,7 @@
 import { TextareaControl, Button, Spinner, Dashicon, SelectControl } from '@wordpress/components';
 import React, { useState, useRef, useEffect } from 'react';
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
-import { TerminalCommand } from '@/types/index';
+import { TerminalCommand } from '@/types';
 
 const Terminal: React.FC = () => {
   const { terminal, isLoading } = useWPDevToolkit();
@@ -80,10 +80,10 @@ const Terminal: React.FC = () => {
       // Simple tab completion for WordPress CLI commands
       if (input.startsWith('wp ')) {
         const wpCommands = [
-          'wp plugin', 'wp theme', 'wp user', 'wp post', 'wp option', 
+          'wp plugin', 'wp theme', 'wp user', 'wp post', 'wp option',
           'wp core', 'wp db', 'wp cache', 'wp site', 'wp config'
         ];
-        
+
         const matchingCommand = wpCommands.find(cmd => cmd.startsWith(input));
         if (matchingCommand) {
           setInput(matchingCommand + ' ');
@@ -122,7 +122,7 @@ const Terminal: React.FC = () => {
   ];
 
   // Terminal theme classes
-  const terminalClasses = terminalTheme === 'dark' 
+  const terminalClasses = terminalTheme === 'dark'
     ? 'wdt-bg-gray-900 wdt-text-green-400'
     : 'wdt-bg-white wdt-text-gray-800 wdt-border wdt-border-gray-300';
 
@@ -145,14 +145,14 @@ const Terminal: React.FC = () => {
               <h2>Command Line Interface</h2>
             </div>
             <div className="wdt-flex wdt-gap-2">
-              <Button 
+              <Button
                 className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
                 onClick={changeTerminalTheme}
                 icon={terminalTheme === 'dark' ? 'lightbulb' : 'visibility'}
               >
                 {terminalTheme === 'dark' ? 'Light Theme' : 'Dark Theme'}
               </Button>
-              <Button 
+              <Button
                 className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
                 onClick={clearTerminal}
                 icon="trash"
@@ -203,10 +203,10 @@ const Terminal: React.FC = () => {
                 onKeyDown={handleKeyDown}
                 placeholder="Enter command..."
               />
-              <Button 
+              <Button
                 className="wp-dev-toolkit-button wp-dev-toolkit-button-primary"
                 icon="editor-code"
-                type="submit" 
+                type="submit"
                 disabled={isLoading}
               >
                 Execute

@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { createHashRouter, RouterProvider, Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Dashicon } from '@wordpress/components';
 
-import Dashboard from '@/components/Dashboard';
-import ErrorLog from '@/components/ErrorLog';
-import HookInspector from '@/components/HookInspector';
-import QueryMonitor from '@/components/QueryMonitor';
-import Settings from '@/components/Settings';
-import SystemInfo from '@/components/SystemInfo';
-import Terminal from '@/components/Terminal';
-import TailwindTest from '@/components/TailwindTest';
+import Dashboard from '@/pages/Dashboard';
+import ErrorLog from '@/pages/ErrorLog';
+import HookInspector from '@/pages/HookInspector';
+import QueryMonitor from '@/pages/QueryMonitor';
+import Settings from '@/pages/Settings';
+import SystemInfo from '@/pages/SystemInfo';
+import Terminal from '@/pages/Terminal';
+import TailwindTest from '@/pages/TailwindTest';
 
 // Extend Window interface to include our global object
 declare global {
@@ -30,7 +30,7 @@ declare global {
 const MainNavigation: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  
+
   const tabs = [
     { name: 'dashboard', title: 'Dashboard', icon: 'dashboard' },
     { name: 'error-log', title: 'Error Log', icon: 'warning' },
@@ -45,23 +45,23 @@ const MainNavigation: React.FC = () => {
   return (
     <aside className="wp-dev-toolkit-sidebar">
       <div className="wp-dev-toolkit-logo">
-        <img 
-          src={`${window.wpDevToolkit?.pluginUrl || ''}assets/images/wp-dev-toolkit-icon.svg`} 
-          alt="WP Dev Toolkit Logo" 
+        <img
+          src={`${window.wpDevToolkit?.pluginUrl || ''}assets/images/wp-dev-toolkit-icon.svg`}
+          alt="WP Dev Toolkit Logo"
         />
         <h1>Dev Toolkit</h1>
       </div>
       <nav className="wp-dev-toolkit-nav">
         <ul>
           {tabs.map(tab => {
-            const isActive = 
-              (tab.name === 'dashboard' && (currentPath === '/' || currentPath === '/dashboard')) || 
+            const isActive =
+              (tab.name === 'dashboard' && (currentPath === '/' || currentPath === '/dashboard')) ||
               (tab.name !== 'dashboard' && currentPath === `/${tab.name}`);
-            
+
             return (
               <li key={tab.name} className={isActive ? 'active' : ''}>
-                <Link 
-                  to={tab.name === 'dashboard' ? '/' : `/${tab.name}`} 
+                <Link
+                  to={tab.name === 'dashboard' ? '/' : `/${tab.name}`}
                   className={isActive ? 'active' : ''}
                 >
                   <Dashicon icon={tab.icon as any} />
@@ -82,7 +82,7 @@ const MainNavigation: React.FC = () => {
 // Root Layout Component
 const RootLayout: React.FC = () => {
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     // Check if we have an initial route from the server
     if (window.wpDevToolkitInitialRoute) {
@@ -92,7 +92,7 @@ const RootLayout: React.FC = () => {
       navigate(route);
     }
   }, [navigate]);
-  
+
   return (
     <div className="wp-dev-toolkit-app">
       <MainNavigation />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Spinner, ToggleControl, Dashicon, TextControl, SelectControl } from '@wordpress/components';
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
-import { ErrorLogResponse } from '@/types/index';
+import { ErrorLogResponse } from '@/types';
 
 interface ParsedLogEntry {
   timestamp: string;
@@ -72,20 +72,20 @@ const ErrorLog: React.FC = () => {
       debug: getLogLevelCount('DEBUG'),
       other: 0
     };
-    
+
     stats.other = stats.total - (stats.errors + stats.warnings + stats.info + stats.debug);
     setLogStats(stats);
   }, [parsedLogs]);
 
   const fetchErrorLog = async () => {
     if (isFetching) return; // Prevent multiple simultaneous requests
-    
+
     setIsFetching(true);
     try {
       const rawResponse = await errorLog.get();
       // Type assertion with unknown intermediate step
       const response = rawResponse as unknown as ErrorLogResponse;
-      
+
       if (response && response.log_content) {
         setLogContent(response.log_content);
         const parsed = parseLogContent(response.log_content);
@@ -109,7 +109,7 @@ const ErrorLog: React.FC = () => {
     // More comprehensive regex to extract file and line information
     const logEntryRegex = /\[([\d\s\-:.]+)\]\s*\[([A-Z]+)\]\s*(.*?)(?:\s+in\s+(\S+)\s+on\s+line\s+(\d+))?(?=\n\[\d|\n\s*$|$)/gs;
     const entries: ParsedLogEntry[] = [];
-    
+
     let match;
     while ((match = logEntryRegex.exec(content)) !== null) {
       entries.push({
@@ -121,7 +121,7 @@ const ErrorLog: React.FC = () => {
         raw: match[0] || '',
       });
     }
-    
+
     return sortDirection === 'desc' ? entries.reverse() : entries;
   };
 
@@ -149,21 +149,21 @@ const ErrorLog: React.FC = () => {
 
   const getFilteredLogs = () => {
     let filtered = parsedLogs;
-    
+
     // Apply level filter if set
     if (filterLevel) {
       filtered = filtered.filter(log => log.level === filterLevel);
     }
-    
+
     // Apply search filter if set
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(log => 
-        log.message.toLowerCase().includes(query) || 
+      filtered = filtered.filter(log =>
+        log.message.toLowerCase().includes(query) ||
         (log.file && log.file.toLowerCase().includes(query))
       );
     }
-    
+
     // Apply date filter if set
     if (dateFilter) {
       filtered = filtered.filter(log => {
@@ -171,7 +171,7 @@ const ErrorLog: React.FC = () => {
         return logDate === dateFilter;
       });
     }
-    
+
     return filtered;
   };
 
@@ -247,9 +247,9 @@ const ErrorLog: React.FC = () => {
   const toggleSortDirection = () => {
     const newDirection = sortDirection === 'desc' ? 'asc' : 'desc';
     setSortDirection(newDirection);
-    
+
     // Re-sort the logs based on the new direction
-    setParsedLogs(prevLogs => 
+    setParsedLogs(prevLogs =>
       newDirection === 'desc' ? [...prevLogs].reverse() : [...prevLogs].reverse()
     );
   };
@@ -282,7 +282,7 @@ const ErrorLog: React.FC = () => {
           >
             {isFetching ? 'Refreshing...' : 'Refresh Log'}
           </Button>
-          
+
           <Button
             className="wp-dev-toolkit-button wp-dev-toolkit-button-secondary"
             onClick={clearErrorLog}
@@ -291,7 +291,7 @@ const ErrorLog: React.FC = () => {
           >
             {isClearing ? 'Clearing...' : 'Clear Log'}
           </Button>
-          
+
           <Button
             className={`wp-dev-toolkit-button ${config.error_logging ? 'wp-dev-toolkit-button-secondary' : 'wp-dev-toolkit-button-primary'}`}
             onClick={toggleLogging}
@@ -299,14 +299,14 @@ const ErrorLog: React.FC = () => {
           >
             {config.error_logging ? 'Disable Logging' : 'Enable Logging'}
           </Button>
-          
+
           <div className="wdt-ml-auto wdt-flex wdt-items-center wdt-gap-2">
             <ToggleControl
               label="Auto-refresh"
               checked={autoRefresh}
               onChange={() => setAutoRefresh(!autoRefresh)}
             />
-            
+
             {autoRefresh && (
               <SelectControl
                 label="Refresh rate"
@@ -330,22 +330,22 @@ const ErrorLog: React.FC = () => {
           <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Total Entries</div>
           <div className="wdt-text-2xl wdt-font-bold">{logStats.total}</div>
         </div>
-        
+
         <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
           <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Errors</div>
           <div className="wdt-text-2xl wdt-font-bold wdt-text-red-600">{logStats.errors}</div>
         </div>
-        
+
         <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
           <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Warnings</div>
           <div className="wdt-text-2xl wdt-font-bold wdt-text-yellow-600">{logStats.warnings}</div>
         </div>
-        
+
         <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
           <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">Info</div>
           <div className="wdt-text-2xl wdt-font-bold wdt-text-blue-600">{logStats.info}</div>
         </div>
-        
+
         <div className="wdt-bg-white wdt-rounded-lg wdt-shadow-sm wdt-p-4 wdt-text-center">
           <div className="wdt-text-sm wdt-text-gray-500 wdt-mb-1">File Size</div>
           <div className="wdt-text-2xl wdt-font-bold">{formatFileSize(logSize)}</div>
@@ -371,37 +371,37 @@ const ErrorLog: React.FC = () => {
                 className="wdt-w-full"
               />
             </div>
-            
+
             <div className="wdt-flex wdt-flex-col">
               <label className="wdt-text-xs wdt-font-medium wdt-text-gray-700 wdt-mb-1">Filter by level</label>
               <div className="wdt-flex wdt-flex-wrap wdt-items-center wdt-gap-2">
-                <button 
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === null ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`} 
+                <button
+                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === null ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
                   onClick={() => setFilterLevel(null)}
                 >
                   All ({logStats.total})
                 </button>
-                <button 
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'ERROR' ? 'wdt-bg-red-100 wdt-text-red-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`} 
+                <button
+                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'ERROR' ? 'wdt-bg-red-100 wdt-text-red-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
                   onClick={() => setFilterLevel('ERROR')}
                 >
                   Errors ({logStats.errors})
                 </button>
-                <button 
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'WARNING' ? 'wdt-bg-yellow-100 wdt-text-yellow-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`} 
+                <button
+                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'WARNING' ? 'wdt-bg-yellow-100 wdt-text-yellow-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
                   onClick={() => setFilterLevel('WARNING')}
                 >
                   Warnings ({logStats.warnings})
                 </button>
-                <button 
-                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'INFO' ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`} 
+                <button
+                  className={`wdt-px-3 wdt-py-1 wdt-rounded-md wdt-text-xs wdt-font-medium wdt-transition-colors ${filterLevel === 'INFO' ? 'wdt-bg-blue-100 wdt-text-blue-800' : 'wdt-bg-gray-100 wdt-text-gray-700 hover:wdt-bg-gray-200'}`}
                   onClick={() => setFilterLevel('INFO')}
                 >
                   Info ({logStats.info})
                 </button>
               </div>
             </div>
-            
+
             {getUniqueDates().length > 0 && (
               <div>
                 <label className="wdt-text-xs wdt-font-medium wdt-text-gray-700 wdt-mb-1">Filter by date</label>
@@ -415,7 +415,7 @@ const ErrorLog: React.FC = () => {
                 />
               </div>
             )}
-            
+
             <div className="wdt-ml-auto">
               <Button
                 icon={sortDirection === 'desc' ? 'arrow-down-alt2' : 'arrow-up-alt2'}
@@ -438,18 +438,18 @@ const ErrorLog: React.FC = () => {
               <div className="wdt-border wdt-rounded-lg wdt-overflow-hidden wdt-divide-y wdt-divide-gray-200">
                 {getFilteredLogs().length > 0 ? (
                   getFilteredLogs().map((log, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className={`wdt-transition-colors ${expanded === index ? 'wdt-bg-gray-50' : 'hover:wdt-bg-gray-50'}`}
                     >
                       <div className="wdt-p-4">
                         <div className="wdt-flex wdt-items-center wdt-gap-2 wdt-mb-2">
-                          <button 
-                            onClick={() => toggleExpandLog(index)} 
+                          <button
+                            onClick={() => toggleExpandLog(index)}
                             className="wdt-flex wdt-items-center wdt-justify-center wdt-w-6 wdt-h-6 wdt-rounded-full wdt-text-white"
                             aria-label={expanded === index ? "Collapse log entry" : "Expand log entry"}
-                            style={{ backgroundColor: log.level === 'ERROR' ? '#ef4444' : 
-                                                      log.level === 'WARNING' ? '#f59e0b' : 
+                            style={{ backgroundColor: log.level === 'ERROR' ? '#ef4444' :
+                                                      log.level === 'WARNING' ? '#f59e0b' :
                                                       log.level === 'INFO' ? '#3b82f6' : '#6b7280' }}
                           >
                             <Dashicon icon={getLogLevelIcon(log.level)} size={14} />
@@ -458,14 +458,14 @@ const ErrorLog: React.FC = () => {
                             {log.level}
                           </span>
                           <span className="wdt-text-xs wdt-text-gray-500">{log.timestamp}</span>
-                          
+
                           {log.file && (
                             <span className="wdt-text-xs wdt-bg-gray-100 wdt-px-2 wdt-py-0.5 wdt-rounded wdt-truncate wdt-max-w-[200px] wdt-hidden md:wdt-inline-block">
                               {log.file} {log.line && `(line ${log.line})`}
                             </span>
                           )}
-                          
-                          <button 
+
+                          <button
                             onClick={() => toggleExpandLog(index)}
                             className="wdt-ml-auto wdt-text-gray-400 hover:wdt-text-gray-600"
                             aria-label={expanded === index ? "Collapse log entry" : "Expand log entry"}
@@ -473,28 +473,28 @@ const ErrorLog: React.FC = () => {
                             <Dashicon icon={expanded === index ? "arrow-up-alt2" : "arrow-down-alt2"} size={16} />
                           </button>
                         </div>
-                        
+
                         {/* Truncated message for collapsed view */}
                         {expanded !== index && (
                           <div className="wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200 wdt-truncate">
                             {log.message}
                           </div>
                         )}
-                        
+
                         {/* Full details for expanded view */}
                         {expanded === index && (
                           <div className="wdt-mt-3 wdt-space-y-3">
                             <div className="wdt-font-mono wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-whitespace-pre-wrap wdt-border wdt-border-gray-200">
                               {log.message}
                             </div>
-                            
+
                             {log.file && (
                               <div className="wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200">
                                 <div className="wdt-font-medium wdt-mb-1">File Location:</div>
                                 <div className="wdt-font-mono">{log.file} {log.line && `(line ${log.line})`}</div>
                               </div>
                             )}
-                            
+
                             <div className="wdt-text-sm wdt-bg-gray-50 wdt-p-3 wdt-rounded-lg wdt-border wdt-border-gray-200">
                               <div className="wdt-font-medium wdt-mb-1">Timestamp:</div>
                               <div>{log.timestamp}</div>
@@ -518,7 +518,7 @@ const ErrorLog: React.FC = () => {
               <p className="wdt-text-gray-700">No log entries found. Your application is running smoothly!</p>
             </div>
           )}
-          
+
           {/* Log entry count */}
           {parsedLogs.length > 0 && (
             <div className="wdt-mt-4 wdt-text-sm wdt-text-gray-500 wdt-text-right">
