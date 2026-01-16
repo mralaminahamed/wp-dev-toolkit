@@ -163,7 +163,6 @@ class WP_Dev_Toolkit {
 		$this->assets            = new \WPDevToolkit\Admin\Assets();
 
 		// Initialize components
-		$this->menu->init();
 		$this->assets->init();
 	}
 
@@ -464,6 +463,9 @@ class WP_Dev_Toolkit {
 
 		// Schedule cron jobs
 		$this->schedule_cron_jobs();
+
+		// Set activation redirect transient
+		\set_transient( 'wp_dev_toolkit_activation_redirect', true, 30 );
 
 		// Flush rewrite rules
 		\flush_rewrite_rules();
