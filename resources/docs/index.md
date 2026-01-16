@@ -14,6 +14,10 @@ wp-dev-toolkit/
 │   ├── Utilities/                 # Helper functions and logging system
 │   ├── Tools/                     # Development tools and base classes
 ├── src/                           # React/TypeScript frontend
+│   ├── components/                # React components
+│   ├── stores/                    # WordPress data stores (WC Affiliate patterns)
+│   ├── types/                     # TypeScript type definitions
+│   └── styles/                    # CSS/SCSS files
 ├── resources/docs/                # Documentation files
 └── AGENTS.md                      # Development guidelines for AI agents
 ```
@@ -54,6 +58,30 @@ Provides shared utility functions, helpers, and logging system:
 - Centralized logging system
 - Helper functions for common tasks
 
+## Frontend Architecture
+
+### 🎨 **React/TypeScript Frontend** (`src/`)
+
+Modern frontend architecture with WordPress data stores:
+
+#### **Components** (`src/components/`)
+
+- React components for each feature
+- TypeScript interfaces for props and state
+- WordPress component library integration
+
+#### **Stores** (`src/stores/`) - WC Affiliate Patterns
+
+- Individual data stores per feature following WooCommerce Affiliate conventions
+- WordPress data registry integration
+- Async/await actions with operation-specific loading states
+
+#### **Types** (`src/types/`)
+
+- TypeScript type definitions
+- Store action types and interfaces
+- API response types
+
 ## Architecture Principles
 
 ### 1. **Global Access Pattern**
@@ -79,6 +107,13 @@ Provides shared utility functions, helpers, and logging system:
 - All tools implement `ToolInterface`
 - Consistent API for tool initialization and REST registration
 - Extensible architecture for adding new tools
+
+### 5. **WC Affiliate Store Patterns**
+
+- WordPress data stores following WooCommerce Affiliate conventions
+- Async/await actions with granular loading/error states
+- Modular architecture with separate stores per feature
+- Consistent resolver patterns for data fetching
 
 ## Key Classes
 
@@ -121,14 +156,28 @@ Provides shared utility functions, helpers, and logging system:
 
 ### Adding Frontend Features
 
-1. Update `Frontend\Assets` for new scripts/styles
-2. Add React components in `src/components/`
-3. Register routes in `src/App.tsx`
+1. Create data store following WC Affiliate patterns in `src/stores/`
+2. Register store in `src/stores/index.ts`
+3. Add React components in `src/components/`
+4. Register routes in `src/App.tsx`
+5. Update TypeScript types in `src/types/`
+
+### Adding New Stores
+
+1. Create store directory in `src/stores/{store-name}/`
+2. Create `constants.ts` with STORE_NAME and action types
+3. Create `actions.ts` with async/await functions using WC Affiliate patterns
+4. Create `reducer.ts` with default export and isResolving/errors state
+5. Create `selectors.ts` with default export and null checking
+6. Create `resolvers.ts` with async API calls (optional)
+7. Create `index.ts` to register store with WordPress data registry
+8. Import and register store in `src/stores/index.ts`
 
 ## Documentation Files
 
 - **[AGENTS.md](../AGENTS.md)**: Comprehensive development guidelines for AI coding agents
 - **[admin-scope.md](admin-scope.md)**: Admin interface, config, and assets documentation
+- **[frontend-scope.md](frontend-scope.md)**: React/TypeScript frontend and store architecture
 - **[rest-scope.md](rest-scope.md)**: REST API architecture
 - **[tools-scope.md](tools-scope.md)**: Development tools and base classes overview
 - **[utilities-scope.md](utilities-scope.md)**: Utility functions and logging
@@ -136,8 +185,10 @@ Provides shared utility functions, helpers, and logging system:
 ## Standards and Conventions
 
 - **PHP**: PSR-4 autoloading, WordPress Coding Standards
-- **JavaScript**: ESLint rules, React best practices
+- **TypeScript**: Strict mode, explicit types, WC Affiliate store patterns
+- **JavaScript**: ESLint rules, React best practices, async/await patterns
 - **CSS**: Tailwind v4 with custom prefix (`wdt`)
+- **Stores**: WC Affiliate patterns with granular operation tracking
 - **Git**: Conventional commits with scope-based organization
 - **Documentation**: Comprehensive inline docs and external guides
 
