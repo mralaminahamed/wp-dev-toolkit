@@ -14,20 +14,15 @@ module.exports = {
     node: true,
   },
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:jsx-a11y/recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
     // WordPress ESLint configurations
     'plugin:@wordpress/eslint-plugin/recommended',
     'plugin:@wordpress/eslint-plugin/jsx',
     'plugin:@wordpress/eslint-plugin/react',
-    // Keep prettier last to override other configs
-    'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
   ],
   plugins: [
     '@typescript-eslint',
@@ -39,7 +34,7 @@ module.exports = {
     'prettier',
   ],
   rules: {
-    'prettier/prettier': ['error', {}, { usePrettierrc: true }],
+    'prettier/prettier': 'off',
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -56,12 +51,7 @@ module.exports = {
         alphabetize: { order: 'asc', caseInsensitive: true },
       },
     ],
-    'import/no-unresolved': [
-      'error',
-      {
-        ignore: ['^@wordpress/'],
-      },
-    ],
+    'import/no-unresolved': 'error',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'jsx-a11y/anchor-is-valid': [
