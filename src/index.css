@@ -1,6 +1,6 @@
-@import "tailwindcss/theme.css" layer(theme) important;
-@import "tailwindcss/preflight.css" layer(base) important;
-@import "tailwindcss/utilities.css" layer(utilities) important;
+@import 'tailwindcss/theme.css' layer(theme) important;
+@import 'tailwindcss/preflight.css' layer(base) important;
+@import 'tailwindcss/utilities.css' layer(utilities) important;
 
 @source "./src/**/*.{js,jsx,ts,tsx}";
 
