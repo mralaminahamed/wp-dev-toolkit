@@ -95,7 +95,7 @@ class Assets {
 	 * @return void
 	 */
 	private function register_scripts() {
-		$asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/app.asset.php';
+		$asset_file = WP_DEV_TOOLKIT_PATH . 'build/app.asset.php';
 		$asset_data = $this->get_asset_data( $asset_file );
 
 		// Get version and dependencies from asset file
@@ -137,7 +137,7 @@ class Assets {
 	 * @return void
 	 */
 	private function register_styles() {
-		$asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/app.asset.php';
+		$asset_file = WP_DEV_TOOLKIT_PATH . 'build/app.asset.php';
 		$asset_data = $this->get_asset_data( $asset_file );
 
 		// Get version from asset file
@@ -225,7 +225,7 @@ class Assets {
 
         // Add file modification time for cache busting in development
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            $real_path = WP_DEV_TOOLKIT_PLUGIN_DIR . $file_path;
+            $real_path = WP_DEV_TOOLKIT_PATH . $file_path;
             if ( file_exists( $real_path ) ) {
                 $version = filemtime( $real_path );
             }

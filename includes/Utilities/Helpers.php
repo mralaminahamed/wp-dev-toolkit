@@ -58,7 +58,7 @@ class Helpers {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		return get_plugin_data( WP_DEV_TOOLKIT_PLUGIN_DIR . 'wp-dev-toolkit.php' );
+		return get_plugin_data( WP_DEV_TOOLKIT_FILE );
 	}
 	
 	/**

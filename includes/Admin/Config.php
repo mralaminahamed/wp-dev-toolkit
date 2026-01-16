@@ -194,10 +194,8 @@ class Config {
 			'debug_bar_integration' => true,
 			'terminal_enabled'      => false, // Disabled by default for security.
 			'log_path'              => $upload_dir['basedir'] . '/wp-dev-toolkit/logs/error.log',
-			'asset_path'            => WP_DEV_TOOLKIT_PLUGIN_DIR . 'assets',
-			'asset_url'             => WP_DEV_TOOLKIT_PLUGIN_URL . 'assets',
-			'build_path'            => WP_DEV_TOOLKIT_PLUGIN_DIR . 'build',
-			'build_url'             => WP_DEV_TOOLKIT_PLUGIN_URL . 'build',
+			'build_path'            => WP_DEV_TOOLKIT_PATH . 'build/',
+			'build_url'             => WP_DEV_TOOLKIT_URL . 'build',
 			'log_retention_days'    => 30,
 			'allowed_ip_addresses'  => [],
 			'excluded_hooks'        => [],
