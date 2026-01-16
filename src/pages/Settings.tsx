@@ -10,17 +10,46 @@ import {
 import { useSelect, useDispatch } from "@wordpress/data";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
 
 interface Settings {
   dev_mode: boolean;
-  error_logger: boolean;
-  query_monitor: boolean;
-  hook_inspector: boolean;
   log_level: string;
-  max_queries: number;
-  slow_query_threshold: number;
+  error_logging: boolean;
+  query_monitoring: boolean;
+  hook_inspection: boolean;
+  max_log_entries: number;
+  log_retention_days: number;
 }
+
+// Helper component for toggle switches
+const ToggleSwitch: React.FC<{
+  label: string;
+  help?: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}> = ({ label, help, checked, onChange }) => (
+  <label className="wdt:flex wdt:items-center wdt:justify-between wdt:p-3 wdt:border wdt:border-gray-200 wdt:rounded-lg wdt:bg-white">
+    <div>
+      <div className="wdt:font-medium wdt:text-gray-900">{label}</div>
+      {help && <div className="wdt:text-sm wdt:text-gray-500">{help}</div>}
+    </div>
+    <button
+      type="button"
+      className={`wdt:relative wdt:inline-flex wdt:h-6 wdt:w-11 wdt:items-center wdt:rounded-full wdt:transition-colors wdt:focus:outline-none wdt:focus:ring-2 wdt:focus:ring-blue-500 wdt:focus:ring-offset-2 ${
+        checked ? "wdt:bg-blue-600" : "wdt:bg-gray-200"
+      }`}
+      onClick={() => onChange(!checked)}
+    >
+      <span
+        className={`wdt:inline-block wdt:h-4 wdt:w-4 wdt:transform wdt:rounded-full wdt:bg-white wdt:transition-transform ${
+          checked ? "wdt:translate-x-6" : "wdt:translate-x-1"
+        }`}
+      />
+    </button>
+  </label>
+);
 
 const Settings: React.FC = () => {
   const { config, isResolving } = useSelect(
@@ -34,12 +63,12 @@ const Settings: React.FC = () => {
   const { toggleTool } = useDispatch(SETTINGS_STORE);
   const [settings, setSettings] = useState<Settings>({
     dev_mode: false,
-    error_logger: true,
-    query_monitor: true,
-    hook_inspector: true,
+    error_logging: true,
+    query_monitoring: true,
+    hook_inspection: true,
     log_level: "all",
-    max_queries: 100,
-    slow_query_threshold: 1.0,
+    max_log_entries: 100,
+    log_retention_days: 30,
   });
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
@@ -160,7 +189,8 @@ const Settings: React.FC = () => {
           </p>
         </div>
         <div className="wdt:flex wdt:justify-center wdt:items-center wdt:p-16 wdt:bg-white wdt:rounded-lg wdt:shadow-sm">
-          <Spinner /> <span className="wdt:ml-2">Loading settings...</span>
+          <div className="wdt:animate-spin wdt:rounded-full wdt:h-8 wdt:w-8 wdt:border-b-2 wdt:border-blue-600"></div>
+          <span className="wdt:ml-2">Loading settings...</span>
         </div>
       </div>
     );
@@ -216,27 +246,53 @@ const Settings: React.FC = () => {
         <div className="wdt:px-6">
           <div className="wdt:space-y-6">
             <div className="wdt:space-y-2">
-              <ToggleControl
-                label="Development Mode"
-                checked={settings.dev_mode}
-                onChange={(value) => updateSetting("dev_mode", value)}
-                help="Enable development mode features across all tools"
-              />
+              <label className="wdt:flex wdt:items-center wdt:justify-between wdt:p-3 wdt:border wdt:border-gray-200 wdt:rounded-lg wdt:bg-white">
+                <div>
+                  <div className="wdt:font-medium wdt:text-gray-900">
+                    Development Mode
+                  </div>
+                  <div className="wdt:text-sm wdt:text-gray-500">
+                    Enable development mode features across all tools
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className={`wdt:relative wdt:inline-flex wdt:h-6 wdt:w-11 wdt:items-center wdt:rounded-full wdt:transition-colors wdt:focus:outline-none wdt:focus:ring-2 wdt:focus:ring-blue-500 wdt:focus:ring-offset-2 ${
+                    settings.dev_mode ? "wdt:bg-blue-600" : "wdt:bg-gray-200"
+                  }`}
+                  onClick={() => updateSetting("dev_mode", !settings.dev_mode)}
+                >
+                  <span
+                    className={`wdt:inline-block wdt:h-4 wdt:w-4 wdt:transform wdt:rounded-full wdt:bg-white wdt:transition-transform ${
+                      settings.dev_mode
+                        ? "wdt:translate-x-6"
+                        : "wdt:translate-x-1"
+                    }`}
+                  />
+                </button>
+              </label>
             </div>
 
             <div className="wdt:space-y-2">
-              <SelectControl
-                label="Log Level"
-                value={settings.log_level}
-                options={[
-                  { label: "All", value: "all" },
-                  { label: "Errors Only", value: "error" },
-                  { label: "Warnings & Errors", value: "warning" },
-                  { label: "Notices & Above", value: "notice" },
-                  { label: "Info & Above", value: "info" },
-                ]}
-                onChange={(value) => updateSetting("log_level", value)}
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Log Level
+                </span>
+                <select
+                  value={settings.log_level}
+                  onChange={(e) => updateSetting("log_level", e.target.value)}
+                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                >
+                  <option value="all">All</option>
+                  <option value="error">Errors Only</option>
+                  <option value="warning">Warnings & Errors</option>
+                  <option value="notice">Notices & Above</option>
+                  <option value="none">None</option>
+                </select>
+                <span className="wdt:text-sm wdt:text-gray-500">
+                  Control which log messages are displayed
+                </span>
+              </label>
             </div>
           </div>
         </div>
@@ -252,28 +308,28 @@ const Settings: React.FC = () => {
         <div className="wdt:px-6">
           <div className="wdt:space-y-6">
             <div className="wdt:space-y-2">
-              <ToggleControl
+              <ToggleSwitch
                 label="Error Logger"
-                checked={settings.error_logger}
-                onChange={(value) => updateSetting("error_logger", value)}
+                checked={settings.error_logging}
+                onChange={(value) => updateSetting("error_logging", value)}
                 help="Enable error logging functionality"
               />
             </div>
 
             <div className="wdt:space-y-2">
-              <ToggleControl
+              <ToggleSwitch
                 label="Query Monitor"
-                checked={settings.query_monitor}
-                onChange={(value) => updateSetting("query_monitor", value)}
+                checked={settings.query_monitoring}
+                onChange={(value) => updateSetting("query_monitoring", value)}
                 help="Enable database query monitoring"
               />
             </div>
 
             <div className="wdt:space-y-2">
-              <ToggleControl
+              <ToggleSwitch
                 label="Hook Inspector"
-                checked={settings.hook_inspector}
-                onChange={(value) => updateSetting("hook_inspector", value)}
+                checked={settings.hook_inspection}
+                onChange={(value) => updateSetting("hook_inspection", value)}
                 help="Enable WordPress hook inspection"
               />
             </div>
@@ -293,39 +349,70 @@ const Settings: React.FC = () => {
         <div className="wdt:px-6">
           <div className="wdt:space-y-6">
             <div className="wdt:space-y-2">
-              <RangeControl
-                label="Maximum Queries to Log"
-                value={settings.max_queries}
-                onChange={(value) => updateSetting("max_queries", value || 100)}
-                min={10}
-                max={1000}
-                step={10}
-                help="Number of database queries to keep in memory"
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Maximum Log Entries
+                </span>
+                <input
+                  type="range"
+                  min={10}
+                  max={1000}
+                  step={10}
+                  value={settings.max_log_entries}
+                  onChange={(e) =>
+                    updateSetting("max_log_entries", parseInt(e.target.value))
+                  }
+                  className="wdt:mt-1 wdt:block wdt:w-full"
+                />
+                <div className="wdt:flex wdt:justify-between wdt:text-sm wdt:text-gray-500">
+                  <span>10</span>
+                  <span>{settings.max_log_entries}</span>
+                  <span>1000</span>
+                </div>
+                <span className="wdt:text-sm wdt:text-gray-500">
+                  Number of log entries to keep in memory
+                </span>
+              </label>
             </div>
 
             <div className="wdt:space-y-2">
-              <RangeControl
-                label="Slow Query Threshold (seconds)"
-                value={settings.slow_query_threshold}
-                onChange={(value) =>
-                  updateSetting("slow_query_threshold", value || 1.0)
-                }
-                min={0.1}
-                max={10.0}
-                step={0.1}
-                help="Queries taking longer than this will be highlighted"
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Log Retention (days)
+                </span>
+                <input
+                  type="range"
+                  min={1}
+                  max={90}
+                  step={1}
+                  value={settings.log_retention_days}
+                  onChange={(e) =>
+                    updateSetting(
+                      "log_retention_days",
+                      parseInt(e.target.value),
+                    )
+                  }
+                  className="wdt:mt-1 wdt:block wdt:w-full"
+                />
+                <div className="wdt:flex wdt:justify-between wdt:text-sm wdt:text-gray-500">
+                  <span>1</span>
+                  <span>{settings.log_retention_days}</span>
+                  <span>90</span>
+                </div>
+                <span className="wdt:text-sm wdt:text-gray-500">
+                  Days to retain log files before cleanup
+                </span>
+              </label>
             </div>
           </div>
         </div>
       </div>
 
       <div className="wdt:flex wdt:space-x-4">
-        <Button onClick={saveSettings} disabled={isSaving} icon="yes">
+        <Button onClick={saveSettings} disabled={isSaving}>
           {isSaving ? "Saving..." : "Save Settings"}
         </Button>
-        <Button onClick={resetSettings} disabled={isSaving} icon="update">
+        <Button onClick={resetSettings} disabled={isSaving}>
           Reset to Defaults
         </Button>
       </div>
