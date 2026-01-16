@@ -1,8 +1,6 @@
 <?php
 namespace WPDevToolkit\Admin;
 
-use WPDevToolkit\Core\Plugin;
-
 /**
  * Admin Menu Handler
  *
@@ -11,21 +9,6 @@ use WPDevToolkit\Core\Plugin;
  * @package WPDevToolkit\Admin
  */
 class Menu {
-	/**
-	 * Plugin instance
-	 *
-	 * @var Plugin
-	 */
-	private $plugin;
-
-	/**
-	 * Constructor
-	 *
-	 * @param Plugin $plugin Plugin instance
-	 */
-	public function __construct( Plugin $plugin ) {
-		$this->plugin = $plugin;
-	}
 
 	/**
 	 * Initialize the menu

@@ -10,42 +10,19 @@ namespace WPDevToolkit\Core;
  */
 class Assets {
     /**
-     * Configuration instance
-     *
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * Script dependencies
-     *
-     * @var array
-     */
-    private $script_deps = [
-        'react',
-        'react-dom',
-        'wp-components',
-        'wp-element',
-        'wp-api-fetch',
-        'wp-data',
-    ];
-
-    /**
-     * Style dependencies
-     *
-     * @var array
-     */
-    private $style_deps = [
-        'wp-components',
-    ];
-
-    /**
      * Constructor
-     *
-     * @param Config $config Configuration instance
      */
-    public function __construct( Config $config ) {
-        $this->config = $config;
+    public function __construct() {
+        // Constructor logic if needed
+    }
+
+    /**
+     * Get configuration instance
+     *
+     * @return Config
+     */
+    protected function get_config() {
+        return wp_dev_toolkit()->get_config();
     }
 
     /**
@@ -104,7 +81,7 @@ class Assets {
                 'nonce'     => wp_create_nonce( 'wp_rest' ),
                 'version'   => WP_DEV_TOOLKIT_VERSION,
                 'logPath'   => $this->get_log_path(),
-                'debugMode' => (bool) $this->config->get( 'debug_mode', false ),
+                'debugMode' => (bool) 		$this->get_config()->get( 'debug_mode', false ),
                 'pluginUrl' => WP_DEV_TOOLKIT_PLUGIN_URL,
             ]
         );
@@ -186,7 +163,7 @@ class Assets {
      * @return string
      */
     private function get_log_path() {
-        $log_path = $this->config->get( 'log_path', '' );
+        $log_path = 		$this->get_config()->get( 'log_path', '' );
         
         if ( empty( $log_path ) ) {
             $log_path = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
