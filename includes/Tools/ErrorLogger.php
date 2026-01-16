@@ -49,13 +49,10 @@ class ErrorLogger extends ToolBase {
 	 *
 	 * Initializes the error logger with configuration and sets up log file path.
 	 *
-	 * @param \WPDevToolkit\Admin\Config $config Configuration instance.
-	 *
-	 *@since 1.0.0
-	 *
+	 * @since 1.0.0
 	 */
-	public function __construct( \WPDevToolkit\Admin\Config $config ) {
-		parent::__construct( $config );
+	public function __construct() {
+		parent::__construct();
 		$this->log_file = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
 	}
 

@@ -110,7 +110,7 @@ class Assets {
 		// Main app script
 		wp_register_script(
 			'wp-dev-toolkit-app',
-			WP_DEV_TOOLKIT_PLUGIN_URL . 'build/app.js',
+			WP_DEV_TOOLKIT_URL . 'build/app.js',
 			$dependencies,
 			$version,
 			true
@@ -126,7 +126,7 @@ class Assets {
                 'version'   => WP_DEV_TOOLKIT_VERSION,
                 'logPath'   => $this->get_log_path(),
                 'debugMode' => (bool) 		$this->get_config()->get( 'debug_mode', false ),
-                'pluginUrl' => WP_DEV_TOOLKIT_PLUGIN_URL,
+                'pluginUrl' => WP_DEV_TOOLKIT_URL,
             ]
         );
     }
@@ -146,7 +146,7 @@ class Assets {
 		// Main app styles
 		wp_register_style(
 			'wp-dev-toolkit-app',
-			WP_DEV_TOOLKIT_PLUGIN_URL . 'build/app.css',
+			WP_DEV_TOOLKIT_URL . 'build/app.css',
 			$this->style_deps,
 			$version
 		);
@@ -154,7 +154,7 @@ class Assets {
 		// Admin styles (for menu icon, etc.) - use plugin version for this
 		wp_register_style(
 			'wp-dev-toolkit-admin',
-			WP_DEV_TOOLKIT_PLUGIN_URL . 'assets/css/admin.css',
+			WP_DEV_TOOLKIT_URL . 'assets/css/admin.css',
 			array(),
 			WP_DEV_TOOLKIT_VERSION
 		);
@@ -220,7 +220,7 @@ class Assets {
      * @return string
      */
     public function get_asset_url( $file_path ) {
-        $url = WP_DEV_TOOLKIT_PLUGIN_URL . $file_path;
+        $url = WP_DEV_TOOLKIT_URL . $file_path;
         $version = WP_DEV_TOOLKIT_VERSION;
 
         // Add file modification time for cache busting in development

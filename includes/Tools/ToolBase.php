@@ -9,6 +9,7 @@
 namespace WPDevToolkit\Tools;
 
 use LogicException;
+use WPDevToolkit\Admin\Config;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {

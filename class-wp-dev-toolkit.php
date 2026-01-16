@@ -109,8 +109,8 @@ class WP_Dev_Toolkit {
 		\register_activation_hook( WP_DEV_TOOLKIT_FILE, array( $this, 'activate' ) );
 		\register_deactivation_hook( WP_DEV_TOOLKIT_FILE, array( $this, 'deactivate' ) );
 
-		\add_action( 'init', array( $this, 'init_components' ) );
-		\add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
+		 \add_action( 'init', array( $this, 'init_components' ) );
+		 \add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 	}
 
 	/**
@@ -156,11 +156,11 @@ class WP_Dev_Toolkit {
 	 * @return void
 	 */
 	private function setup_components() {
-		$this->config            = new \WPDevToolkit\Admin\Config();
+		$this->config            = new WPDevToolkit\Admin\Config();
 		$this->tool_factory      = new WPDevToolkit\Tools\Factory();
 		$this->menu              = new WPDevToolkit\Admin\Menu();
 		$this->controller_loader = new WPDevToolkit\REST\ControllerLoader();
-		$this->assets            = new \WPDevToolkit\Admin\Assets();
+		$this->assets            = new WPDevToolkit\Admin\Assets();
 
 		// Components are initialized via constructor
 	}
