@@ -5,5 +5,5 @@
  */
 
 export default {
-  // Terminal store doesn't need resolvers as commands are user-initiated
+	// Terminal store doesn't need resolvers as commands are user-initiated
 };

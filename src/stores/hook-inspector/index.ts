@@ -12,15 +12,15 @@ import reducer from './reducer';
 import resolvers from './resolvers';
 import selectors from './selectors';
 
-const store = createReduxStore(STORE_NAME, {
-  reducer,
-  actions,
-  selectors,
-  resolvers,
-});
+const store = createReduxStore( STORE_NAME, {
+	reducer,
+	actions,
+	selectors,
+	resolvers,
+} );
 
 // Register the store with WordPress data registry
-register(store);
+register( store );
 
 export { store, STORE_NAME };
 

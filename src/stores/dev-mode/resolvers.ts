@@ -5,5 +5,5 @@
  */
 
 export default {
-  // Dev mode store doesn't need resolvers as state is managed through actions
+	// Dev mode store doesn't need resolvers as state is managed through actions
 };
