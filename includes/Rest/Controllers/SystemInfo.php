@@ -1,13 +1,13 @@
 <?php
 
-namespace WPDevToolkit\Rest\Controllers;
+namespace WPDevToolkit\REST\Controllers;
 
-use WPDevToolkit\Rest\Base;
+use WPDevToolkit\REST\Base;
 
 /**
  * System Information REST API Controller
  *
- * @package WPDevToolkit\Rest\Controllers
+ * @package WPDevToolkit\REST\Controllers
  */
 class SystemInfo extends Base {
 	/**

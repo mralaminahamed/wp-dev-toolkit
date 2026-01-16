@@ -1,7 +1,7 @@
 <?php
 // Create a new file: src/Core/Logger.php
 
-namespace WPDevToolkit\Core;
+namespace WPDevToolkit\Utilities;
 
 /**
  * Logger Class

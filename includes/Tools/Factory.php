@@ -9,7 +9,6 @@
 namespace WPDevToolkit\Tools;
 
 use WPDevToolkit\Base\ToolInterface;
-use WPDevToolkit\Core\Config;
 use Exception;
 
 // Prevent direct access.
@@ -37,23 +36,13 @@ class Factory {
 	private array $tools = [];
 
 	/**
-	 * Configuration instance
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var Config
-	 */
-	private Config $config;
-
-	/**
 	 * Constructor
 	 *
-	 * Initializes the factory with configuration and registers default tools.
+	 * Initializes the factory and registers default tools.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->config = wp_dev_toolkit()->get_config();
 		$this->register_default_tools();
 	}
 

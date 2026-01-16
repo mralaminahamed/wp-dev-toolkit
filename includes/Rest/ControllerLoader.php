@@ -2,10 +2,10 @@
 /**
  * REST Controllers Loader
  *
- * @package WPDevToolkit\Rest
+ * @package WPDevToolkit\REST
  */
 
-namespace WPDevToolkit\Rest;
+namespace WPDevToolkit\REST;
 
 /**
  * Controller Loader Class

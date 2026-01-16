@@ -1,12 +1,12 @@
 <?php
-namespace WPDevToolkit\Core;
+namespace WPDevToolkit\Frontend;
 
 /**
  * Assets Manager Class
  *
  * Handles registration and enqueuing of CSS, JS, and other assets
  *
- * @package WPDevToolkit\Core
+ * @package WPDevToolkit\Frontend
  */
 class Assets {
     /**
