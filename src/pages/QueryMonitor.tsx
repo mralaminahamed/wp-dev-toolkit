@@ -1,4 +1,13 @@
 import React from "react";
+import {
+  AlertTriangle,
+  Database,
+  Clock,
+  BarChart3,
+  Filter,
+  Search,
+  X,
+} from "lucide-react";
 
 import { useSelect, useDispatch } from "@wordpress/data";
 import { useState, useEffect } from "@wordpress/element";
@@ -198,7 +207,7 @@ const QueryMonitor: React.FC = () => {
       <div className="wdt:p-4 wdt:bg-amber-50 wdt:border wdt:border-amber-100 wdt:rounded-lg wdt:mb-6">
         <div className="wdt:flex wdt:items-start wdt:gap-3">
           <div className="wdt:text-amber-600">
-            <Dashicon icon="warning" size={24} />
+            <AlertTriangle size={24} />
           </div>
           <div>
             <h3 className="wdt:font-medium wdt:text-amber-800 wdt:mb-2">
@@ -281,7 +290,7 @@ const QueryMonitor: React.FC = () => {
       <div className="wdt:grid wdt:gap-4 md:wdt:grid-cols-3 wdt:mb-6 wdt:mb-6">
         <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon blue">
-            <Dashicon icon="database" />
+            <Database />
           </div>
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
@@ -298,7 +307,7 @@ const QueryMonitor: React.FC = () => {
 
         <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon amber">
-            <Dashicon icon="clock" />
+            <Clock />
           </div>
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
@@ -332,7 +341,7 @@ const QueryMonitor: React.FC = () => {
 
         <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon green">
-            <Dashicon icon="performance" />
+            <BarChart3 />
           </div>
           <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
             <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
@@ -356,7 +365,7 @@ const QueryMonitor: React.FC = () => {
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:justify-between wdt:items-center">
             <div className="wdt:flex wdt:items-center wdt:gap-2">
-              <Dashicon icon="filter" />
+              <Filter />
               <h2>Query Filters</h2>
             </div>
           </div>
@@ -399,7 +408,7 @@ const QueryMonitor: React.FC = () => {
           {searchTerm && (
             <div className="wdt:bg-blue-50 wdt:p-3 wdt:rounded-md wdt:border wdt:border-blue-100 wdt:mt-4">
               <div className="wdt:flex wdt:items-center wdt:gap-2">
-                <Dashicon icon="search" className="wdt:text-blue-500" />
+                <Search className="wdt:text-blue-500" />
                 <span className="wdt:text-blue-700">
                   Found <strong>{filteredQueries.length}</strong> queries
                   matching: <strong>{searchTerm}</strong>
@@ -409,7 +418,7 @@ const QueryMonitor: React.FC = () => {
                   className="wdt:ml-auto wdt:text-blue-700 hover:wdt:text-blue-900"
                   aria-label="Clear search"
                 >
-                  <Dashicon icon="no-alt" />
+                  <X />
                 </button>
               </div>
             </div>
@@ -432,7 +441,7 @@ const QueryMonitor: React.FC = () => {
               <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
                 <div className="wdt:flex wdt:justify-between wdt:items-center">
                   <div className="wdt:flex wdt:items-center wdt:gap-2">
-                    <Dashicon icon="database" />
+                    <Database />
                     <h2>Query Details</h2>
                   </div>
                   <Button variant="secondary" onClick={closeDetails}>
@@ -491,7 +500,7 @@ const QueryMonitor: React.FC = () => {
             <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
               <div className="wdt:flex wdt:justify-between wdt:items-center">
                 <div className="wdt:flex wdt:items-center wdt:gap-2">
-                  <Dashicon icon="database" />
+                  <Database />
                   <h2>Database Queries</h2>
                 </div>
                 <div className="wdt:text-sm wdt:text-gray-500">
