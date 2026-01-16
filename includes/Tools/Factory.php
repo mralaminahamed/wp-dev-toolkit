@@ -51,11 +51,9 @@ class Factory {
 	 * Initializes the factory with configuration and registers default tools.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param Config|null $config Configuration instance. Creates new if null.
 	 */
-	public function __construct( ?Config $config = null ) {
-		$this->config = $config ?? new Config();
+	public function __construct() {
+		$this->config = wp_dev_toolkit()->get_config();
 		$this->register_default_tools();
 	}
 
@@ -150,7 +148,7 @@ class Factory {
 		}
 
 		$class = $this->tools[ $name ];
-		return new $class( $this->config );
+		return new $class();
 	}
 
 	/**

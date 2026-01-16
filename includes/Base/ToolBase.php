@@ -56,12 +56,10 @@ abstract class ToolBase implements ToolInterface {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Config $config Configuration instance.
-	 *
 	 * @throws LogicException If TOOL_KEY constant is not defined.
 	 */
-	public function __construct( Config $config ) {
-		$this->config = $config;
+	public function __construct() {
+		$this->config = wp_dev_toolkit()->get_config();
 
 		// Validate that child class has defined TOOL_KEY.
 		if ( '' === static::TOOL_KEY ) {
