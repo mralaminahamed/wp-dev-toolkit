@@ -14,9 +14,9 @@
   "homepage": "https://github.com/mralaminahamed/wp-dev-toolkit",
   "authors": [
     {
-      "name": "Mr Alamin Ahamed",
+      "name": "Al-Amin Ahamed",
       "email": "contact@mralaminahamed.com",
-      "homepage": "https://mralaminahamed.com",
+      "homepage": "https://alaminahamed.com",
       "role": "Developer"
     }
   ],
@@ -51,18 +51,7 @@
     "test": "phpunit",
     "phpcs": "phpcs",
     "phpcbf": "phpcbf",
-    "phpstan": "phpstan analyse",
-    "check-cs": "@phpcs",
-    "fix-cs": "@phpcbf",
-    "analyse": "@phpstan",
-    "all": [
-      "@test",
-      "@check-cs",
-      "@analyse"
-    ],
-    "post-install-cmd": [
-      "@php -r \"file_exists('.git/hooks/pre-commit') || copy('resources/pre-commit', '.git/hooks/pre-commit');\""
-    ]
+    "phpstan": "phpstan analyse"
   },
   "config": {
     "sort-packages": true,
