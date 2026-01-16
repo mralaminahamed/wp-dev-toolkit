@@ -9,13 +9,10 @@ wp-dev-toolkit/
 ├── wp-dev-toolkit.php              # Main plugin bootstrap file
 ├── class-wp-dev-toolkit.php        # Main plugin class (singleton)
 ├── includes/                       # PSR-4 autoloaded PHP classes
-│   ├── Admin/                     # Admin interface components
-│   ├── Frontend/                  # Frontend assets and functionality
+│   ├── Admin/                     # WordPress admin interface, config, and assets
 │   ├── REST/                      # REST API controllers and base classes
-│   ├── Utilities/                 # Helper functions and logging
-│   ├── Tools/                     # Development tool implementations
-│   ├── Base/                      # Base classes and interfaces
-│   └── Core/                      # Core functionality (Config.php)
+│   ├── Utilities/                 # Helper functions and logging system
+│   ├── Tools/                     # Development tools and base classes
 ├── src/                           # React/TypeScript frontend
 ├── resources/docs/                # Documentation files
 └── AGENTS.md                      # Development guidelines for AI agents
@@ -27,31 +24,35 @@ The codebase is organized by functional scopes to improve maintainability and co
 
 ### 🎛️ **Admin Scope** (`includes/Admin/`)
 
-Handles WordPress admin interface integration and menu management.
+Handles WordPress admin interface, configuration, and asset management:
 
-### 🎨 **Frontend Scope** (`includes/Frontend/`)
-
-Manages frontend assets, scripts, and styles for the React application.
+- Admin menu registration and page rendering
+- Plugin configuration and settings management
+- Frontend asset registration and enqueuing
+- Admin interface components
 
 ### 🔌 **REST Scope** (`includes/REST/`)
 
-Contains all REST API controllers, base classes, and API management.
+Contains all REST API controllers, base classes, and API management:
+
+- API controllers for each feature
+- Base controller classes
+- API endpoint management
 
 ### 🛠️ **Tools Scope** (`includes/Tools/`)
 
-Houses all development tool implementations (error logging, query monitoring, etc.).
+Houses development tool implementations and base classes:
+
+- Error logging, query monitoring, hook inspection
+- Tool factory and registration
+- Base classes and interfaces for tools
 
 ### 🔧 **Utilities Scope** (`includes/Utilities/`)
 
-Provides shared utility functions, helpers, and logging system.
+Provides shared utility functions, helpers, and logging system:
 
-### 🏗️ **Base Scope** (`includes/Base/`)
-
-Contains foundational interfaces and abstract classes.
-
-### ⚙️ **Core Scope** (`includes/Core/`)
-
-Holds core configuration and essential plugin functionality.
+- Centralized logging system
+- Helper functions for common tasks
 
 ## Architecture Principles
 
@@ -126,13 +127,11 @@ Holds core configuration and essential plugin functionality.
 
 ## Documentation Files
 
-- **[AGENTS.md](AGENTS.md)**: Comprehensive development guidelines for AI coding agents
-- **[admin-scope.md](admin-scope.md)**: Admin interface documentation
-- **[frontend-scope.md](frontend-scope.md)**: Frontend asset management
+- **[AGENTS.md](../AGENTS.md)**: Comprehensive development guidelines for AI coding agents
+- **[admin-scope.md](admin-scope.md)**: Admin interface, config, and assets documentation
 - **[rest-scope.md](rest-scope.md)**: REST API architecture
-- **[tools-scope.md](tools-scope.md)**: Development tools overview
+- **[tools-scope.md](tools-scope.md)**: Development tools and base classes overview
 - **[utilities-scope.md](utilities-scope.md)**: Utility functions and logging
-- **[base-scope.md](base-scope.md)**: Base classes and interfaces
 
 ## Standards and Conventions
 

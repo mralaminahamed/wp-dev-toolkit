@@ -2,11 +2,11 @@
 /**
  * Tool Interface for WordPress Development Toolkit
  *
- * @package WPDevToolkit\Base
+ * @package WPDevToolkit\Tools
  * @since   1.0.0
  */
 
-namespace WPDevToolkit\Base;
+namespace WPDevToolkit\Tools;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {

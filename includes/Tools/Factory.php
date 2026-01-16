@@ -8,7 +8,6 @@
 
 namespace WPDevToolkit\Tools;
 
-use WPDevToolkit\Base\ToolInterface;
 use Exception;
 
 // Prevent direct access.

@@ -2,13 +2,12 @@
 /**
  * Base Tool Class for WordPress Development Toolkit
  *
- * @package WPDevToolkit\Base
+ * @package WPDevToolkit\Tools
  * @since   1.0.0
  */
 
-namespace WPDevToolkit\Base;
+namespace WPDevToolkit\Tools;
 
-use WPDevToolkit\Core\Config;
 use LogicException;
 
 // Prevent direct access.

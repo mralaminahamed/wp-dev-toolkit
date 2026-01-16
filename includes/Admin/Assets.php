@@ -1,12 +1,14 @@
 <?php
-namespace WPDevToolkit\Frontend;
+namespace WPDevToolkit\Admin;
+
+use WPDevToolkit\Admin\Config;
 
 /**
  * Assets Manager Class
  *
  * Handles registration and enqueuing of CSS, JS, and other assets
  *
- * @package WPDevToolkit\Frontend
+ * @package WPDevToolkit\Admin
  */
 class Assets {
     /**
@@ -53,7 +55,7 @@ class Assets {
      */
     private function register_scripts() {
         $asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/index.asset.php';
-        
+
         // Get version and dependencies from asset file if it exists
         if ( file_exists( $asset_file ) ) {
             $asset = require $asset_file;
@@ -94,7 +96,7 @@ class Assets {
      */
     private function register_styles() {
         $asset_file = WP_DEV_TOOLKIT_PLUGIN_DIR . 'build/index.asset.php';
-        
+
         // Get version from asset file if it exists
         if ( file_exists( $asset_file ) ) {
             $asset = require $asset_file;
@@ -124,7 +126,7 @@ class Assets {
      * Enqueue assets for admin pages
      *
      * @param string $hook Current admin page hook
-     * 
+     *
      * @return void
      */
     public function enqueue_assets( $hook ) {
@@ -164,25 +166,25 @@ class Assets {
      */
     private function get_log_path() {
         $log_path = 		$this->get_config()->get( 'log_path', '' );
-        
+
         if ( empty( $log_path ) ) {
             $log_path = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
         }
-        
+
         return $log_path;
     }
-    
+
     /**
      * Get the asset URL with version
      *
      * @param string $file_path Path to the asset file
-     * 
+     *
      * @return string
      */
     public function get_asset_url( $file_path ) {
         $url = WP_DEV_TOOLKIT_PLUGIN_URL . $file_path;
         $version = WP_DEV_TOOLKIT_VERSION;
-        
+
         // Add file modification time for cache busting in development
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
             $real_path = WP_DEV_TOOLKIT_PLUGIN_DIR . $file_path;
@@ -190,7 +192,7 @@ class Assets {
                 $version = filemtime( $real_path );
             }
         }
-        
+
         return add_query_arg( 'ver', $version, $url );
     }
-} 
+}

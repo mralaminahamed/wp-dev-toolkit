@@ -2,13 +2,14 @@
 /**
  * Configuration Class for WordPress Development Toolkit
  *
- * @package WPDevToolkit\Core
+ * @package WPDevToolkit\Admin
  * @since   1.0.0
  */
 
-namespace WPDevToolkit\Core;
+namespace WPDevToolkit\Admin;
 
 // Prevent direct access.
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -127,7 +128,7 @@ class Config {
 	public function update( array $new_config ): void {
 		// Validate input data before merging.
 		$sanitized_config = $this->sanitize_config_data( $new_config );
-		
+
 		$this->config = array_merge( $this->config, $sanitized_config );
 		$this->save_config();
 	}
@@ -184,7 +185,7 @@ class Config {
 	private function get_default_config(): array {
 		// Get WordPress upload directory information
 		$upload_dir = wp_upload_dir();
-		
+
 		return [
 			'dev_mode'              => false,
 			'error_logging'         => true,

@@ -1,6 +1,6 @@
 # WP Dev Toolkit - Tools Scope
 
-This directory contains all development tool implementations for the WP Dev Toolkit plugin.
+This directory contains all development tool implementations and base classes for the WP Dev Toolkit plugin.
 
 ## Files
 
@@ -38,20 +38,33 @@ This directory contains all development tool implementations for the WP Dev Tool
   - Identify slow or problematic queries
   - REST API for query analysis
 
-## Tool Interface
+### ToolBase.php
 
-All tools implement the `ToolInterface` which defines:
+- **Purpose**: Abstract base class providing common functionality for tools
+- **Features**:
+  - Configuration access via `wp_dev_toolkit()->get_config()`
+  - Permission checking utilities
+  - Tool key management and validation
+  - Common tool properties and methods
 
-- `init()`: Initialize the tool
-- `register_rest_routes()`: Register REST API endpoints
+### ToolInterface.php
 
-## Base Classes
+- **Purpose**: Interface defining the contract for all development tools
+- **Methods**:
+  - `init()`: Initialize the tool functionality
+  - `register_rest_routes()`: Register REST API endpoints
 
-Tools extend `ToolBase` which provides:
+## Tool Architecture
 
-- Configuration access via `wp_dev_toolkit()`
-- Permission checking methods
-- Common tool utilities
+The tool system follows a consistent pattern:
+
+```
+ToolInterface (Contract)
+    ↑
+ToolBase (Abstract Implementation)
+    ↑
+Concrete Tools (ErrorLogger, QueryMonitor, etc.)
+```
 
 ## Usage
 
@@ -60,6 +73,6 @@ interface.
 
 ## Dependencies
 
-- ToolInterface and ToolBase classes
-- Main plugin configuration
-- WordPress core APIs (hooks, database, etc.)</content> <parameter name="filePath">resources/docs/tools-scope.md
+- Main plugin class for global access
+- WordPress core APIs (hooks, database, logging, etc.)
+- PSR-4 autoloading for class resolution</content> <parameter name="filePath">resources/docs/tools-scope.md

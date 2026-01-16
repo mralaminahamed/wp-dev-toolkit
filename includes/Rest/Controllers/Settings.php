@@ -2,8 +2,8 @@
 
 namespace WPDevToolkit\REST\Controllers;
 
+use WPDevToolkit\Admin\Config;
 use WPDevToolkit\REST\Base;
-use WPDevToolkit\Core\Config;
 
 /**
  * Settings REST API Controller
