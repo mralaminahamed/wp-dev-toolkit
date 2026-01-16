@@ -81,6 +81,7 @@ import axios from 'axios';
 
 // 4. Internal modules (@/)
 import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
+import { STORE_NAME } from '@/stores/settings';
 
 // 5. Relative imports
 import Dashboard from './components/Dashboard';
@@ -91,10 +92,10 @@ import Dashboard from './components/Dashboard';
 ### WordPress Plugin Structure
 
 - **Entry Point**: `wp-dev-toolkit.php` - Plugin bootstrap with constants and initialization
-- **Main Class**: `class-wp-dev-toolkit.php` - Main plugin class following singleton pattern (autoloaded)
+- **Main Class**: `class-wp-dev-toolkit.php` - Main plugin class following singleton pattern (Composer autoloaded)
 - **Global Access**: `wp_dev_toolkit()` function provides access to main plugin instance
 - **Dependency Access**: All classes use `wp_dev_toolkit()` to access config and other dependencies
-- **Core Classes**: Config, Logger, Assets, Menu in `WPDevToolkit\Core\`
+- **Core Classes**: Config, Logger, Assets, Menu in `WPDevToolkit\Admin\`
 - **Tool System**: Implements `ToolInterface`, factory pattern for tool registration
 - **REST API**: Base controller with `/wp-dev-toolkit/v1/` prefix, `manage_options` capability required
 
@@ -103,8 +104,29 @@ import Dashboard from './components/Dashboard';
 - **Router**: Hash-based routing with React Router
 - **Components**: Dashboard, ErrorLog, QueryMonitor, HookInspector, Terminal, Settings, SystemInfo
 - **Styling**: Tailwind CSS v4 with CSS-first configuration
-- **Data**: WordPress API fetch, custom hooks, Zustand store
+- **Data**: WordPress data stores with WC Affiliate patterns, API fetch, custom hooks
 - **Build**: @wordpress/scripts with webpack, TypeScript compilation
+
+### Store Architecture (WC Affiliate Patterns)
+
+- **Pattern**: Individual stores per feature following WC Affiliate conventions
+- **Structure**: Each store in separate directory with actions, constants, reducer, resolvers, selectors, index
+- **Actions**: Async/await functions with dispatch destructuring, operation-specific loading states
+- **State**: `isResolving` and `errors` objects for granular operation tracking
+- **Selectors**: Default exports with extensive null checking and function syntax
+- **Resolvers**: Async API calls with proper error handling
+
+**Store Structure:**
+
+```
+src/stores/{store-name}/
+├── constants.ts    # Action types and store name
+├── actions.ts      # Action creators with API calls
+├── reducer.ts      # State reducer (default export)
+├── selectors.ts    # State selectors (default export)
+├── resolvers.ts    # Data resolvers (default export)
+└── index.ts        # Store registration and exports
+```
 
 ## Development Workflow
 
@@ -112,9 +134,22 @@ import Dashboard from './components/Dashboard';
 
 1. Create tool class implementing `ToolInterface` in `includes/Tools/`
 2. Add REST controller extending `WPDevToolkit\Rest\Base`
-3. Create React component in `src/components/`
-4. Register in `Plugin::init_tools()` or via `wp_dev_toolkit_tools` filter
-5. Add route to `src/App.tsx` router configuration
+3. Create data store following WC Affiliate patterns in `src/stores/`
+4. Create React component in `src/components/`
+5. Register store in `src/stores/index.ts`
+6. Register in `Plugin::init_tools()` or via `wp_dev_toolkit_tools` filter
+7. Add route to `src/App.tsx` router configuration
+
+### Adding New Stores
+
+1. Create store directory in `src/stores/{store-name}/`
+2. Create `constants.ts` with STORE_NAME and action types
+3. Create `actions.ts` with async/await functions using WC Affiliate patterns
+4. Create `reducer.ts` with default export and isResolving/errors state
+5. Create `selectors.ts` with default export and null checking
+6. Create `resolvers.ts` with async API calls (optional)
+7. Create `index.ts` to register store with WordPress data registry
+8. Import and register store in `src/stores/index.ts`
 
 ### Adding REST Endpoints
 
@@ -229,14 +264,16 @@ register_rest_route(
 wp-dev-toolkit/
 ├── class-wp-dev-toolkit.php    # Main plugin class (Composer autoloaded)
 ├── includes/                   # PHP classes (PSR-4 autoloaded)
-│   ├── Core/                  # Core functionality
+│   ├── Admin/                 # Admin functionality (Config, Assets, Menu)
 │   ├── Tools/                 # Tool implementations
 │   ├── Rest/Controllers/      # REST API controllers
+│   ├── Utilities/             # Utility classes (Helpers, Logger)
 │   └── Base/                  # Interfaces and base classes
 ├── src/                       # React/TypeScript frontend
 │   ├── components/            # React components
 │   ├── hooks/                 # Custom React hooks
-│   ├── store/                 # State management
+│   ├── stores/                # WordPress data stores (WC Affiliate patterns)
+│   ├── types/                 # TypeScript type definitions
 │   └── styles/                # CSS/SCSS files
 ├── tests/                     # Test files
 │   ├── Unit/                  # Unit tests
@@ -245,9 +282,10 @@ wp-dev-toolkit/
 └── resources/                 # Static resources
 ```
 
-wp-dev-toolkit/ ├── class-wp-dev-toolkit.php # Main plugin class ├── includes/ # PHP classes (PSR-4) │ ├── Core/ # Core functionality │ ├── Tools/ # Tool implementations │ ├── Rest/Controllers/ # REST
-API controllers │ └── Base/ # Interfaces and base classes ├── src/ # React/TypeScript frontend │ ├── components/ # React components │ ├── hooks/ # Custom React hooks │ ├── store/ # State management │
-└── styles/ # CSS/SCSS files ├── tests/ # Test files │ ├── Unit/ # Unit tests │ └── Integration/ # Integration tests ├── .cursor/rules/ # IDE configuration └── resources/ # Static resources
+wp-dev-toolkit/ ├── class-wp-dev-toolkit.php # Main plugin class ├── includes/ # PHP classes (PSR-4) │ ├── Admin/ # Admin functionality │ ├── Tools/ # Tool implementations │ ├── Rest/Controllers/ #
+REST API controllers │ ├── Utilities/ # Utility classes │ └── Base/ # Interfaces and base classes ├── src/ # React/TypeScript frontend │ ├── components/ # React components │ ├── hooks/ # Custom React
+hooks │ ├── stores/ # WordPress data stores │ ├── types/ # TypeScript definitions │ └── styles/ # CSS/SCSS files ├── tests/ # Test files │ ├── Unit/ # Unit tests │ └── Integration/ # Integration tests
+├── .cursor/rules/ # IDE configuration └── resources/ # Static resources
 
 ```
 
@@ -264,9 +302,10 @@ API controllers │ └── Base/ # Interfaces and base classes ├── src/
 ## Performance Considerations
 
 - **CSS**: Tailwind v4 with tree-shaking for unused styles
-- **JavaScript**: Code splitting with dynamic imports where appropriate
+- **JavaScript**: Code splitting with dynamic imports, modular store architecture
 - **PHP**: Efficient database queries, proper caching strategies
 - **Assets**: Optimized bundling with @wordpress/scripts
+- **Stores**: WC Affiliate patterns with granular operation tracking
 - **Images**: Lazy loading and proper sizing
 
 Always run quality checks before committing and ensure all tests pass.
