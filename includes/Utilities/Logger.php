@@ -178,7 +178,7 @@ class Logger {
 }
 
 //// Usage example:
-//use WPDevToolkit\Core\Logger;
+//use WPDevToolkit\Utilities\Logger;
 //use const WPDevToolkit\Core\WP_CONTENT_DIR;
 //use const WPDevToolkit\Core\WP_DEBUG;
 //

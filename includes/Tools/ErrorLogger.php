@@ -9,7 +9,7 @@
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
-use WPDevToolkit\Core\Logger;
+use WPDevToolkit\Utilities\Logger;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {

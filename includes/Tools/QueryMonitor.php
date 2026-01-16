@@ -3,7 +3,7 @@
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
-use WPDevToolkit\Core\Logger;
+use WPDevToolkit\Utilities\Logger;
 use function add_filter;
 use function register_rest_route;
 use function rest_ensure_response;

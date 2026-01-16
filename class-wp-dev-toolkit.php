@@ -33,7 +33,7 @@ class WP_Dev_Toolkit {
 	 * Configuration instance
 	 *
 	 * @since 1.0.0
-	 * @var WPDevToolkit\Core\Config
+	 * @var \WPDevToolkit\Admin\Config
 	 */
 	private $config;
 
@@ -146,7 +146,7 @@ class WP_Dev_Toolkit {
 		\load_plugin_textdomain( 'wp-dev-toolkit', false, dirname( plugin_basename( WP_DEV_TOOLKIT_FILE ) ) . '/languages' );
 
 		// Initialize logger first
-		WPDevToolkit\Core\Logger::init();
+		WPDevToolkit\Utilities\Logger::init();
 	}
 
 	/**
@@ -156,11 +156,11 @@ class WP_Dev_Toolkit {
 	 * @return void
 	 */
 	private function setup_components() {
-		$this->config            = new WPDevToolkit\Core\Config();
+		$this->config            = new \WPDevToolkit\Admin\Config();
 		$this->tool_factory      = new WPDevToolkit\Tools\Factory();
 		$this->menu              = new WPDevToolkit\Admin\Menu();
 		$this->controller_loader = new WPDevToolkit\REST\ControllerLoader();
-		$this->assets            = new WPDevToolkit\Frontend\Assets();
+		$this->assets            = new \WPDevToolkit\Admin\Assets();
 
 		// Initialize components
 		$this->menu->init();
@@ -190,7 +190,7 @@ class WP_Dev_Toolkit {
 		$error = error_get_last();
 
 		if ( $error && in_array( $error['type'], array( E_ERROR, E_PARSE, E_COMPILE_ERROR, E_CORE_ERROR ) ) ) {
-			WPDevToolkit\Core\Logger::log(
+			WPDevToolkit\Utilities\Logger::log(
 				sprintf(
 					'Fatal Error: %s in %s on line %d',
 					$error['message'],
@@ -210,7 +210,7 @@ class WP_Dev_Toolkit {
 	 * @return void
 	 */
 	public function handle_exception( $exception ) {
-		WPDevToolkit\Core\Logger::log(
+		WPDevToolkit\Utilities\Logger::log(
 			sprintf(
 				'Uncaught Exception: %s in %s on line %d',
 				$exception->getMessage(),
@@ -312,7 +312,7 @@ class WP_Dev_Toolkit {
 					$this->tools[ $tool_name ] = $tool;
 					$tool->init();
 				} catch ( Exception $e ) {
-					WPDevToolkit\Core\Logger::log(
+					WPDevToolkit\Utilities\Logger::log(
 						sprintf( 'Failed to create tool %s: %s', $tool_name, $e->getMessage() ),
 						'error'
 					);
@@ -331,12 +331,12 @@ class WP_Dev_Toolkit {
 	 * @throws InvalidArgumentException If tool class is invalid
 	 */
 	public function register_tool( $name, $class ) {
-		if ( ! class_exists( $class ) || ! in_array( 'WPDevToolkit\\Base\\ToolInterface', class_implements( $class ) ) ) {
+		if ( ! class_exists( $class ) || ! in_array( 'WPDevToolkit\\Tools\\ToolInterface', class_implements( $class ) ) ) {
 			throw new InvalidArgumentException( "Invalid tool class: $class" );
 		}
 
 		$this->tools[ $name ] = new $class();
-		WPDevToolkit\Core\Logger::log(
+		WPDevToolkit\Utilities\Logger::log(
 			sprintf( 'Registered tool: %s (%s)', $name, $class ),
 			'info'
 		);
@@ -345,9 +345,10 @@ class WP_Dev_Toolkit {
 	/**
 	 * Get a registered tool
 	 *
-	 * @since 1.0.0
 	 * @param string $name Tool name
-	 * @return WPDevToolkit\Base\ToolInterface|null
+	 *
+	 * @return \WPDevToolkit\Tools\ToolInterface|null
+	 *@since 1.0.0
 	 */
 	public function get_tool( $name ) {
 		return isset( $this->tools[ $name ] ) ? $this->tools[ $name ] : null;
@@ -376,8 +377,8 @@ class WP_Dev_Toolkit {
 	/**
 	 * Get the config instance
 	 *
+	 * @return \WPDevToolkit\Admin\Config
 	 * @since 1.0.0
-	 * @return WPDevToolkit\Core\Config
 	 */
 	public function get_config() {
 		return $this->config;

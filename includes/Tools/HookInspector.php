@@ -4,7 +4,7 @@
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
-use WPDevToolkit\Core\Logger;
+use WPDevToolkit\Utilities\Logger;
 use function add_action;
 use function get_transient;
 use function register_rest_route;

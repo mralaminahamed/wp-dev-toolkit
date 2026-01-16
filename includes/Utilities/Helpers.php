@@ -7,7 +7,7 @@
 
 namespace WPDevToolkit\Utilities;
 
-use WPDevToolkit\Core\Logger;
+use WPDevToolkit\Utilities\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
