@@ -3,8 +3,8 @@
  * WordPress Development Toolkit
  *
  * @package           WPDevToolkit
- * @author            Mr Alamin Ahamed
- * @copyright         2025 Mr Alamin Ahamed
+ * @author            A-Amin Ahamed
+ * @copyright         2025 A-Amin Ahamed
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
@@ -14,8 +14,8 @@
  * Version:           1.0.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
- * Author:            Mr Alamin Ahamed
- * Author URI:        https://mralaminahamed.com
+ * Author:            A-Amin Ahamed
+ * Author URI:        https://alaminahamed.com
  * Text Domain:       wp-dev-toolkit
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html

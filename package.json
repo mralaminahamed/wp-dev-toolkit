@@ -2,7 +2,7 @@
   "name": "wp-dev-toolkit",
   "version": "1.0.0",
   "description": "A comprehensive toolkit for WordPress plugin development with React-based admin interface, debugging tools, and developer utilities",
-  "author": "Mr Alamin Ahamed <contact@mralaminahamed.com> (https://mralaminahamed.com)",
+  "author": "A-Amin Ahamed <contact@mralaminahamed.com> (https://alaminahamed.com)",
   "license": "GPL-2.0-or-later",
   "homepage": "https://github.com/mralaminahamed/wp-dev-toolkit",
   "repository": {
