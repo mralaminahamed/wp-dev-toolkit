@@ -1,13 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Code, Info, ArrowRight, List } from "lucide-react";
 
-import {
-  TextareaControl,
-  Button,
-  Spinner,
-  Dashicon,
-  SelectControl,
-} from "@wordpress/components";
 import { useSelect } from "@wordpress/data";
+
+import { Button } from "@/components/ui/button";
 
 import { STORE_NAME as TERMINAL_STORE } from "@/stores/terminal/constants";
 
@@ -177,7 +173,7 @@ const Terminal: React.FC = () => {
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:justify-between wdt:items-center">
             <div className="wdt:flex wdt:items-center wdt:gap-2">
-              <Dashicon icon="editor-code" />
+              <Code />
               <h2>Command Line Interface</h2>
             </div>
             <div className="wdt:flex wdt:gap-2">
@@ -202,7 +198,7 @@ const Terminal: React.FC = () => {
                 />
               </div>
               <div className="wdt:flex wdt:items-center wdt:text-sm wdt:text-gray-500 wdt:ml-auto">
-                <Dashicon icon="info-outline" className="wdt:mr-2" />
+                <Info className="wdt:mr-2" />
                 <span>Press Tab for command completion</span>
               </div>
             </div>
@@ -227,7 +223,7 @@ const Terminal: React.FC = () => {
               <div
                 className={`${terminalTheme === "dark" ? "wdt:text-green-400" : "wdt:text-gray-600"} wdt:px-2 wdt:flex wdt:items-center`}
               >
-                <Dashicon icon="arrow-right-alt2" />
+                <ArrowRight />
               </div>
               <input
                 ref={inputRef}
@@ -249,7 +245,7 @@ const Terminal: React.FC = () => {
           </div>
           <div className="wdt:p-4 wdt:border-t wdt:border-gray-200 wdt:bg-gray-50 wdt:rounded-b-lg">
             <div className="wdt:flex wdt:items-center wdt:text-sm wdt:text-gray-500">
-              <Dashicon icon="info-outline" className="wdt:mr-2" />
+              <Info className="wdt:mr-2" />
               <span>
                 Use the up/down arrow keys to navigate command history.
               </span>
@@ -261,7 +257,7 @@ const Terminal: React.FC = () => {
       <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:mt-6">
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:items-center wdt:gap-2">
-            <Dashicon icon="list-view" />
+            <List />
             <h2>Command History</h2>
           </div>
         </div>
