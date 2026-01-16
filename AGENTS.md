@@ -46,7 +46,7 @@ composer run all
 - **Imports**: Organized in groups (React → WordPress → External → Internal → Relative)
 - **Types**: Strict TypeScript mode, explicit types required, no `any` except when necessary
 - **Components**: Use `React.FC<Interface>` pattern with proper prop interfaces
-- **Hooks**: Custom hooks prefixed with `use`, follow Rules of Hooks
+- **Stores**: Direct store usage following WC Affiliate patterns
 - **Error Handling**: Try-catch blocks with console.error logging, graceful fallbacks
 - **Naming**: camelCase for variables/functions, PascalCase for components/classes
 
@@ -80,8 +80,8 @@ import { Button } from '@wordpress/components';
 import axios from 'axios';
 
 // 4. Internal modules (@/)
-import { useWPDevToolkit } from '@/hooks/useWPDevToolkit';
 import { STORE_NAME } from '@/stores/settings';
+import selectors from '@/stores/settings/selectors';
 
 // 5. Relative imports
 import Dashboard from './components/Dashboard';
@@ -208,7 +208,7 @@ register_rest_route(
 - **Formatter**: 2-space indent, 200 char width, single quotes, trailing commas
 - **Import Groups**: React → WordPress → External → Internal → Relative
 - **Linting**: ESLint with React hooks, import order, JSX accessibility rules
-- **Patterns**: React FC components, custom hooks, WordPress API fetch, WordPress components
+- **Patterns**: React FC components, WordPress data stores, WordPress API fetch, WordPress components
 
 ### PHP Rules
 
@@ -271,7 +271,6 @@ wp-dev-toolkit/
 │   └── Base/                  # Interfaces and base classes
 ├── src/                       # React/TypeScript frontend
 │   ├── components/            # React components
-│   ├── hooks/                 # Custom React hooks
 │   ├── stores/                # WordPress data stores (WC Affiliate patterns)
 │   ├── types/                 # TypeScript type definitions
 │   └── styles/                # CSS/SCSS files
@@ -283,9 +282,9 @@ wp-dev-toolkit/
 ```
 
 wp-dev-toolkit/ ├── class-wp-dev-toolkit.php # Main plugin class ├── includes/ # PHP classes (PSR-4) │ ├── Admin/ # Admin functionality │ ├── Tools/ # Tool implementations │ ├── Rest/Controllers/ #
-REST API controllers │ ├── Utilities/ # Utility classes │ └── Base/ # Interfaces and base classes ├── src/ # React/TypeScript frontend │ ├── components/ # React components │ ├── hooks/ # Custom React
-hooks │ ├── stores/ # WordPress data stores │ ├── types/ # TypeScript definitions │ └── styles/ # CSS/SCSS files ├── tests/ # Test files │ ├── Unit/ # Unit tests │ └── Integration/ # Integration tests
-├── .cursor/rules/ # IDE configuration └── resources/ # Static resources
+REST API controllers │ ├── Utilities/ # Utility classes │ └── Base/ # Interfaces and base classes ├── src/ # React/TypeScript frontend │ ├── components/ # React components │ ├── stores/ # WordPress
+data stores hooks │ ├── stores/ # WordPress data stores │ ├── types/ # TypeScript definitions │ └── styles/ # CSS/SCSS files ├── tests/ # Test files │ ├── Unit/ # Unit tests │ └── Integration/ #
+Integration tests ├── .cursor/rules/ # IDE configuration └── resources/ # Static resources
 
 ```
 
