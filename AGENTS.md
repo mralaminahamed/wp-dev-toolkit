@@ -43,9 +43,10 @@ composer run all
 ### TypeScript/JavaScript Standards
 
 - **Formatting**: 2-space indentation, single quotes, 200 character line width
-- **Imports**: Organized in groups (React → WordPress → External → Internal → Relative)
+- **Imports**: Organized in groups (React → External → Internal (@/) → Relative)
 - **Types**: Strict TypeScript mode, explicit types required, no `any` except when necessary
 - **Components**: Use `React.FC<Interface>` pattern with proper prop interfaces
+- **UI Library**: Magic UI as primary, shadcn/ui as fallback (no WordPress components)
 - **Stores**: Direct store usage following WC Affiliate patterns
 - **Error Handling**: Try-catch blocks with console.error logging, graceful fallbacks
 - **Naming**: camelCase for variables/functions, PascalCase for components/classes
@@ -61,8 +62,8 @@ composer run all
 
 ### CSS/Tailwind Standards
 
-- **Prefix**: `wdt` (Tailwind v4 prefix for WordPress compatibility)
-- **Architecture**: BEM-style naming with `wp-dev-toolkit-` prefix for components
+- **Prefix**: `wdt:` (Tailwind v4 prefix for WordPress compatibility)
+- **Architecture**: Pure Tailwind utility classes with shadcn/ui components
 - **Responsive**: Mobile-first approach with Tailwind responsive utilities
 - **Custom Properties**: CSS variables for theme tokens in `:root`
 - **Preflight**: Disabled to preserve WordPress admin styles
@@ -71,20 +72,21 @@ composer run all
 
 ```typescript
 // 1. React imports
-import React from 'react';
+import React from "react";
 
-// 2. WordPress imports
-import { Button } from '@wordpress/components';
+// 2. External dependencies
+import axios from "axios";
 
-// 3. External dependencies
-import axios from 'axios';
+// 3. UI Components (Magic UI primary, shadcn/ui fallback)
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 // 4. Internal modules (@/)
-import { STORE_NAME } from '@/stores/settings';
-import selectors from '@/stores/settings/selectors';
+import { STORE_NAME } from "@/stores/settings";
+import selectors from "@/stores/settings/selectors";
 
 // 5. Relative imports
-import Dashboard from './components/Dashboard';
+import Dashboard from "./components/Dashboard";
 ```
 
 ## Architecture Overview
@@ -103,8 +105,9 @@ import Dashboard from './components/Dashboard';
 
 - **Router**: Hash-based routing with React Router
 - **Components**: Dashboard, ErrorLog, QueryMonitor, HookInspector, Terminal, Settings, SystemInfo
-- **Styling**: Tailwind CSS v4 with CSS-first configuration
-- **Data**: WordPress data stores with WC Affiliate patterns, API fetch, custom hooks
+- **UI Library**: Magic UI as primary, shadcn/ui as fallback (no WordPress components)
+- **Styling**: Tailwind CSS v4 with `wdt:` prefix for WordPress compatibility
+- **Data**: WordPress data stores with WC Affiliate patterns, API fetch
 - **Build**: @wordpress/scripts with webpack, TypeScript compilation
 
 ### Store Architecture (WC Affiliate Patterns)
@@ -206,9 +209,9 @@ register_rest_route(
 ### TypeScript Rules
 
 - **Formatter**: 2-space indent, 200 char width, single quotes, trailing commas
-- **Import Groups**: React → WordPress → External → Internal → Relative
+- **Import Groups**: React → External → UI Components → Internal → Relative
 - **Linting**: ESLint with React hooks, import order, JSX accessibility rules
-- **Patterns**: React FC components, WordPress data stores, WordPress API fetch, WordPress components
+- **Patterns**: React FC components, WordPress data stores, WordPress API fetch, shadcn/ui components
 
 ### PHP Rules
 
@@ -247,7 +250,7 @@ register_rest_route(
 - Proper error boundaries with fallback UI
 - React hooks rules compliance
 - TypeScript strict mode adherence
-- WordPress component library usage
+- Magic UI component library usage
 - Accessibility considerations
 
 ### PHP Best Practices

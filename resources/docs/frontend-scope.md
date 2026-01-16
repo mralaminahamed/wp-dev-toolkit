@@ -86,14 +86,14 @@ const actions = {
 
   fetchData() {
     return async ({ dispatch }) => {
-      dispatch(actions.setIsResolving('fetch', true));
+      dispatch(actions.setIsResolving("fetch", true));
       try {
-        const data = await apiFetch({ path: '/endpoint' });
+        const data = await apiFetch({ path: "/endpoint" });
         dispatch(actions.setData(data));
       } catch (error) {
-        dispatch(actions.setError('fetch', error.message));
+        dispatch(actions.setError("fetch", error.message));
       } finally {
-        dispatch(actions.setIsResolving('fetch', false));
+        dispatch(actions.setIsResolving("fetch", false));
       }
     };
   },
@@ -151,7 +151,7 @@ export default {
 
 - Functional components with TypeScript
 - React.FC pattern with proper prop interfaces
-- WordPress component library integration
+- Magic UI component library integration (shadcn/ui fallback)
 - Custom hooks for store interactions
 
 ### Key Components
@@ -208,6 +208,7 @@ export default {
 
 - **@wordpress/data**: WordPress data stores
 - **@wordpress/api-fetch**: API communication
-- **@wordpress/components**: UI components
+- **Magic UI**: Primary UI component library
+- **shadcn/ui**: Fallback UI components
 - **React/TypeScript**: Frontend framework
 - **Tailwind CSS**: Styling framework

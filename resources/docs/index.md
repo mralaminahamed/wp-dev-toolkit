@@ -68,7 +68,7 @@ Modern frontend architecture with WordPress data stores:
 
 - React components for each feature
 - TypeScript interfaces for props and state
-- WordPress component library integration
+- Magic UI component library integration (shadcn/ui fallback)
 
 #### **Stores** (`src/stores/`) - WC Affiliate Patterns
 
