@@ -190,12 +190,22 @@ const Terminal: React.FC = () => {
           <div className="wdt:p-4 wdt:bg-gray-50 wdt:border-b wdt:border-gray-200">
             <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-4">
               <div className="wdt:w-64">
-                <SelectControl
-                  label="Common Commands"
-                  value={commonCommands}
-                  options={wpCommonCommands}
-                  onChange={handleCommonCommandSelect}
-                />
+                <label className="wdt:block">
+                  <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                    Common Commands
+                  </span>
+                  <select
+                    value={commonCommands}
+                    onChange={(e) => handleCommonCommandSelect(e.target.value)}
+                    className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                  >
+                    {wpCommonCommands.map((cmd: any) => (
+                      <option key={cmd.value} value={cmd.value}>
+                        {cmd.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
               <div className="wdt:flex wdt:items-center wdt:text-sm wdt:text-gray-500 wdt:ml-auto">
                 <Info className="wdt:mr-2" />
@@ -211,7 +221,7 @@ const Terminal: React.FC = () => {
               {output}
               {isLoading && (
                 <div className="wdt:flex wdt:items-center wdt:text-white wdt:mt-2">
-                  <Spinner />{" "}
+                  <div className="wdt:animate-spin wdt:rounded-full wdt:h-4 wdt:w-4 wdt:border-b-2 wdt:border-blue-600"></div>{" "}
                   <span className="wdt:ml-2">Executing command...</span>
                 </div>
               )}
@@ -234,10 +244,10 @@ const Terminal: React.FC = () => {
                 placeholder="Enter command..."
               />
               <Button
-                className=""
-                icon="editor-code"
+                className="wdt:mt-2"
+                onClick={executeCommand}
+                disabled={isExecuting}
                 type="submit"
-                disabled={isLoading}
               >
                 Execute
               </Button>
@@ -291,10 +301,9 @@ const Terminal: React.FC = () => {
                     </td>
                     <td className="wdt:py-3 wdt:px-4">
                       <Button
-                        isSmall
+                        size="sm"
                         variant="secondary"
                         onClick={() => setInput(cmd.command)}
-                        icon="editor-paste-text"
                       >
                         Use
                       </Button>
