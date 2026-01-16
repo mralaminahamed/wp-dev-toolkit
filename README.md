@@ -87,7 +87,7 @@ After activation, you'll find a new "Dev Toolkit" menu item in your WordPress ad
 You can configure the plugin through the Settings interface or programmatically:
 
 ```php
-use WPDevToolkit\Core\Config;
+use WPDevToolkit\Admin\Config;
 
 $config = new Config();
 $config->update([

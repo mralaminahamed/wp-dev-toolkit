@@ -2,7 +2,7 @@
 @import "tailwindcss/preflight.css" layer(base) important;
 @import "tailwindcss/utilities.css" layer(utilities) important;
 
-@source "../../src/**/*.{js,jsx,ts,tsx}";
+@source "./src/**/*.{js,jsx,ts,tsx}";
 
 @theme {
   --color-primary-50: #f0f6fc;
