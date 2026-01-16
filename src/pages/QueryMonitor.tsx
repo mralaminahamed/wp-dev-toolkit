@@ -264,7 +264,7 @@ const QueryMonitor: React.FC = () => {
       {/* Quick Actions */}
       <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:mb-6">
         <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-4">
-          <Button onClick={fetchQueries} disabled={isLoading} icon="refresh">
+          <Button onClick={fetchQueries} disabled={isLoading}>
             {isLoading ? "Refreshing..." : "Refresh Queries"}
           </Button>
 
@@ -278,11 +278,17 @@ const QueryMonitor: React.FC = () => {
           </Button>
 
           <div className="wdt:ml-auto wdt:flex wdt:items-center wdt:gap-2">
-            <ToggleControl
-              label="Show optimization tips"
-              checked={showOptimizationTips}
-              onChange={() => setShowOptimizationTips(!showOptimizationTips)}
-            />
+            <label className="wdt:flex wdt:items-center wdt:gap-2 wdt:cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showOptimizationTips}
+                onChange={() => setShowOptimizationTips(!showOptimizationTips)}
+                className="wdt:rounded wdt:border-gray-300 wdt:text-blue-600 wdt:focus:ring-blue-500"
+              />
+              <span className="wdt:text-sm wdt:font-medium">
+                Show optimization tips
+              </span>
+            </label>
           </div>
         </div>
       </div>
@@ -373,35 +379,48 @@ const QueryMonitor: React.FC = () => {
         <div className="wdt:px-6">
           <div className="wdt:grid wdt:grid-cols-1 md:wdt:grid-cols-3 wdt:gap-6">
             <div>
-              <TextControl
-                label="Search Queries"
-                value={searchTerm}
-                onChange={handleSearch}
-                placeholder="Search in query or caller..."
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Search Queries
+                </span>
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Search in query or caller..."
+                  className="wdt:mt-1"
+                />
+              </label>
             </div>
             <div>
-              <SelectControl
-                label="Sort By"
-                value={queryOptions.order}
-                options={[
-                  { label: "Execution Time", value: "time" },
-                  { label: "Caller", value: "caller" },
-                  { label: "Query", value: "query" },
-                ]}
-                onChange={handleOrderChange}
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Sort By
+                </span>
+                <select
+                  value={queryOptions.order}
+                  onChange={(e) => handleOrderChange(e.target.value)}
+                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                >
+                  <option value="time">Execution Time</option>
+                  <option value="caller">Caller</option>
+                  <option value="query">Query</option>
+                </select>
+              </label>
             </div>
             <div>
-              <SelectControl
-                label="Direction"
-                value={queryOptions.direction}
-                options={[
-                  { label: "Descending", value: "desc" },
-                  { label: "Ascending", value: "asc" },
-                ]}
-                onChange={handleDirectionChange}
-              />
+              <label className="wdt:block">
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Direction
+                </span>
+                <select
+                  value={queryOptions.direction}
+                  onChange={(e) => handleDirectionChange(e.target.value)}
+                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
+                >
+                  <option value="desc">Descending</option>
+                  <option value="asc">Ascending</option>
+                </select>
+              </label>
             </div>
           </div>
 
@@ -555,8 +574,7 @@ const QueryMonitor: React.FC = () => {
                             <Button
                               variant="secondary"
                               onClick={() => viewQueryDetails(query)}
-                              isSmall
-                              icon="visibility"
+                              size="sm"
                             >
                               View
                             </Button>
