@@ -3,40 +3,60 @@ namespace WPDevToolkit\Admin;
 
 use WPDevToolkit\Admin\Config;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Assets Manager Class
  *
  * Handles registration and enqueuing of CSS, JS, and other assets
  *
  * @package WPDevToolkit\Admin
+ * @since 1.0.0
  */
 class Assets {
-    /**
-     * Constructor
-     */
-    public function __construct() {
-        // Constructor logic if needed
-    }
 
-    /**
-     * Get configuration instance
-     *
-     * @return Config
-     */
-    protected function get_config() {
-        return wp_dev_toolkit()->get_config();
-    }
+	/**
+	 * Script dependencies
+	 *
+	 * @var array
+	 */
+	private $script_deps = array( 'wp-api', 'wp-api-fetch', 'wp-i18n', 'wp-components', 'wp-element' );
 
-    /**
-     * Initialize the assets manager
-     *
-     * @return void
-     */
-    public function init() {
-        add_action( 'admin_enqueue_scripts', [ $this, 'register_assets' ] );
-        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-        add_action( 'admin_head', [ $this, 'add_admin_inline_css' ] );
-    }
+	/**
+	 * Style dependencies
+	 *
+	 * @var array
+	 */
+	private $style_deps = array();
+
+	/**
+	 * Controller constructor
+	 *
+	 * Initializes the assets manager and registers necessary hooks
+	 */
+	public function __construct() {
+		$this->register_hooks();
+	}
+
+	/**
+	 * Register hooks for assets manager
+	 *
+	 * @return void
+	 */
+	protected function register_hooks(): void {
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'admin_head', array( $this, 'add_admin_inline_css' ) );
+	}
+
+	/**
+	 * Get configuration instance
+	 *
+	 * @return Config
+	 */
+	protected function get_config() {
+		return wp_dev_toolkit()->get_config();
+	}
 
     /**
      * Register all assets

@@ -162,8 +162,7 @@ class WP_Dev_Toolkit {
 		$this->controller_loader = new WPDevToolkit\REST\ControllerLoader();
 		$this->assets            = new \WPDevToolkit\Admin\Assets();
 
-		// Initialize components
-		$this->assets->init();
+		// Components are initialized via constructor
 	}
 
 	/**
