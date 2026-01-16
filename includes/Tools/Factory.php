@@ -8,8 +8,6 @@
 
 namespace WPDevToolkit\Tools;
 
-use WPDevToolkit\Base\ToolInterface;
-use WPDevToolkit\Core\Config;
 use Exception;
 
 // Prevent direct access.
@@ -37,25 +35,13 @@ class Factory {
 	private array $tools = [];
 
 	/**
-	 * Configuration instance
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var Config
-	 */
-	private Config $config;
-
-	/**
 	 * Constructor
 	 *
-	 * Initializes the factory with configuration and registers default tools.
+	 * Initializes the factory and registers default tools.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param Config|null $config Configuration instance. Creates new if null.
 	 */
-	public function __construct( ?Config $config = null ) {
-		$this->config = $config ?? new Config();
+	public function __construct() {
 		$this->register_default_tools();
 	}
 
@@ -150,7 +136,7 @@ class Factory {
 		}
 
 		$class = $this->tools[ $name ];
-		return new $class( $this->config );
+		return new $class();
 	}
 
 	/**

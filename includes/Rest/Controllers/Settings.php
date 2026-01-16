@@ -1,30 +1,30 @@
 <?php
 
-namespace WPDevToolkit\Rest\Controllers;
+namespace WPDevToolkit\REST\Controllers;
 
-use WPDevToolkit\Rest\Base;
-use WPDevToolkit\Core\Config;
+use WPDevToolkit\Admin\Config;
+use WPDevToolkit\REST\Base;
 
 /**
  * Settings REST API Controller
  *
- * @package WPDevToolkit\Rest\Controllers
+ * @package WPDevToolkit\REST\Controllers
  */
 class Settings extends Base {
 	/**
-	 * Configuration instance
-	 *
-	 * @var Config
+	 * Constructor
 	 */
-	protected $config;
+	public function __construct() {
+		// Constructor logic if needed
+	}
 
 	/**
-	 * Constructor
+	 * Get configuration instance
 	 *
-	 * @param Config $config Configuration instance
+	 * @return Config
 	 */
-	public function __construct( Config $config ) {
-		$this->config = $config;
+	protected function get_config() {
+		return wp_dev_toolkit()->get_config();
 	}
 
 	/**
@@ -71,7 +71,7 @@ class Settings extends Base {
 	public function get_settings() {
 		return $this->send_json_success(
 			array(
-				'settings' => $this->config->get_all(),
+				'settings' => $this->get_config()->get_all(),
 				'version'  => WP_DEV_TOOLKIT_VERSION,
 			)
 		);
@@ -91,11 +91,11 @@ class Settings extends Base {
 			return $this->send_json_error( __( 'Invalid settings data', 'wp-dev-toolkit' ) );
 		}
 
-		$this->config->update( $new_settings );
+		$this->get_config()->update( $new_settings );
 
 		return $this->send_json_success(
 			array(
-				'settings' => $this->config->get_all(),
+				'settings' => $this->get_config()->get_all(),
 				'message'  => __( 'Settings updated successfully', 'wp-dev-toolkit' ),
 			)
 		);
@@ -107,11 +107,11 @@ class Settings extends Base {
 	 * @return \WP_REST_Response
 	 */
 	public function reset_settings() {
-		$this->config->set_default_options();
+		$this->get_config()->set_default_options();
 
 		return $this->send_json_success(
 			array(
-				'settings' => $this->config->get_all(),
+				'settings' => $this->get_config()->get_all(),
 				'message'  => __( 'Settings reset to defaults', 'wp-dev-toolkit' ),
 			)
 		);

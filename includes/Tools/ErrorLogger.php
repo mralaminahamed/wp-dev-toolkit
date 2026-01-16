@@ -9,8 +9,7 @@
 namespace WPDevToolkit\Tools;
 
 use WP_REST_Server;
-use WPDevToolkit\Base\ToolBase;
-use WPDevToolkit\Core\Logger;
+use WPDevToolkit\Utilities\Logger;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,7 +34,7 @@ class ErrorLogger extends ToolBase {
 	 * @var string
 	 */
 	public const TOOL_KEY = 'error_logging';
-	
+
 	/**
 	 * Log file path
 	 *
@@ -51,11 +50,9 @@ class ErrorLogger extends ToolBase {
 	 * Initializes the error logger with configuration and sets up log file path.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param \WPDevToolkit\Core\Config $config Configuration instance.
 	 */
-	public function __construct( \WPDevToolkit\Core\Config $config ) {
-		parent::__construct( $config );
+	public function __construct() {
+		parent::__construct();
 		$this->log_file = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
 	}
 
@@ -71,11 +68,11 @@ class ErrorLogger extends ToolBase {
 	 */
 	public static function clean_old_logs(): void {
 		$log_file = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log';
-		
+
 		if ( ! file_exists( $log_file ) ) {
 			return;
 		}
-		
+
 		// If file is larger than 5MB, rotate it
 		if ( filesize( $log_file ) > 5 * 1024 * 1024 ) { // 5MB limit
 			$backup_file = WP_CONTENT_DIR . '/wp-dev-toolkit-error.log.bak';
@@ -84,7 +81,7 @@ class ErrorLogger extends ToolBase {
 			}
 			rename( $log_file, $backup_file );
 			file_put_contents( $log_file, 'Log file rotated at ' . date( 'Y-m-d H:i:s' ) . "\n" );
-			
+
 			// Log the rotation
 			Logger::log( 'Error log file rotated due to size limit', 'info' );
 		}
@@ -135,7 +132,7 @@ class ErrorLogger extends ToolBase {
 			set_error_handler( [ $this, 'custom_error_handler' ] );
 		}
 	}
-	
+
 	/**
 	 * Custom error handler
 	 *
@@ -143,7 +140,7 @@ class ErrorLogger extends ToolBase {
 	 * @param string $errstr  Error message
 	 * @param string $errfile File where error occurred
 	 * @param int    $errline Line number where error occurred
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function custom_error_handler( $errno, $errstr, $errfile, $errline ) {
@@ -151,20 +148,20 @@ class ErrorLogger extends ToolBase {
 		if ( ! ( error_reporting() & $errno ) ) {
 			return false;
 		}
-		
+
 		$error_type = $this->get_error_type( $errno );
 		$log_message = "$error_type: $errstr in $errfile on line $errline";
 		Logger::log( $log_message, 'error' );
-		
+
 		// Let PHP handle the error as well
 		return false;
 	}
-	
+
 	/**
 	 * Get error type string from error number
 	 *
 	 * @param int $errno Error number
-	 * 
+	 *
 	 * @return string
 	 */
 	private function get_error_type( $errno ) {
@@ -262,7 +259,7 @@ class ErrorLogger extends ToolBase {
 			// Security: Limit the amount of data that can be read.
 			$max_size = 1024 * 1024; // 1MB limit.
 			$file_size = filesize( $this->log_file );
-			
+
 			if ( $file_size > $max_size ) {
 				// Read only the last portion of large files.
 				$handle = fopen( $this->log_file, 'r' );
@@ -324,10 +321,10 @@ class ErrorLogger extends ToolBase {
 				current_time( 'Y-m-d H:i:s' ),
 				get_current_user_id()
 			);
-			
+
 			file_put_contents( $this->log_file, $cleared_message . "\n" );
 			Logger::log( 'Error log cleared manually by user ID: ' . get_current_user_id(), 'info' );
-			
+
 			return rest_ensure_response(
 				[
 					'success' => true,

@@ -42,3 +42,4 @@ phpunit.xml
 
 # Compiled JavaScript
 *.min.js
+/.husky/

@@ -1,32 +1,91 @@
-# WordPress Development Toolkit - Core Components
+# WP Dev Toolkit - Includes Directory
 
-This directory contains the core components of the WordPress Development Toolkit plugin, organized into logical
-subdirectories.
+This directory contains all PHP classes for the WP Dev Toolkit plugin, organized by functional scope for improved maintainability and code discovery.
 
 ## Directory Structure
 
-- `Admin/`: Admin interface components and menu handling
-- `Base/`: Base classes and interfaces for tool implementation
-- `Core/`: Core functionality including plugin main class and configuration
-- `Rest/`: REST API controllers and endpoints
-- `Tools/`: Individual developer tools implementation
-- `Utilities/`: Helper functions and utility classes
+```
+includes/
+├── Admin/           # WordPress admin interface components
+├── Frontend/        # Frontend assets and functionality
+├── REST/           # REST API controllers and base classes
+├── Utilities/      # Helper functions and logging system
+├── Tools/          # Development tool implementations
+├── Base/           # Base classes and interfaces
+└── Core/           # Core functionality (Config.php)
+```
 
-## Organization Philosophy
+## Scope Organization
 
-The codebase follows these design principles:
+### Admin (`Admin/`)
 
-1. **Separation of Concerns**: Each directory contains components with a specific responsibility
-2. **Consistent Namespacing**: Namespaces match directory structure for easier navigation
-3. **Extensibility**: Core functionality is designed to be extended through hooks and interfaces
-4. **Component-Based Design**: Functionality is broken into discrete, reusable components
+Contains WordPress admin interface integration:
 
-## Adding New Tools
+- Menu registration and page rendering
+- Admin hooks and functionality
 
-To extend the toolkit with new tools:
+### Frontend (`Frontend/`)
 
-1. Create a new tool class in the `Tools/` directory that extends `WPDevToolkit\Base\ToolBase`
-2. Create a matching REST controller in `Rest/Controllers/` if needed
-3. Register your tool in the `init_tools()` method of the `Plugin` class
+Manages frontend assets and client-side functionality:
 
-See the documentation in individual directories for more specific information.
+- Asset registration and enqueuing
+- Script localization
+- Frontend dependencies
+
+### REST (`REST/`)
+
+Handles all REST API functionality:
+
+- API controllers for each feature
+- Base controller classes
+- API endpoint management
+
+### Utilities (`Utilities/`)
+
+Shared utility functions and services:
+
+- Logging system
+- Helper functions
+- Common utilities
+
+### Tools (`Tools/`)
+
+Development tool implementations:
+
+- Error logging, query monitoring, hook inspection
+- Tool factory and registration
+- Individual tool classes
+
+### Base (`Base/`)
+
+Foundational classes and interfaces:
+
+- ToolInterface (contract for all tools)
+- ToolBase (abstract base class)
+- Common interfaces
+
+### Core (`Core/`)
+
+Essential plugin functionality:
+
+- Configuration management
+- Core plugin systems
+
+## Architecture Notes
+
+- **PSR-4 Autoloading**: All classes follow PSR-4 namespace conventions
+- **Global Access**: Use `wp_dev_toolkit()` for accessing main plugin instance
+- **Dependency Injection**: Replaced with global access pattern for simplicity
+- **Scope Separation**: Clear functional boundaries improve maintainability
+
+## Development Guidelines
+
+- New features should be added to appropriate scope directories
+- Follow existing naming conventions and patterns
+- Update documentation when adding new functionality
+- Use the global `wp_dev_toolkit()` function for plugin access
+
+## See Also
+
+- [AGENTS.md](../AGENTS.md) - Development guidelines for AI coding agents
+- [resources/docs/](../resources/docs/) - Detailed scope documentation

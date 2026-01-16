@@ -2,10 +2,10 @@
 /**
  * REST Controllers Loader
  *
- * @package WPDevToolkit\Rest
+ * @package WPDevToolkit\REST
  */
 
-namespace WPDevToolkit\Rest;
+namespace WPDevToolkit\REST;
 
 /**
  * Controller Loader Class
@@ -21,19 +21,9 @@ class ControllerLoader {
 	private $controllers = array();
 
 	/**
-	 * Configuration instance
-	 *
-	 * @var \WPDevToolkit\Core\Config
-	 */
-	private $config;
-
-	/**
 	 * Constructor
-	 *
-	 * @param \WPDevToolkit\Core\Config $config Configuration instance
 	 */
-	public function __construct( \WPDevToolkit\Core\Config $config ) {
-		$this->config = $config;
+	public function __construct() {
 		$this->init_controllers();
 	}
 
@@ -44,7 +34,7 @@ class ControllerLoader {
 	 */
 	private function init_controllers() {
 		$this->controllers = array(
-			'settings'       => new Controllers\Settings( $this->config ),
+			'settings'       => new Controllers\Settings(),
 			'dev_mode'       => new Controllers\DevMode(),
 			'error_log'      => new Controllers\ErrorLog(),
 			'query_monitor'  => new Controllers\QueryMonitor(),
