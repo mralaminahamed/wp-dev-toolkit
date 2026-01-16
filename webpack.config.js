@@ -1,4 +1,5 @@
-const path = require('path');
+const path = require( 'path' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 
@@ -6,18 +7,40 @@ module.exports = {
   ...defaultConfig,
   devtool: 'source-map',
   entry: {
-    index: path.resolve(process.cwd(), 'src/index.tsx'),
-  },
-  output: {
-    ...defaultConfig.output,
-    path: path.resolve(process.cwd(), 'build'),
+    'app': path.resolve(process.cwd(), 'src/index.tsx'),
   },
   resolve: {
     ...defaultConfig.resolve,
-    extensions: ['.ts', '.tsx', '.js', '.json'],
+    extensions: ['.json', '.js', '.jsx', '.ts', '.tsx'],
     alias: {
       ...defaultConfig.resolve.alias,
       '@': path.resolve(__dirname, 'src/'),
     },
-  }
+  },
+  optimization: {
+    ...defaultConfig.optimization,
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+        terserOptions: {
+          output: {
+            comments: /translators:/i,
+          },
+          compress: {
+            passes: 2,
+            drop_console: true,
+          },
+          mangle: {
+            reserved: ['__', '_n', '_nx', '_x'],
+          },
+        },
+        extractComments: false,
+      }),
+    ],
+  },
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
+  },
 };
