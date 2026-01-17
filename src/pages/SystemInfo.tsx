@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   AlertTriangle,
   Info,
@@ -11,9 +10,12 @@ import {
   Settings as SettingsIcon,
   Lock,
 } from "lucide-react";
+import React, { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+import SystemInfoHeader from "./SystemInfo/SystemInfoHeader";
+import { SystemInfoCard, PermissionsCard } from "./SystemInfo/SystemInfoCard";
 
 interface SystemInfo {
   wordpress: {
@@ -193,7 +195,7 @@ const SystemInfo: React.FC = () => {
           <p>View details about your WordPress environment</p>
         </div>
 
-        <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm">
+        <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border-border wdt:border wdt:py-6 wdt:shadow-sm">
           <div className="wdt:px-6">
             <p>No system information available.</p>
           </div>
@@ -226,12 +228,12 @@ const SystemInfo: React.FC = () => {
 
   return (
     <div className="wdt:space-y-6 wdt:p-6">
-      <div className="wdt:space-y-2">
-        <h1>System Information</h1>
-        <p>View details about your WordPress environment</p>
-      </div>
+      <SystemInfoHeader
+        title="System Information"
+        description="View details about your WordPress environment"
+      />
 
-      <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:mb-6">
+      <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border-border wdt:border wdt:py-6 wdt:shadow-sm wdt:mb-6">
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:justify-between wdt:items-center">
             <div className="wdt:flex wdt:items-center wdt:gap-2">
@@ -307,7 +309,7 @@ const SystemInfo: React.FC = () => {
         </div>
       </div>
 
-      <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm">
+      <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border-border wdt:border wdt:py-6 wdt:shadow-sm">
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
           <div className="wdt:flex wdt:items-center wdt:gap-2">
             <List />
@@ -337,59 +339,43 @@ const SystemInfo: React.FC = () => {
           </div>
 
           <div className="wdt:p-6">
-            {activeTab === "wordpress" && (
-              <div>
-                <h3 className="wdt:text-lg wdt:font-medium wdt:mb-4">
-                  WordPress Environment
-                </h3>
-                <table className="wdt:w-full wdt:text-sm">
-                  <tbody>
-                    <InfoRow
-                      label="WordPress Version"
-                      value={systemInfo.wordpress.version}
-                    />
-                    <InfoRow
-                      label="Home URL"
-                      value={systemInfo.wordpress.home_url}
-                    />
-                    <InfoRow
-                      label="Site URL"
-                      value={systemInfo.wordpress.site_url}
-                    />
-                    <InfoRow
-                      label="Multisite"
-                      value={systemInfo.wordpress.is_multisite}
-                    />
-                    <InfoRow
-                      label="Debug Mode"
-                      value={systemInfo.wordpress.debug_mode}
-                    />
-                    <InfoRow
-                      label="Memory Limit"
-                      value={systemInfo.wordpress.memory_limit}
-                    />
-                    <InfoRow
-                      label="Permalink Structure"
-                      value={
-                        systemInfo.wordpress.permalink_structure || "Default"
-                      }
-                    />
-                    <InfoRow
-                      label="Active Theme"
-                      value={`${systemInfo.wordpress.theme} ${systemInfo.wordpress.theme_version}`}
-                    />
-                    <InfoRow
-                      label="Active Plugins"
-                      value={systemInfo.wordpress.active_plugins}
-                    />
-                    <InfoRow
-                      label="Site Language"
-                      value={systemInfo.wordpress.language}
-                    />
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <SystemInfoCard
+              title="WordPress Information"
+              icon={Info}
+              data={systemInfo.wordpress}
+              formatValue={(key, value) => {
+                switch (key) {
+                  case "is_multisite":
+                    return value ? "Yes" : "No";
+                  case "debug_mode":
+                    return value ? "Enabled" : "Disabled";
+                  case "theme":
+                    return `${value} (${systemInfo.wordpress.theme_version})`;
+                  default:
+                    return String(value);
+                }
+              }}
+            />
+
+            <SystemInfoCard
+              title="Server Information"
+              icon={Monitor}
+              data={systemInfo.server}
+              formatValue={(key, value) => {
+                if (key === "php_max_execution_time") {
+                  return `${value} seconds`;
+                }
+                return String(value);
+              }}
+            />
+
+            <SystemInfoCard
+              title="WordPress Constants"
+              icon={SettingsIcon}
+              data={systemInfo.constants}
+            />
+
+            <PermissionsCard permissions={systemInfo.permissions} />
 
             {activeTab === "server" && (
               <div>

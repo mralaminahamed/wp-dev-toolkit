@@ -1,26 +1,19 @@
+import { AlertTriangle } from "lucide-react";
 import React from "react";
-import {
-  AlertTriangle,
-  Database,
-  Clock,
-  BarChart3,
-  Filter,
-  Search,
-  X,
-} from "lucide-react";
 
 import { useSelect, useDispatch } from "@wordpress/data";
 import { useState, useEffect } from "@wordpress/element";
 
-import { STORE_NAME as QUERY_MONITOR_STORE } from "@/stores/query-monitor/constants";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
-// Local interface to match the component's needs
+import LoadingState from "./QueryMonitor/LoadingState";
+import QueryDetails from "./QueryMonitor/QueryDetails";
+import QueryFilters from "./QueryMonitor/QueryFilters";
+import QueryStatsCards from "./QueryMonitor/QueryStatsCards";
+import QueryTable from "./QueryMonitor/QueryTable";
+
 interface QueryItem {
   query: string;
   time: number;
@@ -42,13 +35,6 @@ interface QueryStats {
 }
 
 const QueryMonitor: React.FC = () => {
-  const { queries: storeQueries } = useSelect(
-    (select: any) => ({
-      queries: select(QUERY_MONITOR_STORE).getQueries(),
-    }),
-    [],
-  );
-
   const { config } = useSelect(
     (select: any) => ({
       config: select(SETTINGS_STORE).getConfig(),
@@ -254,6 +240,7 @@ const QueryMonitor: React.FC = () => {
 
   return (
     <div className="wdt:space-y-6 wdt:p-6">
+      {/* Header */}
       <div className="wdt:space-y-2">
         <h1 className="wdt:text-3xl wdt:font-bold">Query Monitor</h1>
         <p className="wdt:text-muted-foreground">
@@ -262,7 +249,7 @@ const QueryMonitor: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:mb-6">
+      <div className="wdt:bg-card wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:mb-6 wdt:border wdt:border-border">
         <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-4">
           <Button onClick={fetchQueries} disabled={isLoading}>
             {isLoading ? "Refreshing..." : "Refresh Queries"}
@@ -283,7 +270,7 @@ const QueryMonitor: React.FC = () => {
                 type="checkbox"
                 checked={showOptimizationTips}
                 onChange={() => setShowOptimizationTips(!showOptimizationTips)}
-                className="wdt:rounded wdt:border-gray-300 wdt:text-blue-600 wdt:focus:ring-blue-500"
+                className="wdt:rounded wdt:border-input wdt:text-primary wdt:focus:ring-ring"
               />
               <span className="wdt:text-sm wdt:font-medium">
                 Show optimization tips
@@ -293,310 +280,42 @@ const QueryMonitor: React.FC = () => {
         </div>
       </div>
 
-      <div className="wdt:grid wdt:gap-4 md:wdt:grid-cols-3 wdt:mb-6 wdt:mb-6">
-        <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
-          <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon blue">
-            <Database />
-          </div>
-          <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
-            <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
-              Total Queries
-            </div>
-            <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-value">
-              {totalQueries}
-            </div>
-            <div className="wdt:mt-2 wdt:text-sm wdt:text-gray-500">
-              This page load
-            </div>
-          </div>
-        </div>
-
-        <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
-          <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon amber">
-            <Clock />
-          </div>
-          <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
-            <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
-              Total Execution Time
-            </div>
-            <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-value">
-              {formatTime(totalTime)}
-            </div>
-            <div className="wdt:mt-2 wdt:flex wdt:gap-2">
-              <span className="wdt:inline-flex wdt:items-center wdt:gap-1 wdt:px-2 wdt:py-0.5 wdt:rounded-full wdt:text-xs wdt:font-medium wdt:bg-green-100 wdt:text-green-800">
-                Fast{" "}
-                <span className="wdt:bg-white wdt:px-1.5 wdt:py-0.5 wdt:rounded-full">
-                  {stats.fast}
-                </span>
-              </span>
-              <span className="wdt:inline-flex wdt:items-center wdt:gap-1 wdt:px-2 wdt:py-0.5 wdt:rounded-full wdt:text-xs wdt:font-medium wdt:bg-yellow-100 wdt:text-yellow-800">
-                Medium{" "}
-                <span className="wdt:bg-white wdt:px-1.5 wdt:py-0.5 wdt:rounded-full">
-                  {stats.medium}
-                </span>
-              </span>
-              <span className="wdt:inline-flex wdt:items-center wdt:gap-1 wdt:px-2 wdt:py-0.5 wdt:rounded-full wdt:text-xs wdt:font-medium wdt:bg-red-100 wdt:text-red-800">
-                Slow{" "}
-                <span className="wdt:bg-white wdt:px-1.5 wdt:py-0.5 wdt:rounded-full">
-                  {stats.slow}
-                </span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm">
-          <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-icon green">
-            <BarChart3 />
-          </div>
-          <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-content">
-            <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-title">
-              Average Query Time
-            </div>
-            <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:p-6 wdt:shadow-sm-value">
-              {totalQueries > 0 ? formatTime(totalTime / totalQueries) : "0 ms"}
-            </div>
-            <div className="wdt:mt-2 wdt:text-sm wdt:text-gray-500">
-              {totalQueries > 30
-                ? "High query count - consider caching"
-                : "Query count is acceptable"}
-            </div>
-          </div>
-        </div>
-      </div>
+      <QueryStatsCards
+        totalQueries={totalQueries}
+        totalTime={totalTime}
+        stats={stats}
+        formatTime={formatTime}
+      />
 
       {showOptimizationTips && getOptimizationTips()}
 
-      <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:mb-6">
-        <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
-          <div className="wdt:flex wdt:justify-between wdt:items-center">
-            <div className="wdt:flex wdt:items-center wdt:gap-2">
-              <Filter />
-              <h2>Query Filters</h2>
-            </div>
-          </div>
-        </div>
-        <div className="wdt:px-6">
-          <div className="wdt:grid wdt:grid-cols-1 md:wdt:grid-cols-3 wdt:gap-6">
-            <div>
-              <label className="wdt:block">
-                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
-                  Search Queries
-                </span>
-                <Input
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  placeholder="Search in query or caller..."
-                  className="wdt:mt-1"
-                />
-              </label>
-            </div>
-            <div>
-              <label className="wdt:block">
-                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
-                  Sort By
-                </span>
-                <select
-                  value={queryOptions.order}
-                  onChange={(e) => handleOrderChange(e.target.value)}
-                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
-                >
-                  <option value="time">Execution Time</option>
-                  <option value="caller">Caller</option>
-                  <option value="query">Query</option>
-                </select>
-              </label>
-            </div>
-            <div>
-              <label className="wdt:block">
-                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
-                  Direction
-                </span>
-                <select
-                  value={queryOptions.direction}
-                  onChange={(e) => handleDirectionChange(e.target.value)}
-                  className="wdt:mt-1 wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
-                >
-                  <option value="desc">Descending</option>
-                  <option value="asc">Ascending</option>
-                </select>
-              </label>
-            </div>
-          </div>
+      <QueryFilters
+        searchTerm={searchTerm}
+        onSearch={handleSearch}
+        queryOptions={queryOptions}
+        onOrderChange={handleOrderChange}
+        onDirectionChange={handleDirectionChange}
+        filteredQueriesCount={filteredQueries.length}
+      />
 
-          {searchTerm && (
-            <div className="wdt:bg-blue-50 wdt:p-3 wdt:rounded-md wdt:border wdt:border-blue-100 wdt:mt-4">
-              <div className="wdt:flex wdt:items-center wdt:gap-2">
-                <Search className="wdt:text-blue-500" />
-                <span className="wdt:text-blue-700">
-                  Found <strong>{filteredQueries.length}</strong> queries
-                  matching: <strong>{searchTerm}</strong>
-                </span>
-                <button
-                  onClick={() => handleSearch("")}
-                  className="wdt:ml-auto wdt:text-blue-700 hover:wdt:text-blue-900"
-                  aria-label="Clear search"
-                >
-                  <X />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      {isLoading && <LoadingState />}
 
-      {isLoading ? (
-        <div className="wdt:flex wdt:justify-center wdt:items-center wdt:p-16 wdt:bg-white wdt:rounded-lg wdt:shadow-sm">
-          <div className="wdt:animate-spin wdt:rounded-full wdt:h-8 wdt:w-8 wdt:border-b-2 wdt:border-blue-600"></div>
-          <span className="wdt:ml-2">Loading queries...</span>
-        </div>
-      ) : (
-        <>
-          {selectedQuery && (
-            <div
-              id="query-details"
-              className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm wdt:mb-6"
-            >
-              <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
-                <div className="wdt:flex wdt:justify-between wdt:items-center">
-                  <div className="wdt:flex wdt:items-center wdt:gap-2">
-                    <Database />
-                    <h2>Query Details</h2>
-                  </div>
-                  <Button variant="secondary" onClick={closeDetails}>
-                    Close Details
-                  </Button>
-                </div>
-              </div>
-              <div className="wdt:px-6">
-                <div className="wdt:grid wdt:grid-cols-1 md:wdt:grid-cols-2 wdt:gap-6 wdt:mb-6">
-                  <div>
-                    <h3 className="wdt:font-medium wdt:mb-2">Execution Time</h3>
-                    <div
-                      className={`wdt:p-3 wdt:rounded-lg wdt:border wdt:font-medium ${getTimeClass(selectedQuery.time)}`}
-                    >
-                      {formatTime(selectedQuery.time)}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="wdt:font-medium wdt:mb-2">Caller</h3>
-                    <div className="wdt:bg-gray-50 wdt:p-3 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:font-mono wdt:text-sm wdt:overflow-x-auto">
-                      {selectedQuery.caller}
-                    </div>
-                  </div>
-                </div>
+      {!isLoading && selectedQuery && (
+        <QueryDetails
+          selectedQuery={selectedQuery}
+          onClose={closeDetails}
+          formatTime={formatTime}
+          getTimeClass={getTimeClass}
+        />
+      )}
 
-                <div className="wdt:mb-6">
-                  <h3 className="wdt:font-medium wdt:mb-2">SQL Query</h3>
-                  <pre className="wdt:bg-gray-50 wdt:p-4 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:overflow-x-auto wdt:text-sm wdt:whitespace-pre-wrap wdt:font-mono">
-                    {selectedQuery.query}
-                  </pre>
-                </div>
-
-                {selectedQuery.backtrace &&
-                  selectedQuery.backtrace.length > 0 && (
-                    <div>
-                      <h3 className="wdt:font-medium wdt:mb-2">Stack Trace</h3>
-                      <div className="wdt:bg-gray-50 wdt:p-4 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:overflow-x-auto">
-                        <ol className="wdt:list-decimal wdt:list-inside">
-                          {selectedQuery.backtrace.map((trace, index) => (
-                            <li
-                              key={index}
-                              className="wdt:text-sm wdt:font-mono wdt:my-1 wdt:break-all"
-                            >
-                              {trace}
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    </div>
-                  )}
-              </div>
-            </div>
-          )}
-
-          <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm">
-            <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
-              <div className="wdt:flex wdt:justify-between wdt:items-center">
-                <div className="wdt:flex wdt:items-center wdt:gap-2">
-                  <Database />
-                  <h2>Database Queries</h2>
-                </div>
-                <div className="wdt:text-sm wdt:text-gray-500">
-                  {filteredQueries.length} queries found
-                </div>
-              </div>
-            </div>
-            <div className="wdt:px-6 wdt:p-0">
-              <div className="wdt:overflow-x-auto">
-                <table className="wdt:w-full">
-                  <thead className="wdt:bg-gray-50 wdt:border-b wdt:border-gray-200">
-                    <tr>
-                      <th className="wdt:py-3 wdt:px-4 wdt:text-left wdt:text-xs wdt:font-medium wdt:text-gray-500 wdt:uppercase wdt:tracking-wider wdt:w-32">
-                        Time
-                      </th>
-                      <th className="wdt:py-3 wdt:px-4 wdt:text-left wdt:text-xs wdt:font-medium wdt:text-gray-500 wdt:uppercase wdt:tracking-wider">
-                        Query
-                      </th>
-                      <th className="wdt:py-3 wdt:px-4 wdt:text-left wdt:text-xs wdt:font-medium wdt:text-gray-500 wdt:uppercase wdt:tracking-wider">
-                        Caller
-                      </th>
-                      <th className="wdt:py-3 wdt:px-4 wdt:text-left wdt:text-xs wdt:font-medium wdt:text-gray-500 wdt:uppercase wdt:tracking-wider wdt:w-32">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="wdt:bg-white wdt:divide-y wdt:divide-gray-200">
-                    {filteredQueries.length > 0 ? (
-                      filteredQueries.map((query, index) => (
-                        <tr
-                          key={index}
-                          className="hover:wdt:bg-gray-50 wdt:transition-colors"
-                        >
-                          <td className="wdt:py-3 wdt:px-4 wdt:font-mono wdt:text-sm wdt:whitespace-nowrap">
-                            <span
-                              className={`wdt:inline-block wdt:px-2 wdt:py-1 wdt:rounded-full wdt:text-xs ${getTimeClass(query.time)}`}
-                            >
-                              {formatTime(query.time)}
-                            </span>
-                          </td>
-                          <td className="wdt:py-3 wdt:px-4">
-                            <div className="wdt:max-w-lg wdt:truncate wdt:font-mono wdt:text-xs">
-                              {query.query}
-                            </div>
-                          </td>
-                          <td className="wdt:py-3 wdt:px-4">
-                            <div className="wdt:max-w-md wdt:truncate wdt:text-xs">
-                              {query.caller}
-                            </div>
-                          </td>
-                          <td className="wdt:py-3 wdt:px-4">
-                            <Button
-                              variant="secondary"
-                              onClick={() => viewQueryDetails(query)}
-                              size="sm"
-                            >
-                              View
-                            </Button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className="wdt:py-8 wdt:px-4 wdt:text-center wdt:text-gray-500"
-                        >
-                          No queries found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </>
+      {!isLoading && (
+        <QueryTable
+          queries={filteredQueries}
+          onViewDetails={viewQueryDetails}
+          formatTime={formatTime}
+          getTimeClass={getTimeClass}
+        />
       )}
     </div>
   );

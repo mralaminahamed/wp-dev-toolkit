@@ -1,37 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  ChevronUp,
-  ChevronDown,
-  Filter,
-  Search,
-  X,
-  Database,
-  Zap,
-  Clock,
-  Code,
-  Wrench,
-  AlertTriangle,
-  Info,
-  CheckCircle,
-} from "lucide-react";
+import { AlertTriangle, Info, CheckCircle, Wrench } from "lucide-react";
 
 import { useSelect, useDispatch } from "@wordpress/data";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { STORE_NAME as ERROR_LOG_STORE } from "@/stores/error-log/constants";
 import { STORE_NAME as SETTINGS_STORE } from "@/stores/settings/constants";
 
-import { ErrorLogResponse } from "@/types";
-
-interface ParsedLogEntry {
-  timestamp: string;
-  level: string;
-  message: string;
-  file?: string | undefined;
-  line?: number | undefined;
-  raw: string;
-}
+import ErrorLogHeader from "./ErrorLog/ErrorLogHeader";
+import LogStats from "./ErrorLog/LogStats";
+import LogFilters from "./ErrorLog/LogFilters";
+import LogTable from "./ErrorLog/LogTable";
 
 interface LogStats {
   total: number;
@@ -43,15 +21,9 @@ interface LogStats {
 }
 
 const ErrorLog: React.FC = () => {
-  const {
-    entries: errorLog,
-    isResolving,
-    getError,
-  } = useSelect(
+  const { entries } = useSelect(
     (select: any) => ({
       entries: select(ERROR_LOG_STORE).getEntries(),
-      isResolving: (key: string) => select(ERROR_LOG_STORE).isResolving(key),
-      getError: (key: string) => select(ERROR_LOG_STORE).getError(key),
     }),
     [],
   );
@@ -65,16 +37,13 @@ const ErrorLog: React.FC = () => {
 
   const { fetchEntries, clearLog } = useDispatch(ERROR_LOG_STORE);
   const { toggleTool } = useDispatch(SETTINGS_STORE);
-  const [logContent, setLogContent] = useState("");
-  const [parsedLogs, setParsedLogs] = useState<ParsedLogEntry[]>([]);
+
   const [isFetching, setIsFetching] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
-  const [logSize, setLogSize] = useState(0);
   const [filterLevel, setFilterLevel] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshRate, setRefreshRate] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [logStats, setLogStats] = useState<LogStats>({
     total: 0,
     errors: 0,
@@ -84,7 +53,6 @@ const ErrorLog: React.FC = () => {
     other: 0,
   });
   const [expandedLogs, setExpandedLogs] = useState<Set<number>>(new Set());
-  const [expanded, setExpanded] = useState<number | null>(null);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const logEndRef = useRef<HTMLDivElement>(null);
 
@@ -104,10 +72,11 @@ const ErrorLog: React.FC = () => {
     };
   }, [autoRefresh, refreshRate]);
 
-  // Calculate log statistics when parsedLogs change
+  // Calculate log statistics when entries change
   useEffect(() => {
+    const currentLogs = entries || [];
     const stats: LogStats = {
-      total: parsedLogs.length,
+      total: currentLogs.length,
       errors: getLogLevelCount("ERROR"),
       warnings: getLogLevelCount("WARNING"),
       info: getLogLevelCount("INFO"),
@@ -118,7 +87,7 @@ const ErrorLog: React.FC = () => {
     stats.other =
       stats.total - (stats.errors + stats.warnings + stats.info + stats.debug);
     setLogStats(stats);
-  }, [parsedLogs]);
+  }, [entries]);
 
   const fetchErrorLog = async () => {
     if (isFetching) {
@@ -129,56 +98,12 @@ const ErrorLog: React.FC = () => {
     try {
       await fetchEntries();
       // The store will update the entries automatically
-      // For now, we'll keep the local state for backward compatibility
-      const entries = errorLog || [];
-      if (entries.length > 0) {
-        // Convert entries to log content format
-        const logContent = entries
-          .map(
-            (entry: any) =>
-              `[${entry.timestamp}] ${entry.level}: ${entry.message}`,
-          )
-          .join("\n");
-        setLogContent(logContent);
-        setParsedLogs(entries);
-        setLogSize(logContent.length);
-      } else {
-        setLogContent("No errors logged.");
-        setParsedLogs([]);
-        setLogSize(0);
-      }
+      // parsedLogs is derived from the store data
     } catch (error: any) {
       console.error("Failed to fetch error log:", error);
-      setLogContent("Error loading log file.");
-      setParsedLogs([]);
     } finally {
       setIsFetching(false);
     }
-  };
-
-  const parseLogContent = (content: string): ParsedLogEntry[] => {
-    if (!content) {
-      return [];
-    }
-
-    // More comprehensive regex to extract file and line information
-    const logEntryRegex =
-      /\[([\d\s\-:.]+)\]\s*\[([A-Z]+)\]\s*(.*?)(?:\s+in\s+(\S+)\s+on\s+line\s+(\d+))?(?=\n\[\d|\n\s*$|$)/gs;
-    const entries: ParsedLogEntry[] = [];
-
-    let match;
-    while ((match = logEntryRegex.exec(content)) !== null) {
-      entries.push({
-        timestamp: match[1]?.trim() || "",
-        level: match[2]?.trim() || "",
-        message: match[3]?.trim() || "",
-        file: match[4] ? match[4].trim() : undefined,
-        line: match[5] ? parseInt(match[5].trim(), 10) : undefined,
-        raw: match[0] || "",
-      });
-    }
-
-    return sortDirection === "desc" ? entries.reverse() : entries;
   };
 
   const clearErrorLog = async () => {
@@ -189,14 +114,12 @@ const ErrorLog: React.FC = () => {
     setIsClearing(true);
     try {
       await clearLog();
-      setLogContent("Error log cleared successfully.");
-      setParsedLogs([]);
-      setLogSize(0);
+      // The store will update the entries automatically
     } catch (error) {
       console.error("Error clearing error log:", error);
-      setLogContent("Failed to clear error log.");
+    } finally {
+      setIsClearing(false);
     }
-    setIsClearing(false);
   };
 
   const toggleLogging = () => {
@@ -204,7 +127,7 @@ const ErrorLog: React.FC = () => {
   };
 
   const getFilteredLogs = () => {
-    let filtered = parsedLogs;
+    let filtered = entries || [];
 
     // Apply level filter if set
     if (filterLevel) {
@@ -243,7 +166,7 @@ const ErrorLog: React.FC = () => {
   };
 
   const getLogLevelCount = (level: string): number => {
-    return parsedLogs.filter((log) => log.level === level).length;
+    return (entries || []).filter((log) => log.level === level).length;
   };
 
   const getLogLevelClass = (level: string): string => {
@@ -261,72 +184,27 @@ const ErrorLog: React.FC = () => {
     }
   };
 
-  const getLogLevelBgClass = (level: string): string => {
-    switch (level.toUpperCase()) {
-      case "ERROR":
-        return "wdt:bg-red-500";
-      case "WARNING":
-        return "wdt:bg-yellow-500";
-      case "INFO":
-        return "wdt:bg-blue-500";
-      case "DEBUG":
-        return "wdt:bg-gray-500";
-      default:
-        return "wdt:bg-gray-500";
-    }
-  };
-
-  const getLogLevelIcon = (
-    level: string,
-  ): React.ComponentType<{ size?: number; className?: string }> => {
-    switch (level.toUpperCase()) {
-      case "ERROR":
-        return AlertTriangle;
-      case "WARNING":
-        return Zap;
-      case "INFO":
-        return Info;
-      case "DEBUG":
-        return Code;
-      default:
-        return Wrench;
-    }
-  };
-
-  const getExpandIcon = (
-    isExpanded: boolean,
-  ): React.ComponentType<{ size?: number; className?: string }> => {
-    return isExpanded ? ChevronUp : ChevronDown;
-  };
-
   const toggleExpandLog = (index: number) => {
-    if (expanded === index) {
-      setExpanded(null);
-    } else {
-      setExpanded(index);
-      // Scroll to the expanded log after a short delay to allow rendering
-      setTimeout(() => {
-        logEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  };
-
-  const toggleSortDirection = () => {
-    const newDirection = sortDirection === "desc" ? "asc" : "desc";
-    setSortDirection(newDirection);
-
-    // Re-sort the logs based on the new direction
-    setParsedLogs((prevLogs) =>
-      newDirection === "desc"
-        ? [...prevLogs].reverse()
-        : [...prevLogs].reverse(),
-    );
+    setExpandedLogs((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.clear(); // Only allow one expanded at a time for now
+        newSet.add(index);
+        // Scroll to the expanded log after a short delay to allow rendering
+        setTimeout(() => {
+          logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+      return newSet;
+    });
   };
 
   // Get unique dates from logs for the date filter
   const getUniqueDates = (): string[] => {
     const dates = new Set<string>();
-    parsedLogs.forEach((log) => {
+    (entries || []).forEach((log) => {
       const datePart = log.timestamp.split(" ")[0]; // Extract date part
       if (datePart) {
         dates.add(datePart);
@@ -337,36 +215,42 @@ const ErrorLog: React.FC = () => {
 
   return (
     <div className="wdt:space-y-6 wdt:p-6">
-      <div className="wdt:space-y-2">
-        <h1>Error Log</h1>
-        <p>Monitor and manage PHP errors, warnings and notices</p>
-      </div>
+      <ErrorLogHeader
+        title="Error Log"
+        description="Monitor and manage PHP errors, warnings and notices"
+      />
 
       {/* Control Panel */}
-      <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:mb-6">
+      <div className="wdt:bg-card wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:mb-6 wdt:border wdt:border-border">
         <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-4">
-          <Button
-            className=""
+          <button
+            className="wdt:px-4 wdt:py-2 wdt:bg-primary wdt:text-primary-foreground wdt:rounded-md wdt:hover:bg-primary/90 wdt:disabled:opacity-50"
             onClick={fetchErrorLog}
             disabled={isFetching || isClearing}
           >
             {isFetching ? "Refreshing..." : "Refresh Log"}
-          </Button>
+          </button>
 
-          <Button
-            variant="secondary"
+          <button
+            className="wdt:px-4 wdt:py-2 wdt:bg-secondary wdt:text-secondary-foreground wdt:rounded-md wdt:hover:bg-secondary/80 wdt:disabled:opacity-50"
             onClick={clearErrorLog}
-            disabled={isFetching || isClearing || parsedLogs.length === 0}
+            disabled={
+              isFetching || isClearing || (entries && entries.length === 0)
+            }
           >
             {isClearing ? "Clearing..." : "Clear Log"}
-          </Button>
+          </button>
 
-          <Button
-            variant={config.error_logging ? "secondary" : "default"}
+          <button
+            className={`wdt:px-4 wdt:py-2 wdt:rounded-md ${
+              config.error_logging
+                ? "wdt:bg-secondary wdt:text-secondary-foreground wdt:hover:bg-secondary/80"
+                : "wdt:bg-primary wdt:text-primary-foreground wdt:hover:bg-primary/90"
+            }`}
             onClick={toggleLogging}
           >
             {config.error_logging ? "Disable Logging" : "Enable Logging"}
-          </Button>
+          </button>
 
           <div className="wdt:ml-auto wdt:flex wdt:items-center wdt:gap-2">
             <label className="wdt:flex wdt:items-center wdt:gap-2 wdt:cursor-pointer">
@@ -381,7 +265,9 @@ const ErrorLog: React.FC = () => {
 
             {autoRefresh && (
               <label className="wdt:block">
-                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">Refresh rate</span>
+                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">
+                  Refresh rate
+                </span>
                 <select
                   value={refreshRate.toString()}
                   onChange={(e) => setRefreshRate(parseInt(e.target.value, 10))}
@@ -398,45 +284,11 @@ const ErrorLog: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Panel */}
-      <div className="wdt:grid wdt:grid-cols-2 sm:wdt:grid-cols-3 md:wdt:grid-cols-5 wdt:gap-4 wdt:mb-6">
-        <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:text-center">
-          <div className="wdt:text-sm wdt:text-gray-500 wdt:mb-1">
-            Total Entries
-          </div>
-          <div className="wdt:text-2xl wdt:font-bold">{logStats.total}</div>
-        </div>
-
-        <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:text-center">
-          <div className="wdt:text-sm wdt:text-gray-500 wdt:mb-1">Errors</div>
-          <div className="wdt:text-2xl wdt:font-bold wdt:text-red-600">
-            {logStats.errors}
-          </div>
-        </div>
-
-        <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:text-center">
-          <div className="wdt:text-sm wdt:text-gray-500 wdt:mb-1">Warnings</div>
-          <div className="wdt:text-2xl wdt:font-bold wdt:text-yellow-600">
-            {logStats.warnings}
-          </div>
-        </div>
-
-        <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:text-center">
-          <div className="wdt:text-sm wdt:text-gray-500 wdt:mb-1">Info</div>
-          <div className="wdt:text-2xl wdt:font-bold wdt:text-blue-600">
-            {logStats.info}
-          </div>
-        </div>
-
-        <div className="wdt:bg-white wdt:rounded-lg wdt:shadow-sm wdt:p-4 wdt:text-center">
-          <div className="wdt:text-sm wdt:text-gray-500 wdt:mb-1">
-            File Size
-          </div>
-          <div className="wdt:text-2xl wdt:font-bold">
-            {formatFileSize(logSize)}
-          </div>
-        </div>
-      </div>
+      <LogStats
+        stats={logStats}
+        fileSize={(entries || []).length * 100} // Rough estimate for demo
+        formatFileSize={formatFileSize}
+      />
 
       <div className="wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border wdt:py-6 wdt:shadow-sm">
         <div className="wdt:/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[\.border-b]:pb-6">
@@ -446,82 +298,18 @@ const ErrorLog: React.FC = () => {
           </div>
         </div>
         <div className="wdt:px-6">
-          {/* Filters */}
-          <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-4 wdt:mb-6">
-            <div className="wdt:flex-1 wdt:min-w-[200px]">
-              <label className="wdt:block">
-                <span className="wdt:text-sm wdt:font-medium wdt:text-gray-700">Search logs</span>
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for error messages or files..."
-                  className="wdt:mt-1"
-                />
-              </label>
-            </div>
-
-            <div className="wdt:flex wdt:flex-col">
-              <label className="wdt:text-xs wdt:font-medium wdt:text-gray-700 wdt:mb-1">
-                Filter by level
-              </label>
-              <div className="wdt:flex wdt:flex-wrap wdt:items-center wdt:gap-2">
-                <button
-                  className={`wdt:px-3 wdt:py-1 wdt:rounded-md wdt:text-xs wdt:font-medium wdt:transition-colors ${filterLevel === null ? "wdt:bg-blue-100 wdt:text-blue-800" : "wdt:bg-gray-100 wdt:text-gray-700 hover:wdt:bg-gray-200"}`}
-                  onClick={() => setFilterLevel(null)}
-                >
-                  All ({logStats.total})
-                </button>
-                <button
-                  className={`wdt:px-3 wdt:py-1 wdt:rounded-md wdt:text-xs wdt:font-medium wdt:transition-colors ${filterLevel === "ERROR" ? "wdt:bg-red-100 wdt:text-red-800" : "wdt:bg-gray-100 wdt:text-gray-700 hover:wdt:bg-gray-200"}`}
-                  onClick={() => setFilterLevel("ERROR")}
-                >
-                  Errors ({logStats.errors})
-                </button>
-                <button
-                  className={`wdt:px-3 wdt:py-1 wdt:rounded-md wdt:text-xs wdt:font-medium wdt:transition-colors ${filterLevel === "WARNING" ? "wdt:bg-yellow-100 wdt:text-yellow-800" : "wdt:bg-gray-100 wdt:text-gray-700 hover:wdt:bg-gray-200"}`}
-                  onClick={() => setFilterLevel("WARNING")}
-                >
-                  Warnings ({logStats.warnings})
-                </button>
-                <button
-                  className={`wdt:px-3 wdt:py-1 wdt:rounded-md wdt:text-xs wdt:font-medium wdt:transition-colors ${filterLevel === "INFO" ? "wdt:bg-blue-100 wdt:text-blue-800" : "wdt:bg-gray-100 wdt:text-gray-700 hover:wdt:bg-gray-200"}`}
-                  onClick={() => setFilterLevel("INFO")}
-                >
-                  Info ({logStats.info})
-                </button>
-              </div>
-            </div>
-
-            {getUniqueDates().length > 0 && (
-              <div>
-                <label className="wdt:text-xs wdt:font-medium wdt:text-gray-700 wdt:mb-1">
-                  Filter by date
-                </label>
-                <select
-                  value={dateFilter || ""}
-                  onChange={(e) => setDateFilter(e.target.value || null)}
-                  className="wdt:block wdt:w-full wdt:px-3 wdt:py-2 wdt:border wdt:border-gray-300 wdt:rounded-md wdt:shadow-sm wdt:focus:outline-none wdt:focus:ring-blue-500 wdt:focus:border-blue-500"
-                >
-                  <option value="">All dates</option>
-                  {getUniqueDates().map((date) => (
-                    <option key={date} value={date}>
-                      {date}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div className="wdt:ml-auto">
-              <Button
-                onClick={toggleSortDirection}
-                variant="secondary"
-                size="sm"
-              >
-                {sortDirection === "desc" ? "Newest first" : "Oldest first"}
-              </Button>
-            </div>
-          </div>
+          <LogFilters
+            searchTerm={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedLevel={filterLevel}
+            onLevelChange={setFilterLevel}
+            selectedDate={dateFilter}
+            onDateChange={setDateFilter}
+            availableDates={getUniqueDates()}
+            filteredCount={(entries || []).length}
+            config={config}
+            toggleLogging={toggleLogging}
+          />
 
           {/* Log Content */}
           {isFetching ? (
@@ -529,121 +317,20 @@ const ErrorLog: React.FC = () => {
               <div className="wdt:animate-spin wdt:rounded-full wdt:h-8 wdt:w-8 wdt:border-b-2 wdt:border-blue-600"></div>
               <span className="wdt:ml-2">Loading error log...</span>
             </div>
-          ) : parsedLogs.length > 0 ? (
+          ) : entries && entries.length > 0 ? (
             <>
-              <div className="wdt:border wdt:rounded-lg wdt:overflow-hidden wdt:divide-y wdt:divide-gray-200">
-                {getFilteredLogs().length > 0 ? (
-                  getFilteredLogs().map((log, index) => (
-                    <div
-                      key={index}
-                      className={`wdt:transition-colors ${expanded === index ? "wdt:bg-gray-50" : "hover:wdt:bg-gray-50"}`}
-                    >
-                      <div className="wdt:p-4">
-                        <div className="wdt:flex wdt:items-center wdt:gap-2 wdt:mb-2">
-                          <button
-                            onClick={() => toggleExpandLog(index)}
-                            className="wdt:flex wdt:items-center wdt:justify-center wdt:w-6 wdt:h-6 wdt:rounded-full wdt:text-white"
-                            aria-label={
-                              expanded === index
-                                ? "Collapse log entry"
-                                : "Expand log entry"
-                            }
-                            style={{
-                              backgroundColor:
-                                log.level === "ERROR"
-                                  ? "#ef4444"
-                                  : log.level === "WARNING"
-                                    ? "#f59e0b"
-                                    : log.level === "INFO"
-                                      ? "#3b82f6"
-                                      : "#6b7280",
-                            }}
-                          >
-                            {React.createElement(getLogLevelIcon(log.level), {
-                              size: 14,
-                            })}
-                          </button>
-                          <span
-                            className={`wdt:px-2 wdt:py-0.5 wdt:rounded-full wdt:text-xs wdt:font-medium ${getLogLevelClass(log.level)}`}
-                          >
-                            {log.level}
-                          </span>
-                          <span className="wdt:text-xs wdt:text-gray-500">
-                            {log.timestamp}
-                          </span>
-
-                          {log.file && (
-                            <span className="wdt:text-xs wdt:bg-gray-100 wdt:px-2 wdt:py-0.5 wdt:rounded wdt:truncate wdt:max-w-[200px] wdt:hidden md:wdt:inline-block">
-                              {log.file} {log.line && `(line ${log.line})`}
-                            </span>
-                          )}
-
-                          <button
-                            onClick={() => toggleExpandLog(index)}
-                            className="wdt:ml-auto wdt:text-gray-400 hover:wdt:text-gray-600"
-                            aria-label={
-                              expanded === index
-                                ? "Collapse log entry"
-                                : "Expand log entry"
-                            }
-                          >
-                            {React.createElement(getExpandIcon(expanded === index), { size: 16 })}
-                            />
-                          </button>
-                        </div>
-
-                        {/* Truncated message for collapsed view */}
-                        {expanded !== index && (
-                          <div className="wdt:font-mono wdt:text-sm wdt:bg-gray-50 wdt:p-3 wdt:rounded-lg wdt:border wdt:border-gray-200 wdt:truncate">
-                            {log.message}
-                          </div>
-                        )}
-
-                        {/* Full details for expanded view */}
-                        {expanded === index && (
-                          <div className="wdt:mt-3 wdt:space-y-3">
-                            <div className="wdt:font-mono wdt:text-sm wdt:bg-gray-50 wdt:p-3 wdt:rounded-lg wdt:whitespace-pre-wrap wdt:border wdt:border-gray-200">
-                              {log.message}
-                            </div>
-
-                            {log.file && (
-                              <div className="wdt:text-sm wdt:bg-gray-50 wdt:p-3 wdt:rounded-lg wdt:border wdt:border-gray-200">
-                                <div className="wdt:font-medium wdt:mb-1">
-                                  File Location:
-                                </div>
-                                <div className="wdt:font-mono">
-                                  {log.file} {log.line && `(line ${log.line})`}
-                                </div>
-                              </div>
-                            )}
-
-                            <div className="wdt:text-sm wdt:bg-gray-50 wdt:p-3 wdt:rounded-lg wdt:border wdt:border-gray-200">
-                              <div className="wdt:font-medium wdt:mb-1">
-                                Timestamp:
-                              </div>
-                              <div>{log.timestamp}</div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="wdt:p-8 wdt:text-center wdt:text-gray-500">
-                    No logs match your search criteria. Try adjusting your
-                    filters.
-                  </div>
-                )}
-              </div>
+              <LogTable
+                logs={getFilteredLogs()}
+                expandedLogs={expandedLogs}
+                onToggleExpanded={toggleExpandLog}
+                getLogLevelBgClass={getLogLevelClass}
+              />
               <div ref={logEndRef}></div>{" "}
               {/* Reference for scrolling to expanded log */}
             </>
           ) : (
             <div className="wdt:bg-gray-50 wdt:p-8 wdt:rounded-lg wdt:text-center">
-              <CheckCircle
-                className="wdt:text-green-500 wdt:mb-2"
-                size={30}
-              />
+              <CheckCircle className="wdt:text-green-500 wdt:mb-2" size={30} />
               <p className="wdt:text-gray-700">
                 No log entries found. Your application is running smoothly!
               </p>
@@ -651,10 +338,9 @@ const ErrorLog: React.FC = () => {
           )}
 
           {/* Log entry count */}
-          {parsedLogs.length > 0 && (
+          {entries && entries.length > 0 && (
             <div className="wdt:mt-4 wdt:text-sm wdt:text-gray-500 wdt:text-right">
-              Showing {getFilteredLogs().length} of {parsedLogs.length} log
-              entries
+              Showing {getFilteredLogs().length} of {entries.length} log entries
             </div>
           )}
         </div>
@@ -686,9 +372,7 @@ const ErrorLog: React.FC = () => {
             </div>
             <div className="wdt:bg-blue-50 wdt:p-4 wdt:rounded-lg wdt:border wdt:border-blue-100">
               <div className="wdt:flex wdt:items-start wdt:gap-3">
-                <Info
-                  className="wdt:text-blue-500 wdt:mt-0.5"
-                />
+                <Info className="wdt:text-blue-500 wdt:mt-0.5" />
                 <div>
                   <div className="wdt:font-medium wdt:text-blue-800 wdt:mb-1">
                     PHP Error Levels

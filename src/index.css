@@ -4,6 +4,7 @@
 
 /* WP Dev Toolkit prefix configuration */
 @theme {
+  /* WordPress Admin Colors */
   --color-primary-50: #f0f6fc;
   --color-primary-100: #dbeafe;
   --color-primary-200: #bfdbfe;
@@ -31,6 +32,64 @@
   --color-warning-500: #dba617;
   --color-info-500: #72aee6;
 
+  /* shadcn/ui Color System */
+  --color-background: #ffffff;
+  --color-foreground: #09090b;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #09090b;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #09090b;
+
+  --color-primary: #2271b1;
+  --color-primary-foreground: #f8fafc;
+
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0f172a;
+
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #f8fafc;
+
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #2271b1;
+
+  /* Dark mode colors */
+  --color-background-dark: #0f172a;
+  --color-foreground-dark: #f8fafc;
+
+  --color-card-dark: #1e293b;
+  --color-card-foreground-dark: #f8fafc;
+
+  --color-popover-dark: #1e293b;
+  --color-popover-foreground-dark: #f8fafc;
+
+  --color-primary-dark: #3b82f6;
+  --color-primary-foreground-dark: #f8fafc;
+
+  --color-secondary-dark: #334155;
+  --color-secondary-foreground-dark: #f8fafc;
+
+  --color-muted-dark: #334155;
+  --color-muted-foreground-dark: #94a3b8;
+
+  --color-accent-dark: #334155;
+  --color-accent-foreground-dark: #f8fafc;
+
+  --color-destructive-dark: #ef4444;
+  --color-destructive-foreground-dark: #f8fafc;
+
+  --color-border-dark: #334155;
+  --color-input-dark: #334155;
+  --color-ring-dark: #3b82f6;
+
   --font-family-sans:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Oxygen-Sans",
     Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -45,6 +104,53 @@
 
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
+
+/* shadcn/ui CSS Variables */
+@layer base {
+  :root {
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+    --card: var(--color-card);
+    --card-foreground: var(--color-card-foreground);
+    --popover: var(--color-popover);
+    --popover-foreground: var(--color-popover-foreground);
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-primary-foreground);
+    --secondary: var(--color-secondary);
+    --secondary-foreground: var(--color-secondary-foreground);
+    --muted: var(--color-muted);
+    --muted-foreground: var(--color-muted-foreground);
+    --accent: var(--color-accent);
+    --accent-foreground: var(--color-accent-foreground);
+    --destructive: var(--color-destructive);
+    --destructive-foreground: var(--color-destructive-foreground);
+    --border: var(--color-border);
+    --input: var(--color-input);
+    --ring: var(--color-ring);
+  }
+
+  .dark {
+    --background: var(--color-background-dark);
+    --foreground: var(--color-foreground-dark);
+    --card: var(--color-card-dark);
+    --card-foreground: var(--color-card-foreground-dark);
+    --popover: var(--color-popover-dark);
+    --popover-foreground: var(--color-popover-foreground-dark);
+    --primary: var(--color-primary-dark);
+    --primary-foreground: var(--color-primary-foreground-dark);
+    --secondary: var(--color-secondary-dark);
+    --secondary-foreground: var(--color-secondary-foreground-dark);
+    --muted: var(--color-muted-dark);
+    --muted-foreground: var(--color-muted-foreground-dark);
+    --accent: var(--color-accent-dark);
+    --accent-foreground: var(--color-accent-foreground-dark);
+    --destructive: var(--color-destructive-dark);
+    --destructive-foreground: var(--color-destructive-foreground-dark);
+    --border: var(--color-border-dark);
+    --input: var(--color-input-dark);
+    --ring: var(--color-ring-dark);
+  }
+}
 
 .toplevel_page_wp-dev-toolkit #wpcontent {
   padding-left: 0;
