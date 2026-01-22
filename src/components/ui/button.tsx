@@ -11,15 +11,15 @@ const buttonVariants = cva(
 		variants: {
 			variant: {
 				default:
-          'wdt:bg-primary wdt:text-primary-foreground wdt:hover:bg-primary/90',
+	        'wdt:bg-primary wdt:text-primary-foreground wdt:hover:bg-primary/90',
 				destructive:
-          'wdt:bg-destructive wdt:text-white wdt:hover:bg-destructive/90 wdt:focus-visible:ring-destructive/20 wdt:dark:focus-visible:ring-destructive/40 wdt:dark:bg-destructive/60',
+	        'wdt:bg-destructive wdt:text-white wdt:hover:bg-destructive/90 wdt:focus-visible:ring-destructive/20 wdt:dark:focus-visible:ring-destructive/40 wdt:dark:bg-destructive/60',
 				outline:
-          'wdt:border-border wdt:border wdt:bg-background wdt:shadow-xs wdt:hover:bg-accent wdt:hover:text-accent-foreground wdt:dark:bg-input/30 wdt:dark:border-input wdt:dark:hover:bg-input/50',
+	        'wdt:border-border wdt:border wdt:bg-background wdt:shadow-xs wdt:hover:bg-accent wdt:hover:text-accent-foreground wdt:dark:bg-input/30 wdt:dark:border-input wdt:dark:hover:bg-input/50',
 				secondary:
-          'wdt:bg-secondary wdt:text-secondary-foreground wdt:hover:bg-secondary/80',
+	        'wdt:bg-secondary wdt:text-secondary-foreground wdt:hover:bg-secondary/80',
 				ghost:
-          'wdt:hover:bg-accent wdt:hover:text-accent-foreground wdt:dark:hover:bg-accent/50',
+	        'wdt:hover:bg-accent wdt:hover:text-accent-foreground wdt:dark:hover:bg-accent/50',
 				link: 'wdt:text-primary wdt:underline-offset-4 wdt:hover:underline',
 			},
 			size: {
@@ -45,12 +45,12 @@ function Button( {
 	asChild = false,
 	...props
 }: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & { asChild?: boolean } ) {
+	VariantProps<typeof buttonVariants> & { asChild?: boolean } ) {
 	const Comp = asChild ? Slot : 'button';
 
 	return (
 		<Comp
-			data-slot="button"
+			data-slot='button'
 			data-variant={ variant }
 			data-size={ size }
 			className={ cn( buttonVariants( { variant, size, className } ) ) }

@@ -17,15 +17,15 @@ export function AnimatedListItem( { children }: { children: React.ReactNode } ) 
 	};
 
 	return (
-		<motion.div { ...animations } layout className="wdt:mx-auto wdt:w-full">
+		<motion.div { ...animations } layout className='wdt:mx-auto wdt:w-full'>
 			{ children }
 		</motion.div>
 	);
 }
 
 export interface AnimatedListProps extends ComponentPropsWithoutRef<'div'> {
-  children: React.ReactNode
-  delay?: number
+	children: React.ReactNode
+	delay?: number
 }
 
 export const AnimatedList = React.memo(

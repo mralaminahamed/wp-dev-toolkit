@@ -4,23 +4,23 @@ import { RefObject, useEffect, useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface AnimatedBeamProps {
-  className?: string;
-  containerRef: RefObject<HTMLElement | null>; // Container ref
-  fromRef: RefObject<HTMLElement | null>;
-  toRef: RefObject<HTMLElement | null>;
-  curvature?: number;
-  reverse?: boolean;
-  pathColor?: string;
-  pathWidth?: number;
-  pathOpacity?: number;
-  gradientStartColor?: string;
-  gradientStopColor?: string;
-  delay?: number;
-  duration?: number;
-  startXOffset?: number;
-  startYOffset?: number;
-  endXOffset?: number;
-  endYOffset?: number;
+	className?: string;
+	containerRef: RefObject<HTMLElement | null>; // Container ref
+	fromRef: RefObject<HTMLElement | null>;
+	toRef: RefObject<HTMLElement | null>;
+	curvature?: number;
+	reverse?: boolean;
+	pathColor?: string;
+	pathWidth?: number;
+	pathOpacity?: number;
+	gradientStartColor?: string;
+	gradientStopColor?: string;
+	delay?: number;
+	duration?: number;
+	startXOffset?: number;
+	startYOffset?: number;
+	endXOffset?: number;
+	endYOffset?: number;
 }
 
 export const AnimatedBeam: React.FC<AnimatedBeamProps> = ( {
@@ -73,13 +73,13 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ( {
 				setSvgDimensions( { width: svgWidth, height: svgHeight } );
 
 				const startX =
-          rectA.left - containerRect.left + rectA.width / 2 + startXOffset;
+	        rectA.left - containerRect.left + rectA.width / 2 + startXOffset;
 				const startY =
-          rectA.top - containerRect.top + rectA.height / 2 + startYOffset;
+	        rectA.top - containerRect.top + rectA.height / 2 + startYOffset;
 				const endX =
-          rectB.left - containerRect.left + rectB.width / 2 + endXOffset;
+	        rectB.left - containerRect.left + rectB.width / 2 + endXOffset;
 				const endY =
-          rectB.top - containerRect.top + rectB.height / 2 + endYOffset;
+	        rectB.top - containerRect.top + rectB.height / 2 + endYOffset;
 
 				const controlY = startY - curvature;
 				const d = `M ${ startX },${ startY } Q ${
@@ -119,10 +119,10 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ( {
 
 	return (
 		<svg
-			fill="none"
+			fill='none'
 			width={ svgDimensions.width }
 			height={ svgDimensions.height }
-			xmlns="http://www.w3.org/2000/svg"
+			xmlns='http://www.w3.org/2000/svg'
 			className={ cn(
 				'wdt:pointer-events-none wdt:absolute wdt:top-0 wdt:left-0 wdt:transform-gpu wdt:stroke-2',
 				className,
@@ -134,18 +134,18 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ( {
 				stroke={ pathColor }
 				strokeWidth={ pathWidth }
 				strokeOpacity={ pathOpacity }
-				strokeLinecap="round"
+				strokeLinecap='round'
 			/>
 			<path
 				d={ pathD }
 				strokeWidth={ pathWidth }
 				stroke={ `url(#${ id })` }
-				strokeOpacity="1"
-				strokeLinecap="round"
+				strokeOpacity='1'
+				strokeLinecap='round'
 			/>
 			<defs>
 				<motion.linearGradient
-					className="wdt:transform-gpu"
+					className='wdt:transform-gpu'
 					id={ id }
 					gradientUnits={ 'userSpaceOnUse' }
 					initial={ {
@@ -168,13 +168,13 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ( {
 						repeatDelay: 0,
 					} }
 				>
-					<stop stopColor={ gradientStartColor } stopOpacity="0"></stop>
+					<stop stopColor={ gradientStartColor } stopOpacity='0'></stop>
 					<stop stopColor={ gradientStartColor }></stop>
-					<stop offset="32.5%" stopColor={ gradientStopColor }></stop>
+					<stop offset='32.5%' stopColor={ gradientStopColor }></stop>
 					<stop
-						offset="100%"
+						offset='100%'
 						stopColor={ gradientStopColor }
-						stopOpacity="0"
+						stopOpacity='0'
 					></stop>
 				</motion.linearGradient>
 			</defs>

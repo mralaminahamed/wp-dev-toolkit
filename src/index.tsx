@@ -8,17 +8,17 @@ import '@/index.css';
 import '@/stores';
 
 declare global {
-  interface Window {
-    wpDevToolkit: {
-      apiUrl: string;
-      nonce: string;
-      version: string;
-      logPath?: string;
-      debugMode?: boolean;
-      pluginUrl?: string;
-    };
-    wpDevToolkitInitialRoute?: string;
-  }
+	interface Window {
+	  wpDevToolkit: {
+	    apiUrl: string;
+	    nonce: string;
+	    version: string;
+	    logPath?: string;
+	    debugMode?: boolean;
+	    pluginUrl?: string;
+	  };
+	  wpDevToolkitInitialRoute?: string;
+	}
 }
 
 domReady( () => {

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 function Card( { className, ...props }: React.ComponentProps<'div'> ) {
 	return (
 		<div
-			data-slot="card"
+			data-slot='card'
 			className={ cn(
 				'wdt:bg-card wdt:text-card-foreground wdt:flex wdt:flex-col wdt:gap-6 wdt:rounded-xl wdt:border-border wdt:border wdt:py-6 wdt:shadow-sm',
 				className,
@@ -18,10 +18,10 @@ function Card( { className, ...props }: React.ComponentProps<'div'> ) {
 function CardHeader( { className, ...props }: React.ComponentProps<'div'> ) {
 	return (
 		<div
-			data-slot="card-header"
+			data-slot='card-header'
 			className={ cn(
 				'wdt:@container/card-header wdt:grid wdt:auto-rows-min wdt:grid-rows-[auto_auto] wdt:items-start wdt:gap-2 wdt:px-6 ' +
-          'wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[.border-b]:pb-6',
+	        'wdt:has-data-[slot=card-action]:grid-cols-[1fr_auto] wdt:[.border-b]:pb-6',
 				className,
 			) }
 			{ ...props }
@@ -32,7 +32,7 @@ function CardHeader( { className, ...props }: React.ComponentProps<'div'> ) {
 function CardTitle( { className, ...props }: React.ComponentProps<'div'> ) {
 	return (
 		<div
-			data-slot="card-title"
+			data-slot='card-title'
 			className={ cn( 'wdt:leading-none wdt:font-semibold', className ) }
 			{ ...props }
 		/>
@@ -42,7 +42,7 @@ function CardTitle( { className, ...props }: React.ComponentProps<'div'> ) {
 function CardDescription( { className, ...props }: React.ComponentProps<'div'> ) {
 	return (
 		<div
-			data-slot="card-description"
+			data-slot='card-description'
 			className={ cn( 'wdt:text-muted-foreground wdt:text-sm', className ) }
 			{ ...props }
 		/>
@@ -52,7 +52,7 @@ function CardDescription( { className, ...props }: React.ComponentProps<'div'> )
 function CardAction( { className, ...props }: React.ComponentProps<'div'> ) {
 	return (
 		<div
-			data-slot="card-action"
+			data-slot='card-action'
 			className={ cn(
 				'wdt:col-start-2 wdt:row-span-2 wdt:row-start-1 wdt:self-start wdt:justify-self-end',
 				className,
@@ -65,7 +65,7 @@ function CardAction( { className, ...props }: React.ComponentProps<'div'> ) {
 function CardContent( { className, ...props }: React.ComponentProps<'div'> ) {
 	return (
 		<div
-			data-slot="card-content"
+			data-slot='card-content'
 			className={ cn( 'wdt:px-6', className ) }
 			{ ...props }
 		/>
@@ -75,7 +75,7 @@ function CardContent( { className, ...props }: React.ComponentProps<'div'> ) {
 function CardFooter( { className, ...props }: React.ComponentProps<'div'> ) {
 	return (
 		<div
-			data-slot="card-footer"
+			data-slot='card-footer'
 			className={ cn(
 				'wdt:flex wdt:items-center wdt:px-6 wdt:[.border-t]:pt-6',
 				className,

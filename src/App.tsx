@@ -15,17 +15,17 @@ import Terminal from '@/pages/Terminal';
 
 // Extend Window interface to include our global object
 declare global {
-  interface Window {
-    wpDevToolkit: {
-      apiUrl: string;
-      nonce: string;
-      version: string;
-      logPath?: string;
-      debugMode?: boolean;
-      pluginUrl?: string;
-    };
-    wpDevToolkitInitialRoute?: string;
-  }
+	interface Window {
+	  wpDevToolkit: {
+	    apiUrl: string;
+	    nonce: string;
+	    version: string;
+	    logPath?: string;
+	    debugMode?: boolean;
+	    pluginUrl?: string;
+	  };
+	  wpDevToolkitInitialRoute?: string;
+	}
 }
 
 const App: React.FC = () => {
