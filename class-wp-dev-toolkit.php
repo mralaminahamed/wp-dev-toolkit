@@ -157,13 +157,12 @@ class WP_Dev_Toolkit {
 	 * @return void
 	 */
 	private function setup_components() {
-		$this->config            = new WPDevToolkit\Admin\Config();
-		$this->tool_factory      = new WPDevToolkit\Tools\Factory();
-		$this->menu              = new WPDevToolkit\Admin\Menu();
-		$this->controller_loader = new WPDevToolkit\REST\ControllerLoader();
-		$this->assets            = new WPDevToolkit\Admin\Assets();
+		$this->config       = new WPDevToolkit\Admin\Config();
+		$this->tool_factory = new WPDevToolkit\Tools\Factory();
+		$this->menu         = new WPDevToolkit\Admin\Menu();
+		$this->assets       = new WPDevToolkit\Admin\Assets();
 
-		// Components are initialized via constructor
+		// Controller loader is initialized during rest_api_init to ensure WP_REST_Controller is available
 	}
 
 	/**
@@ -229,6 +228,11 @@ class WP_Dev_Toolkit {
 	public function register_rest_routes() {
 		if ( ! $this->check_dependencies() ) {
 			return;
+		}
+
+		// Initialize controller loader only when REST API is ready
+		if ( ! $this->controller_loader ) {
+			$this->controller_loader = new WPDevToolkit\Rest\ControllerLoader();
 		}
 
 		// Register core settings routes

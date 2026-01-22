@@ -1,14 +1,14 @@
 <?php
 
-namespace WPDevToolkit\REST\Controllers;
+namespace WPDevToolkit\Rest\Controllers;
 
 use WPDevToolkit\Admin\Config;
-use WPDevToolkit\REST\Base;
+use WPDevToolkit\Rest\Base;
 
 /**
  * Settings REST API Controller
  *
- * @package WPDevToolkit\REST\Controllers
+ * @package WPDevToolkit\Rest\Controllers
  */
 class Settings extends Base {
 	/**

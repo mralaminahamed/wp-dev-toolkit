@@ -1,13 +1,11 @@
 <?php
 
-namespace WPDevToolkit\REST;
-
-use WP_REST_Controller;
+namespace WPDevToolkit\Rest;
 
 /**
  * Base class for REST API controllers
  *
- * @package WPDevToolkit\REST
+ * @package WPDevToolkit\Rest
  */
 abstract class Base extends WP_REST_Controller {
 	/**

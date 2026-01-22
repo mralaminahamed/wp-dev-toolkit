@@ -1,13 +1,13 @@
 <?php
 
-namespace WPDevToolkit\REST\Controllers;
+namespace WPDevToolkit\Rest\Controllers;
 
-use WPDevToolkit\REST\Base;
+use WPDevToolkit\Rest\Base;
 
 /**
  * Hook Inspector REST API Controller
  *
- * @package WPDevToolkit\REST\Controllers
+ * @package WPDevToolkit\Rest\Controllers
  */
 class HookInspector extends Base {
 	/**
